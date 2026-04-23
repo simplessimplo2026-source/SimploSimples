@@ -191,19 +191,48 @@
   @media (max-width: 768px) {
     .app { flex-direction: column; }
     .sidebar { display: none; }
-    .main { flex: 1; padding-bottom: 64px; }
-    .topbar { padding: 10px 16px; }
+    .main { flex: 1; padding-bottom: 72px; }
+    .topbar { padding: 12px 18px; border-bottom: 1px solid var(--gray-border); }
     .topbar .btn-secondary { display: none; }
-    .page-title { font-size: 15px; }
-    .content { padding: 14px 16px; }
-    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .topbar .btn-primary { display: none; }
+    .page-title { font-size: 17px; font-weight: 700; }
+    .content { padding: 16px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-card { padding: 12px 14px; border-radius: 14px; }
+    .stat-val { font-size: 32px; }
     .disc-grid { grid-template-columns: 1fr; }
     .form-row { grid-template-columns: 1fr; }
-    .modal { border-radius: 16px 16px 0 0; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 100%; max-height: 90vh; margin: 0; }
+    .event-card { padding: 14px 16px; border-radius: 14px; border-left-width: 4px; }
+    .event-day { font-size: 24px; }
+    .event-name { font-size: 15px; }
+    .filters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn { white-space: nowrap; flex-shrink: 0; padding: 6px 14px; font-size: 13px; }
+    .import-card { padding: 16px; border-radius: 14px; }
+    .urgency-banner { border-radius: 14px; }
+
+    /* Modal bottom sheet */
     .modal-overlay { align-items: flex-end; }
+    .modal {
+      border-radius: 20px 20px 0 0;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      width: 100%; max-width: 100%;
+      max-height: 92vh;
+      margin: 0;
+      padding: 8px 24px 32px;
+    }
+    .modal::before {
+      content: '';
+      display: block;
+      width: 36px; height: 4px;
+      background: var(--gray-border);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
 
     /* Bottom Nav */
     .bottom-nav { display: flex; }
+    .bottom-nav-item span:last-child { display: block; }
   }
 
   .bottom-nav {
@@ -211,30 +240,34 @@
     position: fixed;
     bottom: 0; left: 0; right: 0;
     background: var(--surface);
-    border-top: 1px solid var(--gray-border);
+    border-top: 0.5px solid var(--gray-border);
     z-index: 200;
-    padding: 6px 0 8px;
+    padding: 8px 0 20px;
     justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
   }
   .bottom-nav-item {
     display: flex; flex-direction: column; align-items: center;
-    gap: 2px; cursor: pointer; padding: 4px 10px;
+    gap: 3px; cursor: pointer; padding: 4px 12px;
     color: var(--text-muted); font-size: 10px; font-weight: 500;
-    border-radius: var(--radius-sm); transition: color 0.12s;
-    min-width: 52px;
+    min-width: 56px; transition: color 0.15s;
   }
   .bottom-nav-item.active { color: var(--blue); }
-  .bottom-nav-item .bnav-icon { font-size: 20px; }
+  .bottom-nav-item .bnav-icon { font-size: 22px; line-height: 1; }
   .bottom-nav-fab {
     display: flex; flex-direction: column; align-items: center;
-    gap: 2px; cursor: pointer; padding: 4px 10px;
+    cursor: pointer; margin-top: -18px;
   }
   .bottom-nav-fab .bnav-fab-btn {
-    width: 44px; height: 44px; background: var(--blue); border-radius: 50%;
+    width: 52px; height: 52px; background: var(--blue); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 22px; margin-top: -14px;
-    box-shadow: 0 4px 12px rgba(24,95,165,0.4);
+    color: white; font-size: 26px;
+    box-shadow: 0 4px 16px rgba(24,95,165,0.45);
+    transition: transform 0.15s, box-shadow 0.15s;
   }
+  .bottom-nav-fab .bnav-fab-btn:active { transform: scale(0.94); box-shadow: 0 2px 8px rgba(24,95,165,0.3); }
+  .bottom-nav-fab-label { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-top: 3px; }
 </style>
 </head>
 <body>
@@ -750,17 +783,24 @@ function renderResumo() {
       ${urgentes.map(e=>`<div class="urgency-item"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0"></span> ${e.nome} — ${getDaysLeft(e.data)===0?'HOJE':'amanhã'}${e.hora?' às '+e.hora:''}</div>`).join('')}
     </div>`:'';
 
+  const hora = new Date().getHours();
+  const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+
   return `
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-label">Próximas provas</div><div class="stat-val" style="color:var(--red)">${provas}</div><div class="stat-desc">pendentes</div></div>
-      <div class="stat-card"><div class="stat-label">Trabalhos</div><div class="stat-val" style="color:var(--blue)">${trabalhos}</div><div class="stat-desc">a entregar</div></div>
-      <div class="stat-card"><div class="stat-label">Total pendente</div><div class="stat-val">${pendentes.length}</div><div class="stat-desc">eventos</div></div>
-      <div class="stat-card"><div class="stat-label">Concluídos</div><div class="stat-val" style="color:var(--green)">${concluidos}</div><div class="stat-desc">feitos ✓</div></div>
+    <div style="margin-bottom:18px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:13px;color:var(--text-muted)">${saudacao} 👋</div>
+        <div style="font-size:20px;font-weight:700;font-family:'DM Serif Display',serif;margin-top:1px">
+          ${pendentes.length === 0 ? 'Tudo em dia!' : pendentes.length + ' evento' + (pendentes.length!==1?'s':'')+' pendente'+(pendentes.length!==1?'s':'')}
+        </div>
+      </div>
+      <button onclick="openImportModal()" style="background:var(--blue-light);border:none;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer">📎 Importar</button>
     </div>
-    <div class="import-card" onclick="openImportModal()">
-      <span style="font-size:22px">📎</span>
-      <div><div style="font-size:13px;font-weight:500;color:var(--text-mid)">Importar cronograma</div><div style="font-size:11px;color:var(--text-muted)">Cole o texto do cronograma — o app identifica as datas automaticamente</div></div>
-      <button class="btn btn-secondary btn-sm" style="margin-left:auto">Importar</button>
+    <div class="stats-row">
+      <div class="stat-card" style="border-radius:14px"><div class="stat-label">Provas</div><div class="stat-val" style="color:var(--red)">${provas}</div><div class="stat-desc">pendentes</div></div>
+      <div class="stat-card" style="border-radius:14px"><div class="stat-label">Trabalhos</div><div class="stat-val" style="color:var(--blue)">${trabalhos}</div><div class="stat-desc">a entregar</div></div>
+      <div class="stat-card" style="border-radius:14px"><div class="stat-label">Pendentes</div><div class="stat-val">${pendentes.length}</div><div class="stat-desc">no total</div></div>
+      <div class="stat-card" style="border-radius:14px"><div class="stat-label">Concluídos</div><div class="stat-val" style="color:var(--green)">${concluidos}</div><div class="stat-desc">feitos ✓</div></div>
     </div>
     ${urgBanner}
     <div class="section-head"><span class="section-label">Próximos eventos</span><button class="btn btn-ghost btn-sm" onclick="showPage('eventos','todos')">Ver todos →</button></div>
