@@ -484,20 +484,29 @@ async function logout() {
 }
 
 // ============ INIT ============
+function isRealUser(user) {
+  // Rejeita sessões anônimas ou sem email confirmado
+  return user && user.email && user.aud === 'authenticated' && !user.is_anonymous;
+}
+
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   document.getElementById('loading-screen').style.display = 'none';
-  if (session) {
+
+  if (session && isRealUser(session.user)) {
     await startApp(session.user);
   } else {
+    // Garante logout de sessões anônimas
+    if (session) await sb.auth.signOut();
     document.getElementById('auth-screen').style.display = 'flex';
   }
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
+    if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && isRealUser(session.user)) {
       document.getElementById('auth-screen').style.display = 'none';
       await startApp(session.user);
     } else if (event === 'SIGNED_OUT') {
+      disciplinas = []; eventos = [];
       document.getElementById('app-screen').style.display = 'none';
       document.getElementById('auth-screen').style.display = 'flex';
     }
