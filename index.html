@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#185FA5">
 <title>Agenda Acadêmica</title>
-<link rel="manifest" href="data:application/json,{%22name%22:%22Agenda%20Acadêmica%22,%22short_name%22:%22Agenda%22,%22display%22:%22standalone%22,%22background_color%22:%22%23ffffff%22,%22theme_color%22:%22%23185FA5%22}">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
 
@@ -24,6 +24,18 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
 
+  /* Auth */
+  .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+  .auth-card { background: var(--surface); border-radius: 16px; padding: 36px; width: 380px; box-shadow: var(--shadow); }
+  .auth-logo { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--blue); margin-bottom: 4px; }
+  .auth-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+  .auth-tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid var(--gray-border); }
+  .auth-tab { flex: 1; padding: 8px; text-align: center; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .auth-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .auth-msg { font-size: 12px; padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 14px; display: none; }
+  .auth-msg.error { background: var(--red-light); color: var(--red-dark); display: block; }
+  .auth-msg.success { background: var(--green-light); color: var(--green-dark); display: block; }
+
   /* Layout */
   .app { display: flex; height: 100vh; overflow: hidden; }
   .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--gray-border); display: flex; flex-direction: column; flex-shrink: 0; }
@@ -40,7 +52,8 @@
   .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 500; border-left-color: var(--blue); }
   .nav-icon { font-size: 15px; width: 18px; text-align: center; }
   .nav-badge { margin-left: auto; background: var(--red-light); color: var(--red-dark); font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 10px; }
-  .sidebar-footer { padding: 14px 18px; border-top: 1px solid var(--gray-border); font-size: 11px; color: var(--text-muted); }
+  .sidebar-footer { padding: 14px 18px; border-top: 1px solid var(--gray-border); }
+  .user-email { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* Topbar */
   .topbar { background: var(--surface); border-bottom: 1px solid var(--gray-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
@@ -62,40 +75,36 @@
   /* Content */
   .content { flex: 1; overflow-y: auto; padding: 20px 24px; }
 
-  /* Cards de stats */
+  /* Stats */
   .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
   .stat-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; }
   .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 500; }
   .stat-val { font-size: 28px; font-weight: 300; margin-top: 4px; font-family: 'DM Serif Display', serif; }
   .stat-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-  /* Import banner */
+  /* Import */
   .import-card { background: var(--surface); border: 1.5px dashed var(--gray-border); border-radius: var(--radius); padding: 14px 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 20px; transition: border-color 0.15s; }
   .import-card:hover { border-color: var(--blue-mid); }
-  .import-icon { font-size: 22px; }
-  .import-text { font-size: 13px; font-weight: 500; color: var(--text-mid); }
-  .import-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-  .import-input { display: none; }
 
   /* Urgência */
   .urgency-banner { background: var(--red-light); border: 1px solid #f7c1c1; border-radius: var(--radius); padding: 12px 16px; margin-bottom: 20px; }
-  .urgency-title { font-size: 11px; font-weight: 600; color: var(--red-dark); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  .urgency-title { font-size: 11px; font-weight: 600; color: var(--red-dark); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
   .urgency-item { font-size: 13px; color: #791F1F; display: flex; align-items: center; gap: 8px; padding: 2px 0; }
 
-  /* Section header */
+  /* Section */
   .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .section-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
   /* Filtros */
   .filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
   .filter-btn { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-border); background: var(--surface); color: var(--text-mid); transition: all 0.12s; }
-  .filter-btn:hover, .filter-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+  .filter-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
   .filter-btn.f-prova.active { background: var(--red); border-color: var(--red); }
   .filter-btn.f-trabalho.active { background: var(--blue); border-color: var(--blue); }
   .filter-btn.f-apresentacao.active { background: var(--green); border-color: var(--green); }
   .filter-btn.f-outro.active { background: var(--amber); border-color: var(--amber); }
 
-  /* Event list */
+  /* Events */
   .event-list { display: flex; flex-direction: column; gap: 8px; }
   .event-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: box-shadow 0.12s; border-left: 3px solid transparent; }
   .event-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.09); }
@@ -106,7 +115,7 @@
   .event-card.concluido { opacity: 0.5; }
   .event-date-box { text-align: center; min-width: 38px; }
   .event-day { font-size: 20px; font-weight: 600; font-family: 'DM Serif Display', serif; line-height: 1; }
-  .event-month { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 500; letter-spacing: 0.3px; }
+  .event-month { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
   .event-info { flex: 1; }
   .event-name { font-size: 14px; font-weight: 500; color: var(--text); }
   .event-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
@@ -125,12 +134,17 @@
   .days-ok { background: var(--green-light); color: var(--green-dark); }
   .days-passado { background: var(--gray-light); color: var(--gray); }
 
-  /* Empty state */
+  /* Empty */
   .empty { text-align: center; padding: 50px 20px; color: var(--text-muted); }
   .empty-icon { font-size: 40px; margin-bottom: 12px; }
   .empty-title { font-size: 15px; font-weight: 500; color: var(--text-mid); margin-bottom: 6px; }
 
-  /* Modal overlay */
+  /* Loading */
+  .loading-screen { display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; gap: 12px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid var(--gray-border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Modal */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border-radius: 14px; padding: 24px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
@@ -144,22 +158,15 @@
   .form-textarea { resize: vertical; min-height: 80px; }
   .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-border); }
 
-  /* Import modal específico */
-  .import-area { border: 2px dashed var(--gray-border); border-radius: var(--radius); padding: 30px; text-align: center; cursor: pointer; transition: border-color 0.15s; margin-bottom: 16px; }
-  .import-area:hover, .import-area.dragover { border-color: var(--blue); background: var(--blue-light); }
-  .import-area-icon { font-size: 36px; margin-bottom: 10px; }
-  .import-area-text { font-size: 14px; font-weight: 500; color: var(--text-mid); }
-  .import-area-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-  .import-preview { background: var(--surface2); border-radius: var(--radius-sm); border: 1px solid var(--gray-border); padding: 12px; margin-bottom: 16px; font-size: 12px; color: var(--text-mid); max-height: 150px; overflow-y: auto; white-space: pre-wrap; }
-  .import-events-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  /* Import modal */
+  .import-area { border: 2px dashed var(--gray-border); border-radius: var(--radius); padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.15s; margin-bottom: 16px; }
+  .import-area:hover { border-color: var(--blue); background: var(--blue-light); }
+  .import-events-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; max-height: 280px; overflow-y: auto; }
   .import-event-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-sm); border: 1px solid var(--gray-border); }
   .import-event-item input[type="checkbox"] { accent-color: var(--blue); width: 15px; height: 15px; flex-shrink: 0; }
   .import-event-item .evt-info { flex: 1; font-size: 12px; }
   .import-event-item .evt-name { font-weight: 500; color: var(--text); }
   .import-event-item .evt-sub { color: var(--text-muted); }
-  .loading-dots { display: inline-block; }
-  .loading-dots::after { content: ''; animation: dots 1.2s steps(4,end) infinite; }
-  @keyframes dots { 0%,20%{content:'.'} 40%{content:'..'} 60%,80%{content:'...'} 100%{content:''} }
 
   /* Calendário */
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -179,21 +186,52 @@
   .disc-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
   .disc-prof { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
   .disc-stats { display: flex; gap: 10px; }
-  .disc-stat { font-size: 12px; color: var(--text-mid); }
 
-  /* Responsive */
   @media (max-width: 768px) {
     .sidebar { width: 56px; }
-    .app-name, .app-sub, .nav-section, .nav-item span:not(.nav-icon), .sidebar-footer, .nav-badge { display: none; }
+    .app-name, .app-sub, .nav-section, .nav-item span:not(.nav-icon), .sidebar-footer .user-email, .nav-badge { display: none; }
     .nav-item { padding: 10px; justify-content: center; }
     .stats-row { grid-template-columns: repeat(2, 1fr); }
     .disc-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
-<div class="app">
-  <!-- Sidebar -->
+
+<!-- Loading -->
+<div id="loading-screen" class="loading-screen">
+  <div class="spinner"></div>
+  <div style="font-size:13px;color:var(--text-muted)">Carregando...</div>
+</div>
+
+<!-- Auth -->
+<div id="auth-screen" class="auth-wrap" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">Agenda</div>
+    <div class="auth-sub">Organize sua vida acadêmica</div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('login')">Entrar</div>
+      <div class="auth-tab" onclick="switchTab('register')">Criar conta</div>
+    </div>
+    <div id="auth-msg" class="auth-msg"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="auth-email" placeholder="seu@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Senha</label>
+      <input type="password" class="form-input" id="auth-password" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')authSubmit()">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px" onclick="authSubmit()" id="auth-btn">Entrar</button>
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text-muted)" id="forgot-wrap">
+      <span style="cursor:pointer;color:var(--blue)" onclick="forgotPassword()">Esqueci minha senha</span>
+    </div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app-screen" class="app" style="display:none">
   <div class="sidebar">
     <div class="sidebar-header">
       <div class="app-name">Agenda</div>
@@ -201,36 +239,21 @@
     </div>
     <nav class="nav">
       <div class="nav-section">Principal</div>
-      <div class="nav-item active" onclick="showPage('resumo')">
-        <span class="nav-icon">📋</span><span>Resumo</span>
-      </div>
-      <div class="nav-item" onclick="showPage('calendario')">
-        <span class="nav-icon">📅</span><span>Calendário</span>
-      </div>
+      <div class="nav-item active" onclick="showPage('resumo')"><span class="nav-icon">📋</span><span>Resumo</span></div>
+      <div class="nav-item" onclick="showPage('calendario')"><span class="nav-icon">📅</span><span>Calendário</span></div>
       <div class="nav-section">Eventos</div>
-      <div class="nav-item" onclick="showPage('eventos', 'todos')">
-        <span class="nav-icon">📚</span><span>Todos</span>
-        <span class="nav-badge" id="badge-todos">0</span>
-      </div>
-      <div class="nav-item" onclick="showPage('eventos', 'prova')">
-        <span class="nav-icon">📝</span><span>Provas</span>
-        <span class="nav-badge" id="badge-prova">0</span>
-      </div>
-      <div class="nav-item" onclick="showPage('eventos', 'trabalho')">
-        <span class="nav-icon">📂</span><span>Trabalhos</span>
-      </div>
-      <div class="nav-item" onclick="showPage('eventos', 'apresentacao')">
-        <span class="nav-icon">🎤</span><span>Apresentações</span>
-      </div>
+      <div class="nav-item" onclick="showPage('eventos','todos')"><span class="nav-icon">📚</span><span>Todos</span><span class="nav-badge" id="badge-todos">0</span></div>
+      <div class="nav-item" onclick="showPage('eventos','prova')"><span class="nav-icon">📝</span><span>Provas</span><span class="nav-badge" id="badge-prova">0</span></div>
+      <div class="nav-item" onclick="showPage('eventos','trabalho')"><span class="nav-icon">📂</span><span>Trabalhos</span></div>
+      <div class="nav-item" onclick="showPage('eventos','apresentacao')"><span class="nav-icon">🎤</span><span>Apresentações</span></div>
       <div class="nav-section">Configurações</div>
-      <div class="nav-item" onclick="showPage('disciplinas')">
-        <span class="nav-icon">🏫</span><span>Disciplinas</span>
-      </div>
+      <div class="nav-item" onclick="showPage('disciplinas')"><span class="nav-icon">🏫</span><span>Disciplinas</span></div>
     </nav>
-    <div class="sidebar-footer">Psicologia · 4° sem</div>
+    <div class="sidebar-footer">
+      <div class="user-email" id="user-email"></div>
+      <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center" onclick="logout()">Sair</button>
+    </div>
   </div>
-
-  <!-- Main -->
   <div class="main">
     <div class="topbar">
       <div class="page-title" id="page-title">Resumo</div>
@@ -243,7 +266,7 @@
   </div>
 </div>
 
-<!-- Modal: Novo/Editar Evento -->
+<!-- Modal: Evento -->
 <div class="modal-overlay" id="eventModal">
   <div class="modal">
     <div class="modal-title">
@@ -272,9 +295,7 @@
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Disciplina</label>
-        <select class="form-input" id="evt-disciplina">
-          <option value="">Selecionar...</option>
-        </select>
+        <select class="form-input" id="evt-disciplina"></select>
       </div>
       <div class="form-group">
         <label class="form-label">Horário (opcional)</label>
@@ -299,48 +320,36 @@
   </div>
 </div>
 
-<!-- Modal: Importar Cronograma -->
+<!-- Modal: Importar -->
 <div class="modal-overlay" id="importModal">
   <div class="modal">
     <div class="modal-title">
-      <span>Importar cronograma com IA</span>
+      <span>Importar cronograma</span>
       <button class="modal-close" onclick="closeImportModal()">✕</button>
     </div>
     <div id="import-step-1">
-      <div class="import-area" id="import-area" onclick="document.getElementById('import-file').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
-        <div class="import-area-icon">📎</div>
-        <div class="import-area-text">Clique ou arraste o arquivo aqui</div>
-        <div class="import-area-sub">PDF ou imagem (foto do quadro, slide)</div>
+      <div style="background:var(--blue-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blue)">
+        💡 Cole o texto do cronograma abaixo. O app vai tentar identificar automaticamente as datas e eventos.
       </div>
-      <input type="file" id="import-file" accept=".pdf,image/*" style="display:none" onchange="handleFileSelect(event)">
-      <div style="margin-bottom:12px">
-        <label class="form-label">Ou cole o texto do cronograma</label>
-        <textarea class="form-input form-textarea" id="import-text" placeholder="Cole aqui o texto com as datas e eventos..."></textarea>
+      <div class="form-group">
+        <label class="form-label">Texto do cronograma</label>
+        <textarea class="form-input form-textarea" id="import-text" style="min-height:140px" placeholder="Ex:&#10;Prova AV1 - Psicopatologia - 15/05&#10;Entrega trabalho - Velhice - 20/05 &#10;Apresentação Psicanálise - 28/05"></textarea>
       </div>
       <div class="form-actions">
         <button class="btn btn-secondary" onclick="closeImportModal()">Cancelar</button>
-        <button class="btn btn-primary" onclick="processImport()">Analisar com IA ✨</button>
+        <button class="btn btn-primary" onclick="processImport()">Analisar texto →</button>
       </div>
     </div>
     <div id="import-step-2" style="display:none">
-      <div id="import-loading" style="text-align:center;padding:24px 0">
-        <div style="font-size:30px;margin-bottom:10px">🤖</div>
-        <div style="font-weight:500;margin-bottom:4px">Analisando cronograma<span class="loading-dots"></span></div>
-        <div style="font-size:12px;color:var(--text-muted)">A IA está identificando datas e eventos</div>
+      <div style="font-size:13px;color:var(--text-mid);margin-bottom:10px;font-weight:500">Eventos encontrados — selecione quais importar:</div>
+      <div class="import-events-list" id="import-events-list"></div>
+      <div class="form-group">
+        <label class="form-label">Disciplina padrão (para eventos sem disciplina)</label>
+        <select class="form-input" id="import-disciplina-default"></select>
       </div>
-      <div id="import-results" style="display:none">
-        <div style="font-size:13px;color:var(--text-mid);margin-bottom:10px;font-weight:500">Eventos encontrados — selecione quais importar:</div>
-        <div class="import-events-list" id="import-events-list"></div>
-        <div class="form-group">
-          <label class="form-label">Disciplina padrão (para eventos sem disciplina)</label>
-          <select class="form-input" id="import-disciplina-default">
-            <option value="">Nenhuma</option>
-          </select>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-secondary" onclick="backImport()">← Voltar</button>
-          <button class="btn btn-primary" onclick="confirmImport()">Importar selecionados</button>
-        </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="backImport()">← Voltar</button>
+        <button class="btn btn-primary" onclick="confirmImport()">Importar selecionados</button>
       </div>
     </div>
     <div id="import-step-3" style="display:none;text-align:center;padding:20px 0">
@@ -352,7 +361,7 @@
   </div>
 </div>
 
-<!-- Modal: Disciplinas -->
+<!-- Modal: Disciplina -->
 <div class="modal-overlay" id="discModal">
   <div class="modal">
     <div class="modal-title">
@@ -387,17 +396,15 @@
 </div>
 
 <script>
-// ============ STATE ============
-let state = JSON.parse(localStorage.getItem('agenda_state') || 'null') || {
-  eventos: [],
-  disciplinas: [
-    { id: uid(), nome: 'Psicopatologia Infantojuvenil', prof: 'Profa. Ana Paula Garcia Dellagiustina', cor: '#E24B4A' },
-    { id: uid(), nome: 'Psicologia da Velhice', prof: 'Prof. Marluci Camila Gomes', cor: '#185FA5' },
-    { id: uid(), nome: 'Avaliação Psicológica Infantojuvenil', prof: 'Profa. Nathalia Piacentini', cor: '#1D9E75' },
-    { id: uid(), nome: 'Psicanálise', prof: '', cor: '#7F77DD' }
-  ]
-};
+// ============ SUPABASE ============
+const SUPABASE_URL = 'https://ptafkfqtoatawdvucjla.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0YWZrZnF0b2F0YXdkdnVjamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDkxODEsImV4cCI6MjA5MjUyNTE4MX0.PZvca1-IeK6rWCZFV3Ol9GM-3mQXc7186XaiIC5lnvM';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ============ STATE ============
+let currentUser = null;
+let disciplinas = [];
+let eventos = [];
 let currentPage = 'resumo';
 let currentFilter = 'todos';
 let editingEventId = null;
@@ -405,28 +412,158 @@ let editingDiscId = null;
 let calendarDate = new Date();
 let importedEvents = [];
 
-function uid() { return Math.random().toString(36).substr(2,9); }
-function save() { localStorage.setItem('agenda_state', JSON.stringify(state)); }
+// ============ AUTH ============
+let authMode = 'login';
+
+function switchTab(mode) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&mode==='login')||(i===1&&mode==='register')));
+  document.getElementById('auth-btn').textContent = mode === 'login' ? 'Entrar' : 'Criar conta';
+  document.getElementById('forgot-wrap').style.display = mode === 'login' ? 'block' : 'none';
+  clearAuthMsg();
+}
+
+function showAuthMsg(msg, type) {
+  const el = document.getElementById('auth-msg');
+  el.textContent = msg;
+  el.className = 'auth-msg ' + type;
+}
+
+function clearAuthMsg() {
+  const el = document.getElementById('auth-msg');
+  el.className = 'auth-msg';
+  el.textContent = '';
+}
+
+async function authSubmit() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!email || !password) { showAuthMsg('Preencha email e senha!', 'error'); return; }
+  const btn = document.getElementById('auth-btn');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    let result;
+    if (authMode === 'login') {
+      result = await sb.auth.signInWithPassword({ email, password });
+    } else {
+      result = await sb.auth.signUp({ email, password });
+      if (!result.error && result.data.user) {
+        showAuthMsg('Conta criada! Verifique seu email para confirmar.', 'success');
+        btn.textContent = 'Criar conta';
+        btn.disabled = false;
+        return;
+      }
+    }
+    if (result.error) throw result.error;
+  } catch(e) {
+    const msgs = {
+      'Invalid login credentials': 'Email ou senha incorretos.',
+      'Email not confirmed': 'Confirme seu email antes de entrar.',
+      'User already registered': 'Este email já está cadastrado.'
+    };
+    showAuthMsg(msgs[e.message] || e.message, 'error');
+    btn.textContent = authMode === 'login' ? 'Entrar' : 'Criar conta';
+    btn.disabled = false;
+  }
+}
+
+async function forgotPassword() {
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { showAuthMsg('Digite seu email primeiro!', 'error'); return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email);
+  if (error) showAuthMsg(error.message, 'error');
+  else showAuthMsg('Email de recuperação enviado!', 'success');
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  disciplinas = []; eventos = [];
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+// ============ INIT ============
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  document.getElementById('loading-screen').style.display = 'none';
+  if (session) {
+    await startApp(session.user);
+  } else {
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      document.getElementById('auth-screen').style.display = 'none';
+      await startApp(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      document.getElementById('app-screen').style.display = 'none';
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+  });
+}
+
+async function startApp(user) {
+  currentUser = user;
+  document.getElementById('user-email').textContent = user.email;
+  document.getElementById('app-screen').style.display = 'flex';
+  await loadData();
+  updateBadges();
+  render();
+}
+
+// ============ DATA ============
+async function loadData() {
+  const [{ data: discs }, { data: evs }] = await Promise.all([
+    sb.from('disciplinas').select('*').order('nome'),
+    sb.from('eventos').select('*').order('data')
+  ]);
+  disciplinas = discs || [];
+  eventos = evs || [];
+
+  // Se não tem disciplinas, cria as padrão
+  if (disciplinas.length === 0) {
+    const defaults = [
+      { nome: 'Psicopatologia Infantojuvenil', prof: 'Profa. Ana Paula Garcia Dellagiustina', cor: '#E24B4A' },
+      { nome: 'Psicologia da Velhice', prof: 'Prof. Marluci Camila Gomes', cor: '#185FA5' },
+      { nome: 'Avaliação Psicológica Infantojuvenil', prof: 'Profa. Nathalia Piacentini', cor: '#1D9E75' },
+      { nome: 'Psicanálise', prof: '', cor: '#7F77DD' }
+    ];
+    for (const d of defaults) {
+      const { data } = await sb.from('disciplinas').insert({ ...d, user_id: currentUser.id }).select().single();
+      if (data) disciplinas.push(data);
+    }
+  }
+}
+
+async function reloadEventos() {
+  const { data } = await sb.from('eventos').select('*').order('data');
+  eventos = data || [];
+}
+
+async function reloadDisciplinas() {
+  const { data } = await sb.from('disciplinas').select('*').order('nome');
+  disciplinas = data || [];
+}
 
 // ============ NAVIGATION ============
 function showPage(page, filter) {
   currentPage = page;
   if (filter) currentFilter = filter;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const map = { resumo: 0, calendario: 1, todos: 2, prova: 3, trabalho: 4, apresentacao: 5, disciplinas: 6 };
-  const items = document.querySelectorAll('.nav-item');
-  const k = filter || page;
-  const idx = map[k];
-  if (idx !== undefined && items[idx]) items[idx].classList.add('active');
-  const titles = { resumo: 'Resumo', calendario: 'Calendário', todos: 'Todos os eventos', prova: 'Provas', trabalho: 'Trabalhos', apresentacao: 'Apresentações', disciplinas: 'Disciplinas' };
+  const navItems = document.querySelectorAll('.nav-item');
+  const map = { resumo:0, calendario:1, todos:2, prova:3, trabalho:4, apresentacao:5, disciplinas:6 };
+  const idx = map[filter || page];
+  if (idx !== undefined && navItems[idx]) navItems[idx].classList.add('active');
+  const titles = { resumo:'Resumo', calendario:'Calendário', todos:'Todos os eventos', prova:'Provas', trabalho:'Trabalhos', apresentacao:'Apresentações', disciplinas:'Disciplinas' };
   document.getElementById('page-title').textContent = titles[filter || page] || '';
-  updateBadges();
   render();
 }
 
 function updateBadges() {
   const today = new Date(); today.setHours(0,0,0,0);
-  const pendentes = state.eventos.filter(e => !e.concluido && new Date(e.data+'T00:00:00') >= today);
+  const pendentes = eventos.filter(e => !e.concluido && new Date(e.data+'T00:00:00') >= today);
   document.getElementById('badge-todos').textContent = pendentes.length;
   document.getElementById('badge-prova').textContent = pendentes.filter(e => e.tipo === 'prova').length;
 }
@@ -442,8 +579,7 @@ function render() {
 
 function getDaysLeft(dateStr) {
   const today = new Date(); today.setHours(0,0,0,0);
-  const d = new Date(dateStr + 'T00:00:00');
-  return Math.round((d - today) / 86400000);
+  return Math.round((new Date(dateStr+'T00:00:00') - today) / 86400000);
 }
 
 function daysLeftBadge(dl) {
@@ -455,59 +591,52 @@ function daysLeftBadge(dl) {
   return `<span class="days-left days-ok">${dl} dias</span>`;
 }
 
-function fmtDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
-}
-
-function getDisc(id) { return state.disciplinas.find(d => d.id === id) || null; }
+function labelTipo(t) { return {prova:'Prova',trabalho:'Trabalho',apresentacao:'Apresentação',outro:'Outro'}[t]||t; }
+function getDisc(id) { return disciplinas.find(d => d.id === id) || null; }
 
 function eventCardHTML(ev) {
-  const d = new Date(ev.data + 'T00:00:00');
+  const d = new Date(ev.data+'T00:00:00');
   const day = d.getDate();
-  const month = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.','');
+  const month = d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
   const dl = getDaysLeft(ev.data);
-  const disc = getDisc(ev.disciplinaId);
-  const concClass = ev.concluido ? ' concluido' : '';
+  const disc = getDisc(ev.disciplina_id);
   return `
-  <div class="event-card tipo-${ev.tipo}${concClass}" onclick="openEventModal('${ev.id}')">
+  <div class="event-card tipo-${ev.tipo}${ev.concluido?' concluido':''}" onclick="openEventModal('${ev.id}')">
     <div class="event-date-box">
       <div class="event-day">${day}</div>
       <div class="event-month">${month}</div>
     </div>
     <div class="event-info">
-      <div class="event-name">${ev.concluido ? '✓ ' : ''}${ev.nome}</div>
+      <div class="event-name">${ev.concluido?'✓ ':''}${ev.nome}</div>
       <div class="event-meta">
         <span class="badge badge-${ev.tipo}">${labelTipo(ev.tipo)}</span>
-        ${disc ? `<span class="event-disc">${disc.nome}</span>` : ''}
-        ${ev.hora ? `<span class="event-disc">🕐 ${ev.hora}</span>` : ''}
-        ${!ev.concluido ? daysLeftBadge(dl) : ''}
+        ${disc?`<span class="event-disc">${disc.nome}</span>`:''}
+        ${ev.hora?`<span class="event-disc">🕐 ${ev.hora}</span>`:''}
+        ${!ev.concluido?daysLeftBadge(dl):''}
       </div>
-      ${ev.notas ? `<div class="event-nota">📝 ${ev.notas}</div>` : ''}
+      ${ev.notas?`<div class="event-nota">📝 ${ev.notas}</div>`:''}
     </div>
     <div class="event-actions">
-      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleConcluido('${ev.id}')">${ev.concluido ? '↩' : '✓'}</button>
+      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleConcluido('${ev.id}',${ev.concluido})">${ev.concluido?'↩':'✓'}</button>
     </div>
   </div>`;
 }
 
-function labelTipo(t) { return {prova:'Prova',trabalho:'Trabalho',apresentacao:'Apresentação',outro:'Outro'}[t] || t; }
-
 function renderResumo() {
   const today = new Date(); today.setHours(0,0,0,0);
-  const sorted = [...state.eventos].sort((a,b) => new Date(a.data) - new Date(b.data));
-  const pendentes = sorted.filter(e => !e.concluido && new Date(e.data+'T00:00:00') >= today);
-  const urgentes = pendentes.filter(e => getDaysLeft(e.data) <= 1);
-  const proximos = pendentes.slice(0, 6);
-  const provas = pendentes.filter(e => e.tipo === 'prova').length;
-  const trabalhos = pendentes.filter(e => e.tipo === 'trabalho').length;
-  const concluidos = state.eventos.filter(e => e.concluido).length;
+  const sorted = [...eventos].sort((a,b)=>new Date(a.data)-new Date(b.data));
+  const pendentes = sorted.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=today);
+  const urgentes = pendentes.filter(e=>getDaysLeft(e.data)<=1);
+  const proximos = pendentes.slice(0,6);
+  const provas = pendentes.filter(e=>e.tipo==='prova').length;
+  const trabalhos = pendentes.filter(e=>e.tipo==='trabalho').length;
+  const concluidos = eventos.filter(e=>e.concluido).length;
 
-  const urgBanner = urgentes.length ? `
+  const urgBanner = urgentes.length?`
     <div class="urgency-banner">
       <div class="urgency-title">⚠ Atenção urgente</div>
-      ${urgentes.map(e => `<div class="urgency-item"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0"></span> ${e.nome} — ${getDaysLeft(e.data) === 0 ? 'HOJE' : 'amanhã'}${e.hora ? ' às '+e.hora : ''}</div>`).join('')}
-    </div>` : '';
+      ${urgentes.map(e=>`<div class="urgency-item"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0"></span> ${e.nome} — ${getDaysLeft(e.data)===0?'HOJE':'amanhã'}${e.hora?' às '+e.hora:''}</div>`).join('')}
+    </div>`:'';
 
   return `
     <div class="stats-row">
@@ -517,24 +646,20 @@ function renderResumo() {
       <div class="stat-card"><div class="stat-label">Concluídos</div><div class="stat-val" style="color:var(--green)">${concluidos}</div><div class="stat-desc">feitos ✓</div></div>
     </div>
     <div class="import-card" onclick="openImportModal()">
-      <span class="import-icon">📎</span>
-      <div><div class="import-text">Importar cronograma com IA</div><div class="import-sub">PDF ou foto do quadro — a IA extrai as datas automaticamente</div></div>
+      <span style="font-size:22px">📎</span>
+      <div><div style="font-size:13px;font-weight:500;color:var(--text-mid)">Importar cronograma</div><div style="font-size:11px;color:var(--text-muted)">Cole o texto do cronograma — o app identifica as datas automaticamente</div></div>
       <button class="btn btn-secondary btn-sm" style="margin-left:auto">Importar</button>
     </div>
     ${urgBanner}
     <div class="section-head"><span class="section-label">Próximos eventos</span><button class="btn btn-ghost btn-sm" onclick="showPage('eventos','todos')">Ver todos →</button></div>
     <div class="event-list">
-      ${proximos.length ? proximos.map(eventCardHTML).join('') : '<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nada pendente!</div><div>Aproveite ou adicione novos eventos.</div></div>'}
+      ${proximos.length?proximos.map(eventCardHTML).join(''):'<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nada pendente!</div><div>Aproveite ou adicione novos eventos.</div></div>'}
     </div>`;
 }
 
 function renderEventos() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  let evs = [...state.eventos].sort((a,b) => new Date(a.data)-new Date(b.data));
-  if (currentFilter !== 'todos') evs = evs.filter(e => e.tipo === currentFilter);
-
-  const tipoMap = { todos: 'active', prova: '', trabalho: '', apresentacao: '', outro: '' };
-
+  let evs = [...eventos].sort((a,b)=>new Date(a.data)-new Date(b.data));
+  if (currentFilter!=='todos') evs = evs.filter(e=>e.tipo===currentFilter);
   return `
     <div class="filters">
       <button class="filter-btn ${currentFilter==='todos'?'active':''}" onclick="setFilter('todos')">Todos</button>
@@ -544,54 +669,47 @@ function renderEventos() {
       <button class="filter-btn f-outro ${currentFilter==='outro'?'active':''}" onclick="setFilter('outro')">📌 Outros</button>
     </div>
     <div class="event-list">
-      ${evs.length ? evs.map(eventCardHTML).join('') : '<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Nenhum evento aqui</div><div>Adicione um evento ou importe um cronograma.</div></div>'}
+      ${evs.length?evs.map(eventCardHTML).join(''):'<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Nenhum evento aqui</div><div>Adicione um evento ou importe um cronograma.</div></div>'}
     </div>`;
 }
 
 function setFilter(f) {
   currentFilter = f;
-  const titles = { todos: 'Todos os eventos', prova: 'Provas', trabalho: 'Trabalhos', apresentacao: 'Apresentações', outro: 'Outros' };
+  const titles = {todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros'};
   document.getElementById('page-title').textContent = titles[f];
   render();
 }
 
 function renderCalendario() {
   const y = calendarDate.getFullYear(), m = calendarDate.getMonth();
-  const monthName = calendarDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-  const firstDay = new Date(y, m, 1).getDay();
-  const daysInMonth = new Date(y, m+1, 0).getDate();
-  const daysInPrev = new Date(y, m, 0).getDate();
+  const monthName = calendarDate.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const firstDay = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const daysInPrev = new Date(y,m,0).getDate();
   const today = new Date();
 
+  const headers = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>`<div class="cal-head">${d}</div>`).join('');
   let days = '';
-  const headers = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => `<div class="cal-head">${d}</div>`).join('');
 
-  // Dias do mês anterior
-  for (let i = firstDay-1; i >= 0; i--) {
-    days += `<div class="cal-day other-month"><div class="cal-day-num">${daysInPrev-i}</div></div>`;
-  }
-  // Dias do mês atual
-  for (let d = 1; d <= daysInMonth; d++) {
-    const isToday = today.getDate()===d && today.getMonth()===m && today.getFullYear()===y;
+  for (let i=firstDay-1;i>=0;i--) days+=`<div class="cal-day other-month"><div class="cal-day-num">${daysInPrev-i}</div></div>`;
+
+  for (let d=1;d<=daysInMonth;d++) {
+    const isToday = today.getDate()===d&&today.getMonth()===m&&today.getFullYear()===y;
     const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const evs = state.eventos.filter(e => e.data === dateStr);
-    const evDots = evs.slice(0,2).map(e => {
-      const colors = { prova:'var(--red-light)', trabalho:'var(--blue-light)', apresentacao:'var(--green-light)', outro:'var(--amber-light)' };
-      const textColors = { prova:'var(--red-dark)', trabalho:'var(--blue)', apresentacao:'var(--green-dark)', outro:'var(--amber)' };
-      return `<div class="cal-event-dot" style="background:${colors[e.tipo]};color:${textColors[e.tipo]}">${e.nome}</div>`;
-    }).join('');
-    const more = evs.length > 2 ? `<div style="font-size:10px;color:var(--text-muted)">+${evs.length-2} mais</div>` : '';
-    days += `<div class="cal-day${isToday?' today':''}" onclick="openEventModal(null,'${dateStr}')">
+    const evs = eventos.filter(e=>e.data===dateStr);
+    const colors = {prova:'var(--red-light)',trabalho:'var(--blue-light)',apresentacao:'var(--green-light)',outro:'var(--amber-light)'};
+    const textColors = {prova:'var(--red-dark)',trabalho:'var(--blue)',apresentacao:'var(--green-dark)',outro:'var(--amber)'};
+    const evDots = evs.slice(0,2).map(e=>`<div class="cal-event-dot" style="background:${colors[e.tipo]};color:${textColors[e.tipo]}">${e.nome}</div>`).join('');
+    const more = evs.length>2?`<div style="font-size:10px;color:var(--text-muted)">+${evs.length-2} mais</div>`:'';
+    days+=`<div class="cal-day${isToday?' today':''}" onclick="openEventModal(null,'${dateStr}')">
       <div class="cal-day-num" style="${isToday?'color:var(--blue);font-weight:700':''}">${d}</div>
       ${evDots}${more}
     </div>`;
   }
-  // Completar grid
-  const total = firstDay + daysInMonth;
-  const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
-  for (let d = 1; d <= remaining; d++) {
-    days += `<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
-  }
+
+  const total = firstDay+daysInMonth;
+  const remaining = total%7===0?0:7-(total%7);
+  for (let d=1;d<=remaining;d++) days+=`<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
 
   return `
     <div class="cal-nav">
@@ -602,27 +720,24 @@ function renderCalendario() {
     <div class="cal-grid">${headers}${days}</div>`;
 }
 
-function changeMonth(d) {
-  calendarDate.setMonth(calendarDate.getMonth() + d);
-  render();
-}
+function changeMonth(d) { calendarDate.setMonth(calendarDate.getMonth()+d); render(); }
 
 function renderDisciplinas() {
-  const discsHTML = state.disciplinas.map(d => {
-    const evs = state.eventos.filter(e => e.disciplinaId === d.id);
-    const pendentes = evs.filter(e => !e.concluido).length;
+  const discsHTML = disciplinas.map(d=>{
+    const evs = eventos.filter(e=>e.disciplina_id===d.id);
+    const pendentes = evs.filter(e=>!e.concluido).length;
     return `
     <div class="disc-card" style="border-left-color:${d.cor}">
       <div style="display:flex;align-items:flex-start;justify-content:space-between">
         <div>
           <div class="disc-name">${d.nome}</div>
-          <div class="disc-prof">${d.prof || 'Professor não informado'}</div>
+          <div class="disc-prof">${d.prof||'Professor não informado'}</div>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="openDiscModal('${d.id}')">✏️</button>
       </div>
       <div class="disc-stats">
-        <span class="disc-stat">📅 ${evs.length} evento${evs.length!==1?'s':''}</span>
-        ${pendentes ? `<span class="disc-stat" style="color:var(--red)">⚠ ${pendentes} pendente${pendentes!==1?'s':''}</span>` : '<span class="disc-stat" style="color:var(--green)">✓ Em dia</span>'}
+        <span style="font-size:12px;color:var(--text-mid)">📅 ${evs.length} evento${evs.length!==1?'s':''}</span>
+        ${pendentes?`<span style="font-size:12px;color:var(--red)">⚠ ${pendentes} pendente${pendentes!==1?'s':''}</span>`:'<span style="font-size:12px;color:var(--green)">✓ Em dia</span>'}
       </div>
     </div>`;
   }).join('');
@@ -631,29 +746,38 @@ function renderDisciplinas() {
     <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
       <button class="btn btn-primary" onclick="openDiscModal()">+ Nova disciplina</button>
     </div>
-    <div class="disc-grid">${discsHTML || '<div class="empty"><div class="empty-title">Nenhuma disciplina cadastrada</div></div>'}</div>`;
+    <div class="disc-grid">${discsHTML||'<div class="empty"><div class="empty-title">Nenhuma disciplina</div></div>'}</div>`;
 }
 
 // ============ EVENT MODAL ============
+function populateDiscSelect(id) {
+  const sel = document.getElementById(id);
+  const val = sel ? sel.value : '';
+  if (sel) {
+    sel.innerHTML = '<option value="">Sem disciplina</option>'+disciplinas.map(d=>`<option value="${d.id}">${d.nome}</option>`).join('');
+    if (val) sel.value = val;
+  }
+}
+
 function openEventModal(id, preDate) {
   editingEventId = id || null;
   populateDiscSelect('evt-disciplina');
   if (id) {
-    const ev = state.eventos.find(e => e.id === id);
+    const ev = eventos.find(e=>e.id===id);
     if (!ev) return;
     document.getElementById('eventModalTitle').textContent = 'Editar evento';
     document.getElementById('evt-tipo').value = ev.tipo;
     document.getElementById('evt-data').value = ev.data;
     document.getElementById('evt-nome').value = ev.nome;
-    document.getElementById('evt-disciplina').value = ev.disciplinaId || '';
-    document.getElementById('evt-hora').value = ev.hora || '';
-    document.getElementById('evt-notas').value = ev.notas || '';
-    document.getElementById('evt-concluido').checked = ev.concluido || false;
+    document.getElementById('evt-disciplina').value = ev.disciplina_id||'';
+    document.getElementById('evt-hora').value = ev.hora||'';
+    document.getElementById('evt-notas').value = ev.notas||'';
+    document.getElementById('evt-concluido').checked = ev.concluido||false;
     document.getElementById('btn-delete-event').style.display = 'inline-flex';
   } else {
     document.getElementById('eventModalTitle').textContent = 'Novo evento';
     document.getElementById('evt-tipo').value = 'prova';
-    document.getElementById('evt-data').value = preDate || '';
+    document.getElementById('evt-data').value = preDate||'';
     document.getElementById('evt-nome').value = '';
     document.getElementById('evt-disciplina').value = '';
     document.getElementById('evt-hora').value = '';
@@ -666,48 +790,50 @@ function openEventModal(id, preDate) {
 
 function closeEventModal() { document.getElementById('eventModal').classList.remove('open'); }
 
-function saveEvent() {
+async function saveEvent() {
   const nome = document.getElementById('evt-nome').value.trim();
   const data = document.getElementById('evt-data').value;
-  if (!nome || !data) { alert('Preencha o nome e a data!'); return; }
+  if (!nome||!data) { alert('Preencha o nome e a data!'); return; }
   const ev = {
-    id: editingEventId || uid(),
     tipo: document.getElementById('evt-tipo').value,
     data,
     nome,
-    disciplinaId: document.getElementById('evt-disciplina').value || null,
-    hora: document.getElementById('evt-hora').value || '',
+    disciplina_id: document.getElementById('evt-disciplina').value||null,
+    hora: document.getElementById('evt-hora').value||'',
     notas: document.getElementById('evt-notas').value.trim(),
-    concluido: document.getElementById('evt-concluido').checked
+    concluido: document.getElementById('evt-concluido').checked,
+    user_id: currentUser.id
   };
   if (editingEventId) {
-    const idx = state.eventos.findIndex(e => e.id === editingEventId);
-    state.eventos[idx] = ev;
+    await sb.from('eventos').update(ev).eq('id', editingEventId);
   } else {
-    state.eventos.push(ev);
+    await sb.from('eventos').insert(ev);
   }
-  save(); closeEventModal(); updateBadges(); render();
+  await reloadEventos();
+  closeEventModal(); updateBadges(); render();
 }
 
-function deleteCurrentEvent() {
+async function deleteCurrentEvent() {
   if (!confirm('Excluir este evento?')) return;
-  state.eventos = state.eventos.filter(e => e.id !== editingEventId);
-  save(); closeEventModal(); updateBadges(); render();
+  await sb.from('eventos').delete().eq('id', editingEventId);
+  await reloadEventos();
+  closeEventModal(); updateBadges(); render();
 }
 
-function toggleConcluido(id) {
-  const ev = state.eventos.find(e => e.id === id);
-  if (ev) { ev.concluido = !ev.concluido; save(); updateBadges(); render(); }
+async function toggleConcluido(id, atual) {
+  await sb.from('eventos').update({ concluido: !atual }).eq('id', id);
+  await reloadEventos();
+  updateBadges(); render();
 }
 
 // ============ DISC MODAL ============
 function openDiscModal(id) {
-  editingDiscId = id || null;
+  editingDiscId = id||null;
   if (id) {
-    const d = state.disciplinas.find(d => d.id === id);
+    const d = disciplinas.find(d=>d.id===id);
     document.getElementById('discModalTitle').textContent = 'Editar disciplina';
     document.getElementById('disc-nome').value = d.nome;
-    document.getElementById('disc-prof').value = d.prof;
+    document.getElementById('disc-prof').value = d.prof||'';
     document.getElementById('disc-cor').value = d.cor;
     document.getElementById('btn-delete-disc').style.display = 'inline-flex';
   } else {
@@ -722,31 +848,25 @@ function openDiscModal(id) {
 
 function closeDiscModal() { document.getElementById('discModal').classList.remove('open'); }
 
-function saveDisc() {
+async function saveDisc() {
   const nome = document.getElementById('disc-nome').value.trim();
-  if (!nome) { alert('Informe o nome da disciplina!'); return; }
-  const disc = { id: editingDiscId || uid(), nome, prof: document.getElementById('disc-prof').value.trim(), cor: document.getElementById('disc-cor').value };
+  if (!nome) { alert('Informe o nome!'); return; }
+  const disc = { nome, prof: document.getElementById('disc-prof').value.trim(), cor: document.getElementById('disc-cor').value, user_id: currentUser.id };
   if (editingDiscId) {
-    const idx = state.disciplinas.findIndex(d => d.id === editingDiscId);
-    state.disciplinas[idx] = disc;
+    await sb.from('disciplinas').update(disc).eq('id', editingDiscId);
   } else {
-    state.disciplinas.push(disc);
+    await sb.from('disciplinas').insert(disc);
   }
-  save(); closeDiscModal(); render();
+  await reloadDisciplinas();
+  closeDiscModal(); render();
 }
 
-function deleteCurrentDisc() {
-  if (!confirm('Excluir disciplina? Os eventos vinculados perderão a disciplina.')) return;
-  state.disciplinas = state.disciplinas.filter(d => d.id !== editingDiscId);
-  state.eventos.forEach(e => { if (e.disciplinaId === editingDiscId) e.disciplinaId = null; });
-  save(); closeDiscModal(); render();
-}
-
-function populateDiscSelect(id) {
-  const sel = document.getElementById(id);
-  const val = sel.value;
-  sel.innerHTML = '<option value="">Sem disciplina</option>' + state.disciplinas.map(d => `<option value="${d.id}">${d.nome}</option>`).join('');
-  if (val) sel.value = val;
+async function deleteCurrentDisc() {
+  if (!confirm('Excluir disciplina?')) return;
+  await sb.from('eventos').update({ disciplina_id: null }).eq('disciplina_id', editingDiscId);
+  await sb.from('disciplinas').delete().eq('id', editingDiscId);
+  await Promise.all([reloadDisciplinas(), reloadEventos()]);
+  closeDiscModal(); render();
 }
 
 // ============ IMPORT ============
@@ -756,8 +876,6 @@ function openImportModal() {
   document.getElementById('import-step-2').style.display = 'none';
   document.getElementById('import-step-3').style.display = 'none';
   document.getElementById('import-text').value = '';
-  document.getElementById('import-file').value = '';
-  populateDiscSelect('import-disciplina-default');
 }
 
 function closeImportModal() { document.getElementById('importModal').classList.remove('open'); }
@@ -766,107 +884,125 @@ function backImport() {
   document.getElementById('import-step-2').style.display = 'none';
 }
 
-function dragOver(e) { e.preventDefault(); document.getElementById('import-area').classList.add('dragover'); }
-function dragLeave(e) { document.getElementById('import-area').classList.remove('dragover'); }
-function dropFile(e) {
-  e.preventDefault(); dragLeave(e);
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
-}
-function handleFileSelect(e) { if (e.target.files[0]) handleFile(e.target.files[0]); }
+function parseTextCronograma(text) {
+  const results = [];
+  const lines = text.split('\n').filter(l => l.trim());
 
-async function handleFile(file) {
-  if (file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      document.getElementById('import-text').value = `[Imagem carregada: ${file.name}]\nA IA vai analisar a imagem diretamente.`;
-      window._importFile = { type: 'image', data: e.target.result.split(',')[1], mediaType: file.type, name: file.name };
-    };
-    reader.readAsDataURL(file);
-  } else {
-    document.getElementById('import-text').value = `[Arquivo: ${file.name}]\nA IA vai analisar o texto extraído.`;
-    window._importFile = { type: 'file', name: file.name };
+  const tipoKeywords = {
+    prova: ['prova', 'av1', 'av2', 'avaliação', 'teste', 'exame'],
+    trabalho: ['trabalho', 'entrega', 'relatório', 'artigo', 'tcc', 'projeto'],
+    apresentacao: ['apresentação', 'seminário', 'defesa', 'exposição']
+  };
+
+  // Padrões de data: dd/mm, dd/mm/yyyy, dd-mm, dd de mês
+  const meses = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
+  const anoAtual = new Date().getFullYear();
+
+  for (const line of lines) {
+    const l = line.trim();
+    if (!l) continue;
+
+    let data = null;
+
+    // dd/mm/yyyy ou dd/mm
+    const m1 = l.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
+    if (m1) {
+      const day = m1[1].padStart(2,'0');
+      const month = m1[2].padStart(2,'0');
+      const year = m1[3] ? (m1[3].length===2?'20'+m1[3]:m1[3]) : anoAtual;
+      data = `${year}-${month}-${day}`;
+    }
+
+    // dd de mês
+    const m2 = l.match(/(\d{1,2})\s+de\s+([a-záéíóú]+)/i);
+    if (!data && m2) {
+      const mesStr = m2[2].toLowerCase().substr(0,3);
+      const mesNum = meses[mesStr];
+      if (mesNum) data = `${anoAtual}-${String(mesNum).padStart(2,'0')}-${m2[1].padStart(2,'0')}`;
+    }
+
+    if (!data) continue;
+
+    // Detecta tipo
+    let tipo = 'outro';
+    const lLower = l.toLowerCase();
+    for (const [t, keywords] of Object.entries(tipoKeywords)) {
+      if (keywords.some(k => lLower.includes(k))) { tipo = t; break; }
+    }
+
+    // Detecta disciplina
+    let disciplina = '';
+    for (const d of disciplinas) {
+      const palavras = d.nome.toLowerCase().split(' ').filter(p => p.length > 3);
+      if (palavras.some(p => lLower.includes(p))) { disciplina = d.nome; break; }
+    }
+
+    // Nome: remove a data e limpa
+    let nome = l
+      .replace(/\d{1,2}\/\d{1,2}(\/\d{2,4})?/, '')
+      .replace(/\d{1,2}\s+de\s+[a-záéíóú]+/i, '')
+      .replace(/[-–—|:]/g, ' ')
+      .trim()
+      .replace(/\s+/g, ' ');
+
+    if (!nome) nome = labelTipo(tipo);
+
+    results.push({ nome, data, tipo, disciplina, hora: '' });
   }
+
+  return results;
 }
 
-async function processImport() {
+function processImport() {
   const text = document.getElementById('import-text').value.trim();
-  const hasFile = window._importFile;
-  if (!text && !hasFile) { alert('Cole um texto ou selecione um arquivo!'); return; }
+  if (!text) { alert('Cole o texto do cronograma!'); return; }
+
+  importedEvents = parseTextCronograma(text);
+
+  if (!importedEvents.length) {
+    alert('Não encontrei datas no texto. Certifique-se que as datas estão no formato dd/mm ou dd/mm/aaaa.');
+    return;
+  }
 
   document.getElementById('import-step-1').style.display = 'none';
   document.getElementById('import-step-2').style.display = 'block';
-  document.getElementById('import-loading').style.display = 'block';
-  document.getElementById('import-results').style.display = 'none';
 
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    let messages;
+  const list = document.getElementById('import-events-list');
+  list.innerHTML = importedEvents.map((e,i) => `
+    <div class="import-event-item">
+      <input type="checkbox" id="imp-${i}" checked>
+      <div class="evt-info">
+        <div class="evt-name">${e.nome}</div>
+        <div class="evt-sub">${labelTipo(e.tipo)} · ${e.data}${e.disciplina?' · '+e.disciplina:''}</div>
+      </div>
+    </div>`).join('');
 
-    if (hasFile && hasFile.type === 'image') {
-      messages = [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: hasFile.mediaType, data: hasFile.data } },
-          { type: 'text', text: `Analise esta imagem de cronograma acadêmico. Hoje é ${today}. Extraia TODOS os eventos: provas, trabalhos, apresentações, datas de entrega. Responda SOMENTE em JSON válido, sem markdown, no formato: [{"nome":"...","data":"YYYY-MM-DD","tipo":"prova|trabalho|apresentacao|outro","disciplina":"...","hora":"HH:MM ou vazio"}]. Se a data for apenas dia/mês sem ano, use o ano atual ou próximo mais lógico.` }
-        ]
-      }];
-    } else {
-      messages = [{
-        role: 'user',
-        content: `Analise este cronograma acadêmico e extraia todos os eventos. Hoje é ${today}.\n\n${text}\n\nResponda SOMENTE em JSON válido, sem markdown, no formato: [{"nome":"...","data":"YYYY-MM-DD","tipo":"prova|trabalho|apresentacao|outro","disciplina":"...","hora":"HH:MM ou vazio"}]. Se a data for apenas dia/mês sem ano, use o ano atual ou próximo mais lógico.`
-      }];
-    }
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages })
-    });
-
-    const data = await response.json();
-    const raw = data.content.map(c => c.text || '').join('');
-    const clean = raw.replace(/```json|```/g, '').trim();
-    importedEvents = JSON.parse(clean);
-
-    document.getElementById('import-loading').style.display = 'none';
-    document.getElementById('import-results').style.display = 'block';
-
-    const list = document.getElementById('import-events-list');
-    list.innerHTML = importedEvents.map((e, i) => `
-      <div class="import-event-item">
-        <input type="checkbox" id="imp-${i}" checked>
-        <div class="evt-info">
-          <div class="evt-name">${e.nome}</div>
-          <div class="evt-sub">${e.tipo} · ${e.data}${e.hora ? ' às '+e.hora : ''}${e.disciplina ? ' · '+e.disciplina : ''}</div>
-        </div>
-      </div>`).join('');
-
-    window._importFile = null;
-  } catch(err) {
-    document.getElementById('import-loading').style.display = 'none';
-    document.getElementById('import-step-2').style.display = 'none';
-    document.getElementById('import-step-1').style.display = 'block';
-    alert('Erro ao processar. Tente colar o texto manualmente.');
-    console.error(err);
-  }
+  populateDiscSelect('import-disciplina-default');
 }
 
-function confirmImport() {
+async function confirmImport() {
   const discDefault = document.getElementById('import-disciplina-default').value;
   let count = 0;
+  const toInsert = [];
+
   importedEvents.forEach((ev, i) => {
     if (!document.getElementById(`imp-${i}`)?.checked) return;
-    // Tenta casar disciplina pelo nome
     let discId = discDefault || null;
     if (ev.disciplina) {
-      const match = state.disciplinas.find(d => d.nome.toLowerCase().includes(ev.disciplina.toLowerCase()) || ev.disciplina.toLowerCase().includes(d.nome.toLowerCase().split(' ')[0]));
+      const match = disciplinas.find(d =>
+        d.nome.toLowerCase().includes(ev.disciplina.toLowerCase().split(' ')[0]) ||
+        ev.disciplina.toLowerCase().includes(d.nome.toLowerCase().split(' ')[0])
+      );
       if (match) discId = match.id;
     }
-    state.eventos.push({ id: uid(), tipo: ev.tipo || 'outro', data: ev.data, nome: ev.nome, disciplinaId: discId, hora: ev.hora || '', notas: '', concluido: false });
+    toInsert.push({ tipo: ev.tipo||'outro', data: ev.data, nome: ev.nome, disciplina_id: discId, hora: ev.hora||'', notas: '', concluido: false, user_id: currentUser.id });
     count++;
   });
-  save(); updateBadges();
+
+  if (toInsert.length) await sb.from('eventos').insert(toInsert);
+  await reloadEventos();
+  updateBadges();
+
   document.getElementById('import-step-2').style.display = 'none';
   document.getElementById('import-step-3').style.display = 'block';
   document.getElementById('import-success-msg').textContent = `${count} evento${count!==1?'s':''} importado${count!==1?'s':''}!`;
@@ -875,12 +1011,11 @@ function confirmImport() {
 
 // Fechar modal clicando fora
 document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  o.addEventListener('click', e => { if (e.target===o) o.classList.remove('open'); });
 });
 
 // Init
-updateBadges();
-render();
+init();
 </script>
 </body>
 </html>
