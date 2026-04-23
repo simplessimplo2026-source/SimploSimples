@@ -820,7 +820,9 @@ async function salvarEvento() {
   if (r.error) { alert('Erro: '+r.error.message); return; }
   const { data: evData } = await sb.from('eventos').select('*').order('data');
   eventos = evData || [];
-  closeModal('evento'); updateBadges(); render();
+  $('m-evento').classList.remove('open');
+  updateBadges();
+  $('content').innerHTML = page === 'resumo' ? renderResumo() : page === 'eventos' ? renderEventos() : page === 'calendario' ? renderCal() : renderDiscs();
 }
 async function delEvento() {
   if (!confirm('Excluir evento?')) return;
@@ -863,15 +865,23 @@ async function salvarDisc() {
   if (r.error) { alert('Erro: '+r.error.message); return; }
   const { data } = await sb.from('disciplinas').select('*').order('nome');
   discs = data || [];
-  closeModal('disc');
-  go('disciplinas');
+  $('m-disc').classList.remove('open');
+  page = 'disciplinas';
+  $('content').innerHTML = renderDiscs();
 }
 async function delDisc() {
   if (!confirm('Excluir disciplina?')) return;
   await sb.from('eventos').update({disciplina_id:null}).eq('disciplina_id',editDiscId);
   await sb.from('disciplinas').delete().eq('id',editDiscId);
-  await Promise.all([reloadDiscs(),reloadEventos()]);
-  closeModal('disc'); render();
+  const [r1, r2] = await Promise.all([
+    sb.from('disciplinas').select('*').order('nome'),
+    sb.from('eventos').select('*').order('data')
+  ]);
+  discs = r1.data || [];
+  eventos = r2.data || [];
+  $('m-disc').classList.remove('open');
+  page = 'disciplinas';
+  $('content').innerHTML = renderDiscs();
 }
 
 // ===== CONFIG MODAL =====
