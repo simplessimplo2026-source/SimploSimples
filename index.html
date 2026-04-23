@@ -483,7 +483,7 @@
     <div class="form-actions">
       <button class="btn btn-danger btn-sm" id="btn-delete-disc" style="margin-right:auto;display:none" onclick="deleteCurrentDisc()">🗑 Excluir</button>
       <button class="btn btn-secondary" onclick="closeDiscModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="alert('clicou!');saveDisc()">Salvar</button>
+      <button class="btn btn-primary" onclick="saveDisc()">Salvar</button>
     </div>
   </div>
 </div>
@@ -987,6 +987,8 @@ async function saveEvent() {
   const nome = document.getElementById('evt-nome').value.trim();
   const data = document.getElementById('evt-data').value;
   if (!nome||!data) { alert('Preencha o nome e a data!'); return; }
+  if (!currentUser) { alert('Usuário não autenticado!'); return; }
+
   const ev = {
     tipo: document.getElementById('evt-tipo').value,
     data,
@@ -997,13 +999,25 @@ async function saveEvent() {
     concluido: document.getElementById('evt-concluido').checked,
     user_id: currentUser.id
   };
-  if (editingEventId) {
-    await sb.from('eventos').update(ev).eq('id', editingEventId);
-  } else {
-    await sb.from('eventos').insert(ev);
+
+  try {
+    let result;
+    if (editingEventId) {
+      result = await sb.from('eventos').update(ev).eq('id', editingEventId);
+    } else {
+      result = await sb.from('eventos').insert(ev);
+    }
+
+    if (result.error) {
+      alert('Erro ao salvar: ' + result.error.message);
+      return;
+    }
+
+    await reloadEventos();
+    closeEventModal(); updateBadges(); render();
+  } catch(e) {
+    alert('Erro inesperado: ' + e.message);
   }
-  await reloadEventos();
-  closeEventModal(); updateBadges(); render();
 }
 
 async function deleteCurrentEvent() {
@@ -1044,14 +1058,34 @@ function closeDiscModal() { document.getElementById('discModal').classList.remov
 async function saveDisc() {
   const nome = document.getElementById('disc-nome').value.trim();
   if (!nome) { alert('Informe o nome!'); return; }
-  const disc = { nome, prof: document.getElementById('disc-prof').value.trim(), cor: document.getElementById('disc-cor').value, user_id: currentUser.id };
-  if (editingDiscId) {
-    await sb.from('disciplinas').update(disc).eq('id', editingDiscId);
-  } else {
-    await sb.from('disciplinas').insert(disc);
+  if (!currentUser) { alert('Usuário não autenticado!'); return; }
+
+  const disc = {
+    nome,
+    prof: document.getElementById('disc-prof').value.trim(),
+    cor: document.getElementById('disc-cor').value,
+    user_id: currentUser.id
+  };
+
+  try {
+    let result;
+    if (editingDiscId) {
+      result = await sb.from('disciplinas').update(disc).eq('id', editingDiscId);
+    } else {
+      result = await sb.from('disciplinas').insert(disc);
+    }
+
+    if (result.error) {
+      alert('Erro ao salvar: ' + result.error.message);
+      return;
+    }
+
+    await reloadDisciplinas();
+    closeDiscModal();
+    render();
+  } catch(e) {
+    alert('Erro inesperado: ' + e.message);
   }
-  await reloadDisciplinas();
-  closeDiscModal(); render();
 }
 
 async function deleteCurrentDisc() {
