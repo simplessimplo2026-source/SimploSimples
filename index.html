@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#185FA5">
 <title>Agenda Acadêmica</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
 
@@ -248,6 +249,7 @@
       <div class="nav-item" onclick="showPage('eventos','apresentacao')"><span class="nav-icon">🎤</span><span>Apresentações</span></div>
       <div class="nav-section">Configurações</div>
       <div class="nav-item" onclick="showPage('disciplinas')"><span class="nav-icon">🏫</span><span>Disciplinas</span></div>
+      <div class="nav-item" onclick="openConfigModal()"><span class="nav-icon">⚙️</span><span>Configurações</span></div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-email" id="user-email"></div>
@@ -329,15 +331,22 @@
     </div>
     <div id="import-step-1">
       <div style="background:var(--blue-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blue)">
-        💡 Cole o texto do cronograma abaixo. O app vai tentar identificar automaticamente as datas e eventos.
+        💡 Suba um PDF ou cole o texto. O GPT vai identificar os eventos automaticamente.
       </div>
+      <div id="import-dropzone" onclick="document.getElementById('import-file').click()" style="border:2px dashed var(--gray-border);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:12px;transition:border-color 0.15s" ondragover="event.preventDefault();this.style.borderColor='var(--blue)'" ondragleave="this.style.borderColor='var(--gray-border)'" ondrop="dropPDF(event)">
+        <div style="font-size:26px;margin-bottom:6px">📄</div>
+        <div style="font-size:13px;font-weight:500;color:var(--text-mid)">Clique ou arraste o PDF aqui</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Ou cole o texto abaixo</div>
+      </div>
+      <input type="file" id="import-file" accept=".pdf" style="display:none" onchange="handlePDF(event)">
+      <div id="pdf-status" style="font-size:12px;color:var(--green-dark);background:var(--green-light);padding:6px 10px;border-radius:var(--radius-sm);margin-bottom:10px;display:none"></div>
       <div class="form-group">
-        <label class="form-label">Texto do cronograma</label>
-        <textarea class="form-input form-textarea" id="import-text" style="min-height:140px" placeholder="Ex:&#10;Prova AV1 - Psicopatologia - 15/05&#10;Entrega trabalho - Velhice - 20/05 &#10;Apresentação Psicanálise - 28/05"></textarea>
+        <label class="form-label">Ou cole o texto do cronograma</label>
+        <textarea class="form-input form-textarea" id="import-text" style="min-height:100px" placeholder="Prova AV1 - Psicopatologia - 15/05&#10;Entrega trabalho - Velhice - 20/05&#10;Apresentacao Psicanalise - 28/05"></textarea>
       </div>
       <div class="form-actions">
         <button class="btn btn-secondary" onclick="closeImportModal()">Cancelar</button>
-        <button class="btn btn-primary" onclick="processImport()">Analisar texto →</button>
+        <button class="btn btn-primary" id="btn-analisar" onclick="processImport()">Analisar com GPT ✨</button>
       </div>
     </div>
     <div id="import-step-2" style="display:none">
@@ -391,6 +400,31 @@
       <button class="btn btn-danger btn-sm" id="btn-delete-disc" style="margin-right:auto;display:none" onclick="deleteCurrentDisc()">🗑 Excluir</button>
       <button class="btn btn-secondary" onclick="closeDiscModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="saveDisc()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Configurações -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">
+      <span>⚙️ Configurações</span>
+      <button class="modal-close" onclick="closeConfigModal()">✕</button>
+    </div>
+    <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--amber)">
+      🔒 Sua API key fica salva só no seu navegador — nunca vai para o servidor.
+    </div>
+    <div class="form-group">
+      <label class="form-label">OpenAI API Key</label>
+      <input type="password" class="form-input" id="config-openai-key" placeholder="sk-proj-...">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Necessária para importar cronogramas com GPT. Obtenha em platform.openai.com/api-keys</div>
+    </div>
+    <div id="config-key-status" style="font-size:12px;margin-bottom:10px;display:none"></div>
+    <div class="form-actions">
+      <button class="btn btn-danger btn-sm" onclick="removeKey()" style="margin-right:auto">Remover key</button>
+      <button class="btn btn-secondary" onclick="closeConfigModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Salvar</button>
     </div>
   </div>
 </div>
@@ -879,12 +913,18 @@ async function deleteCurrentDisc() {
 }
 
 // ============ IMPORT ============
+const OPENAI_KEY = () => localStorage.getItem('openai_key') || '';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
 function openImportModal() {
   document.getElementById('importModal').classList.add('open');
   document.getElementById('import-step-1').style.display = 'block';
   document.getElementById('import-step-2').style.display = 'none';
   document.getElementById('import-step-3').style.display = 'none';
   document.getElementById('import-text').value = '';
+  const st = document.getElementById('pdf-status');
+  st.style.display = 'none'; st.textContent = '';
 }
 
 function closeImportModal() { document.getElementById('importModal').classList.remove('open'); }
@@ -893,100 +933,122 @@ function backImport() {
   document.getElementById('import-step-2').style.display = 'none';
 }
 
-function parseTextCronograma(text) {
-  const results = [];
-  const lines = text.split('\n').filter(l => l.trim());
-
-  const tipoKeywords = {
-    prova: ['prova', 'av1', 'av2', 'avaliação', 'teste', 'exame'],
-    trabalho: ['trabalho', 'entrega', 'relatório', 'artigo', 'tcc', 'projeto'],
-    apresentacao: ['apresentação', 'seminário', 'defesa', 'exposição']
-  };
-
-  // Padrões de data: dd/mm, dd/mm/yyyy, dd-mm, dd de mês
-  const meses = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
-  const anoAtual = new Date().getFullYear();
-
-  for (const line of lines) {
-    const l = line.trim();
-    if (!l) continue;
-
-    let data = null;
-
-    // dd/mm/yyyy ou dd/mm
-    const m1 = l.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/);
-    if (m1) {
-      const day = m1[1].padStart(2,'0');
-      const month = m1[2].padStart(2,'0');
-      const year = m1[3] ? (m1[3].length===2?'20'+m1[3]:m1[3]) : anoAtual;
-      data = `${year}-${month}-${day}`;
-    }
-
-    // dd de mês
-    const m2 = l.match(/(\d{1,2})\s+de\s+([a-záéíóú]+)/i);
-    if (!data && m2) {
-      const mesStr = m2[2].toLowerCase().substr(0,3);
-      const mesNum = meses[mesStr];
-      if (mesNum) data = `${anoAtual}-${String(mesNum).padStart(2,'0')}-${m2[1].padStart(2,'0')}`;
-    }
-
-    if (!data) continue;
-
-    // Detecta tipo
-    let tipo = 'outro';
-    const lLower = l.toLowerCase();
-    for (const [t, keywords] of Object.entries(tipoKeywords)) {
-      if (keywords.some(k => lLower.includes(k))) { tipo = t; break; }
-    }
-
-    // Detecta disciplina
-    let disciplina = '';
-    for (const d of disciplinas) {
-      const palavras = d.nome.toLowerCase().split(' ').filter(p => p.length > 3);
-      if (palavras.some(p => lLower.includes(p))) { disciplina = d.nome; break; }
-    }
-
-    // Nome: remove a data e limpa
-    let nome = l
-      .replace(/\d{1,2}\/\d{1,2}(\/\d{2,4})?/, '')
-      .replace(/\d{1,2}\s+de\s+[a-záéíóú]+/i, '')
-      .replace(/[-–—|:]/g, ' ')
-      .trim()
-      .replace(/\s+/g, ' ');
-
-    if (!nome) nome = labelTipo(tipo);
-
-    results.push({ nome, data, tipo, disciplina, hora: '' });
-  }
-
-  return results;
+function dropPDF(e) {
+  e.preventDefault();
+  document.getElementById('import-dropzone').style.borderColor = 'var(--gray-border)';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') extractPDF(file);
+  else alert('Por favor, selecione um arquivo PDF.');
 }
 
-function processImport() {
+function handlePDF(e) {
+  const file = e.target.files[0];
+  if (file) extractPDF(file);
+}
+
+async function extractPDF(file) {
+  const st = document.getElementById('pdf-status');
+  st.style.display = 'block';
+  st.textContent = 'Extraindo texto do PDF...';
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(item => item.str).join(' ') + '
+';
+    }
+    document.getElementById('import-text').value = text.trim();
+    st.textContent = `PDF lido com sucesso (${pdf.numPages} página${pdf.numPages>1?'s':''})! Clique em Analisar com GPT.`;
+  } catch(err) {
+    st.style.color = 'var(--red-dark)';
+    st.style.background = 'var(--red-light)';
+    st.textContent = 'Erro ao ler o PDF. Tente copiar e colar o texto manualmente.';
+  }
+}
+
+async function processImport() {
   const text = document.getElementById('import-text').value.trim();
-  if (!text) { alert('Cole o texto do cronograma!'); return; }
+  if (!text) { alert('Cole o texto ou suba um PDF!'); return; }
 
-  importedEvents = parseTextCronograma(text);
-
-  if (!importedEvents.length) {
-    alert('Não encontrei datas no texto. Certifique-se que as datas estão no formato dd/mm ou dd/mm/aaaa.');
+  const key = OPENAI_KEY();
+  if (!key) {
+    alert('Configure sua OpenAI API Key nas Configurações (⚙️) antes de usar o GPT!');
     return;
   }
 
-  document.getElementById('import-step-1').style.display = 'none';
-  document.getElementById('import-step-2').style.display = 'block';
+  const btn = document.getElementById('btn-analisar');
+  btn.textContent = 'Analisando...';
+  btn.disabled = true;
 
-  const list = document.getElementById('import-events-list');
-  list.innerHTML = importedEvents.map((e,i) => `
-    <div class="import-event-item">
-      <input type="checkbox" id="imp-${i}" checked>
-      <div class="evt-info">
-        <div class="evt-name">${e.nome}</div>
-        <div class="evt-sub">${labelTipo(e.tipo)} · ${e.data}${e.disciplina?' · '+e.disciplina:''}</div>
-      </div>
-    </div>`).join('');
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const discNames = disciplinas.map(d => d.nome).join(', ');
 
-  populateDiscSelect('import-disciplina-default');
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + OPENAI_KEY()
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        max_tokens: 1500,
+        messages: [{
+          role: 'user',
+          content: `Analise este cronograma acadêmico e extraia todos os eventos. Hoje é ${today}. As disciplinas disponíveis são: ${discNames}.
+
+Texto:
+${text}
+
+Responda SOMENTE com JSON válido, sem markdown, neste formato:
+[{"nome":"nome do evento","data":"YYYY-MM-DD","tipo":"prova|trabalho|apresentacao|outro","disciplina":"nome exato da disciplina ou vazio","hora":"HH:MM ou vazio"}]
+
+Regras:
+- Se a data tiver só dia/mês, use o ano ${new Date().getFullYear()} ou o próximo ano se a data já passou
+- tipo deve ser: prova (provas, avaliações, AV1, AV2), trabalho (entregas, relatórios, TCCs), apresentacao (seminários, apresentações), outro
+- disciplina deve ser o nome exato de uma das disciplinas listadas ou string vazia`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const raw = data.choices[0].message.content;
+    const clean = raw.replace(/\`\`\`json|\`\`\`/g, '').trim();
+    importedEvents = JSON.parse(clean);
+
+    if (!importedEvents.length) {
+      alert('Nenhum evento encontrado no texto.');
+      btn.textContent = 'Analisar com GPT ✨';
+      btn.disabled = false;
+      return;
+    }
+
+    document.getElementById('import-step-1').style.display = 'none';
+    document.getElementById('import-step-2').style.display = 'block';
+
+    const list = document.getElementById('import-events-list');
+    list.innerHTML = importedEvents.map((e,i) => `
+      <div class="import-event-item">
+        <input type="checkbox" id="imp-${i}" checked>
+        <div class="evt-info">
+          <div class="evt-name">${e.nome}</div>
+          <div class="evt-sub">${labelTipo(e.tipo)} · ${e.data}${e.hora?' às '+e.hora:''}${e.disciplina?' · '+e.disciplina:''}</div>
+        </div>
+      </div>`).join('');
+
+    populateDiscSelect('import-disciplina-default');
+
+  } catch(err) {
+    alert('Erro ao chamar o GPT: ' + err.message);
+  }
+
+  btn.textContent = 'Analisar com GPT ✨';
+  btn.disabled = false;
 }
 
 async function confirmImport() {
@@ -1016,6 +1078,47 @@ async function confirmImport() {
   document.getElementById('import-step-3').style.display = 'block';
   document.getElementById('import-success-msg').textContent = `${count} evento${count!==1?'s':''} importado${count!==1?'s':''}!`;
   setTimeout(() => { closeImportModal(); render(); }, 2000);
+}
+
+
+// ============ CONFIG MODAL ============
+function openConfigModal() {
+  const key = localStorage.getItem('openai_key') || '';
+  document.getElementById('config-openai-key').value = key ? '••••••••••••••••' : '';
+  const st = document.getElementById('config-key-status');
+  if (key) {
+    st.style.display = 'block';
+    st.style.color = 'var(--green-dark)';
+    st.textContent = '✓ API key configurada';
+  } else {
+    st.style.display = 'block';
+    st.style.color = 'var(--red-dark)';
+    st.textContent = '✗ Nenhuma key configurada';
+  }
+  document.getElementById('configModal').classList.add('open');
+}
+
+function closeConfigModal() { document.getElementById('configModal').classList.remove('open'); }
+
+function saveConfig() {
+  const val = document.getElementById('config-openai-key').value.trim();
+  if (!val || val.startsWith('•')) {
+    alert('Digite uma API key válida!');
+    return;
+  }
+  if (!val.startsWith('sk-')) {
+    alert('A key deve começar com sk-');
+    return;
+  }
+  localStorage.setItem('openai_key', val);
+  closeConfigModal();
+  alert('✓ API key salva com sucesso!');
+}
+
+function removeKey() {
+  if (!confirm('Remover a API key?')) return;
+  localStorage.removeItem('openai_key');
+  closeConfigModal();
 }
 
 // Fechar modal clicando fora
