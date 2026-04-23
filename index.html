@@ -957,8 +957,7 @@ async function extractPDF(file) {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      text += content.items.map(item => item.str).join(' ') + '
-';
+      text += content.items.map(item => item.str).join(' ') + '\n';
     }
     document.getElementById('import-text').value = text.trim();
     st.textContent = `PDF lido com sucesso (${pdf.numPages} página${pdf.numPages>1?'s':''})! Clique em Analisar com GPT.`;
@@ -1018,7 +1017,7 @@ Regras:
     if (data.error) throw new Error(data.error.message);
 
     const raw = data.choices[0].message.content;
-    const clean = raw.replace(/\`\`\`json|\`\`\`/g, '').trim();
+    const clean = raw.replace(/```json|```/g, '').trim();
     importedEvents = JSON.parse(clean);
 
     if (!importedEvents.length) {
