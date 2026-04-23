@@ -189,12 +189,51 @@
   .disc-stats { display: flex; gap: 10px; }
 
   @media (max-width: 768px) {
-    .sidebar { width: 56px; }
-    .app-name, .app-sub, .nav-section, .nav-item span:not(.nav-icon), .sidebar-footer .user-email, .nav-badge { display: none; }
-    .nav-item { padding: 10px; justify-content: center; }
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .app { flex-direction: column; }
+    .sidebar { display: none; }
+    .main { flex: 1; padding-bottom: 64px; }
+    .topbar { padding: 10px 16px; }
+    .topbar .btn-secondary { display: none; }
+    .page-title { font-size: 15px; }
+    .content { padding: 14px 16px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .disc-grid { grid-template-columns: 1fr; }
     .form-row { grid-template-columns: 1fr; }
+    .modal { border-radius: 16px 16px 0 0; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 100%; max-height: 90vh; margin: 0; }
+    .modal-overlay { align-items: flex-end; }
+
+    /* Bottom Nav */
+    .bottom-nav { display: flex !important; }
+  }
+
+  .bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--gray-border);
+    z-index: 100;
+    padding: 6px 0 8px;
+    justify-content: space-around;
+  }
+  .bottom-nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 2px; cursor: pointer; padding: 4px 10px;
+    color: var(--text-muted); font-size: 10px; font-weight: 500;
+    border-radius: var(--radius-sm); transition: color 0.12s;
+    min-width: 52px;
+  }
+  .bottom-nav-item.active { color: var(--blue); }
+  .bottom-nav-item .bnav-icon { font-size: 20px; }
+  .bottom-nav-fab {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 2px; cursor: pointer; padding: 4px 10px;
+  }
+  .bottom-nav-fab .bnav-fab-btn {
+    width: 44px; height: 44px; background: var(--blue); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 22px; margin-top: -14px;
+    box-shadow: 0 4px 12px rgba(24,95,165,0.4);
   }
 </style>
 </head>
@@ -261,6 +300,7 @@
       <div class="page-title" id="page-title">Resumo</div>
       <div class="topbar-actions">
         <button class="btn btn-secondary" onclick="openImportModal()">📎 Importar cronograma</button>
+        <button class="btn btn-secondary" onclick="openImportModal()" style="display:none" id="btn-import-mobile">📎</button>
         <button class="btn btn-primary" onclick="openEventModal()">+ Novo evento</button>
       </div>
     </div>
@@ -404,6 +444,29 @@
   </div>
 </div>
 
+
+<!-- Bottom Nav Mobile -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="bottom-nav-item active" id="bnav-resumo" onclick="showPage('resumo');setBottomNav('resumo')">
+    <span class="bnav-icon">📋</span>
+    <span>Resumo</span>
+  </div>
+  <div class="bottom-nav-item" id="bnav-calendario" onclick="showPage('calendario');setBottomNav('calendario')">
+    <span class="bnav-icon">📅</span>
+    <span>Agenda</span>
+  </div>
+  <div class="bottom-nav-fab" onclick="openEventModal()">
+    <div class="bnav-fab-btn">+</div>
+  </div>
+  <div class="bottom-nav-item" id="bnav-eventos" onclick="showPage('eventos','todos');setBottomNav('eventos')">
+    <span class="bnav-icon">📚</span>
+    <span>Eventos</span>
+  </div>
+  <div class="bottom-nav-item" id="bnav-mais" onclick="showPage('disciplinas');setBottomNav('mais')">
+    <span class="bnav-icon">⚙️</span>
+    <span>Mais</span>
+  </div>
+</nav>
 
 <!-- Modal: Configurações -->
 <div class="modal-overlay" id="configModal">
@@ -591,6 +654,12 @@ async function reloadDisciplinas() {
 }
 
 // ============ NAVIGATION ============
+function setBottomNav(key) {
+  document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('bnav-' + key);
+  if (el) el.classList.add('active');
+}
+
 function showPage(page, filter) {
   currentPage = page;
   if (filter) currentFilter = filter;
@@ -1056,7 +1125,7 @@ async function confirmImport() {
   const toInsert = [];
 
   importedEvents.forEach((ev, i) => {
-    if (!document.getElementById(`imp-${i}`)?.checked) return;
+    if (!document.getElementById('imp-'+i)?.checked) return;
     let discId = discDefault || null;
     if (ev.disciplina) {
       const match = disciplinas.find(d =>
@@ -1065,17 +1134,30 @@ async function confirmImport() {
       );
       if (match) discId = match.id;
     }
-    toInsert.push({ tipo: ev.tipo||'outro', data: ev.data, nome: ev.nome, disciplina_id: discId, hora: ev.hora||'', notas: '', concluido: false, user_id: currentUser.id });
+    // Validar data
+    if (!ev.data || ev.data === 'undefined') return;
+    toInsert.push({ tipo: ev.tipo||'outro', data: ev.data, nome: ev.nome||'Evento', disciplina_id: discId, hora: ev.hora||'', notas: '', concluido: false, user_id: currentUser.id });
     count++;
   });
 
-  if (toInsert.length) await sb.from('eventos').insert(toInsert);
+  if (!toInsert.length) { alert('Nenhum evento selecionado!'); return; }
+
+  const btnImportar = document.querySelector('#import-step-2 .btn-primary');
+  if (btnImportar) { btnImportar.textContent = 'Salvando...'; btnImportar.disabled = true; }
+
+  const { error } = await sb.from('eventos').insert(toInsert);
+  if (error) {
+    alert('Erro ao salvar: ' + error.message);
+    if (btnImportar) { btnImportar.textContent = 'Importar selecionados'; btnImportar.disabled = false; }
+    return;
+  }
+
   await reloadEventos();
   updateBadges();
 
   document.getElementById('import-step-2').style.display = 'none';
   document.getElementById('import-step-3').style.display = 'block';
-  document.getElementById('import-success-msg').textContent = `${count} evento${count!==1?'s':''} importado${count!==1?'s':''}!`;
+  document.getElementById('import-success-msg').textContent = count+' evento'+(count!==1?'s':'')+' importado'+(count!==1?'s':'')+' com sucesso!';
   setTimeout(() => { closeImportModal(); render(); }, 2000);
 }
 
