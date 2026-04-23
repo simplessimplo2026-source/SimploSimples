@@ -812,14 +812,14 @@ async function salvarEvento() {
   const nome = $('e-nome').value.trim();
   const data = $('e-data').value;
   if (!nome||!data) { alert('Preencha nome e data!'); return; }
-  const u = await getUser();
-  if (!u) { alert('Sessão expirada! Faça login novamente.'); doLogout(); return; }
-  const ev = { tipo:$('e-tipo').value, data, nome, disciplina_id:$('e-disc').value||null, hora:$('e-hora').value||'', notas:$('e-notas').value.trim(), concluido:$('e-done').checked, user_id:u.id };
-  let r;
-  if (editEvId) r = await sb.from('eventos').update(ev).eq('id',editEvId);
-  else r = await sb.from('eventos').insert(ev);
+  if (!user) { alert('Sessão expirada!'); return; }
+  const ev = { tipo:$('e-tipo').value, data, nome, disciplina_id:$('e-disc').value||null, hora:$('e-hora').value||'', notas:$('e-notas').value.trim(), concluido:$('e-done').checked, user_id:user.id };
+  const r = editEvId
+    ? await sb.from('eventos').update(ev).eq('id', editEvId)
+    : await sb.from('eventos').insert(ev);
   if (r.error) { alert('Erro: '+r.error.message); return; }
-  await reloadEventos();
+  const { data: evData } = await sb.from('eventos').select('*').order('data');
+  eventos = evData || [];
   closeModal('evento'); updateBadges(); render();
 }
 async function delEvento() {
@@ -852,24 +852,19 @@ function openDisc(id) {
   }
   $('m-disc').classList.add('open');
 }
-async function getUser() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session && session.user) { user = session.user; return user; }
-  return null;
-}
-
 async function salvarDisc() {
   const nome = $('d-nome').value.trim();
   if (!nome) { alert('Informe o nome!'); return; }
-  const u = await getUser();
-  if (!u) { alert('Sessão expirada! Faça login novamente.'); doLogout(); return; }
-  const d = { nome, prof:$('d-prof').value.trim(), cor:$('d-cor').value, user_id:u.id };
-  let r;
-  if (editDiscId) r = await sb.from('disciplinas').update(d).eq('id',editDiscId);
-  else r = await sb.from('disciplinas').insert(d);
+  if (!user) { alert('Sessão expirada!'); return; }
+  const d = { nome, prof:$('d-prof').value.trim(), cor:$('d-cor').value, user_id:user.id };
+  const r = editDiscId
+    ? await sb.from('disciplinas').update(d).eq('id', editDiscId)
+    : await sb.from('disciplinas').insert(d);
   if (r.error) { alert('Erro: '+r.error.message); return; }
-  await reloadDiscs();
-  closeModal('disc'); render();
+  const { data } = await sb.from('disciplinas').select('*').order('nome');
+  discs = data || [];
+  closeModal('disc');
+  go('disciplinas');
 }
 async function delDisc() {
   if (!confirm('Excluir disciplina?')) return;
@@ -965,8 +960,7 @@ async function analisarImport() {
   btn.textContent='Analisar com GPT ✨'; btn.disabled=false;
 }
 async function confirmarImport() {
-  const u = await getUser();
-  if (!u) { alert('Sessão expirada!'); doLogout(); return; }
+  if (!user) { alert('Sessão expirada!'); return; }
   const def = $('imp-disc-default').value;
   const toIns = [];
   impEvents.forEach((ev,i) => {
@@ -977,7 +971,7 @@ async function confirmarImport() {
       const m = discs.find(d => d.nome.toLowerCase().includes(ev.disciplina.toLowerCase().split(' ')[0]) || ev.disciplina.toLowerCase().includes(d.nome.toLowerCase().split(' ')[0]));
       if (m) discId = m.id;
     }
-    toIns.push({tipo:ev.tipo||'outro',data:ev.data,nome:ev.nome||'Evento',disciplina_id:discId,hora:ev.hora||'',notas:'',concluido:false,user_id:u.id});
+    toIns.push({tipo:ev.tipo||'outro',data:ev.data,nome:ev.nome||'Evento',disciplina_id:discId,hora:ev.hora||'',notas:'',concluido:false,user_id:user.id});
   });
   if (!toIns.length) { alert('Nenhum evento selecionado!'); return; }
   const { error } = await sb.from('eventos').insert(toIns);
