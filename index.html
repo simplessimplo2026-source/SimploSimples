@@ -6,6 +6,11 @@
 <title>Simplo — Agenda Acadêmica</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Simplo">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -932,6 +937,13 @@ document.getElementById('btn-salvar-ev').addEventListener('click', function(e) {
 document.getElementById('btn-confirmar').addEventListener('click', function(e) {
   e.preventDefault(); e.stopPropagation(); confirmar();
 });
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/SimploSimples/sw.js')
+    .then(() => console.log('SW registrado'))
+    .catch(e => console.log('SW erro:', e));
+}
 
 init();
 </script>
