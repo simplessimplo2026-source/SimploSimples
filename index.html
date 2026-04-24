@@ -334,7 +334,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="bottom-nav">
+<nav class="bottom-nav" id="bottom-nav" style="display:none">
   <div class="bnav-item on" id="bn-resumo" onclick="go('resumo');bnav('resumo')"><span class="bnav-icon">📋</span>Resumo</div>
   <div class="bnav-item" id="bn-calendario" onclick="go('calendario');bnav('calendario')"><span class="bnav-icon">📅</span>Agenda</div>
   <div class="bnav-fab" onclick="openModal('evento')"><div class="bnav-fab-btn">+</div></div>
@@ -566,10 +566,7 @@ async function doLogout(){
   try { closeDrawer(); } catch(e) {}
   $('app').style.display='none';
   $('auth').style.display='flex';
-  try {
-    const bn = document.querySelector('.bottom-nav');
-    if(bn) bn.setAttribute('style','display:none!important');
-  } catch(e) {}
+  try { $('bottom-nav').style.display='none'; } catch(e) {}
   try { $('a-email').value=''; $('a-pass').value=''; } catch(e) {}
   $('auth-msg').className='auth-msg';
   $('auth-msg').textContent='';
@@ -596,7 +593,7 @@ async function boot(u){
   U=u;
   $('s-email').textContent=u.email;
   $('app').style.display='block';
-  try { const bn=document.querySelector('.bottom-nav'); if(bn) bn.removeAttribute('style'); } catch(e) {}
+  $('bottom-nav').style.display='';
   await loadAll();
   badges();render();
 }
