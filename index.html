@@ -597,6 +597,7 @@ async function boot(u){
   $('bottom-nav').classList.add('visible');
   await loadAll();
   badges();render();
+  setTimeout(pedirPermissaoNotificacao, 2000);
 }
 
 // ── DATA ──
@@ -945,6 +946,56 @@ document.getElementById('btn-salvar-ev').addEventListener('click', function(e) {
 document.getElementById('btn-confirmar').addEventListener('click', function(e) {
   e.preventDefault(); e.stopPropagation(); confirmar();
 });
+
+
+// ── NOTIFICAÇÕES ──
+async function pedirPermissaoNotificacao() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    agendarNotificacoes();
+    return;
+  }
+  if (Notification.permission !== 'denied') {
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') agendarNotificacoes();
+  }
+}
+
+function agendarNotificacoes() {
+  // Verificar eventos urgentes agora
+  verificarEventosUrgentes();
+  // Verificar todo dia às 8h
+  const agora = new Date();
+  const amanha8h = new Date(agora);
+  amanha8h.setDate(amanha8h.getDate() + (agora.getHours() >= 8 ? 1 : 0));
+  amanha8h.setHours(8, 0, 0, 0);
+  const msAte8h = amanha8h - agora;
+  setTimeout(() => {
+    verificarEventosUrgentes();
+    setInterval(verificarEventosUrgentes, 24 * 60 * 60 * 1000);
+  }, msAte8h);
+}
+
+function verificarEventosUrgentes() {
+  if (!evts.length || Notification.permission !== 'granted') return;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const urgentes = evts.filter(e => {
+    if (e.concluido) return false;
+    const dl = dLeft(e.data);
+    return dl >= 0 && dl <= 3;
+  });
+  urgentes.forEach(ev => {
+    const dl = dLeft(ev.data);
+    const quando = dl === 0 ? 'HOJE' : dl === 1 ? 'amanhã' : `em ${dl} dias`;
+    const disc = gDisc(ev.disciplina_id);
+    new Notification(`${ev.tipo === 'prova' ? '📝' : ev.tipo === 'trabalho' ? '📂' : '🎤'} ${ev.nome}`, {
+      body: `${ftipo(ev.tipo)} ${quando}${disc ? ' · ' + disc.nome : ''}`,
+      icon: '/SimploSimples/icon-192.png',
+      badge: '/SimploSimples/icon-192.png',
+      tag: ev.id
+    });
+  });
+}
 
 // Service Worker
 if ('serviceWorker' in navigator) {

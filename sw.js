@@ -1,7 +1,9 @@
-const CACHE = 'simplo-v1';
+const CACHE = 'simplo-v2';
 const ASSETS = [
   '/SimploSimples/',
-  '/SimploSimples/index.html'
+  '/SimploSimples/index.html',
+  '/SimploSimples/icon-192.png',
+  '/SimploSimples/icon-512.png'
 ];
 
 self.addEventListener('install', e => {
@@ -27,4 +29,10 @@ self.addEventListener('fetch', e => {
       })
       .catch(() => caches.match(e.request))
   );
+});
+
+// Notificação ao clicar
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(clients.openWindow('/SimploSimples/'));
 });
