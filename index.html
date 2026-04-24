@@ -295,7 +295,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
   <div class="layout">
     <aside class="sidebar">
       <div class="sidebar-top">
-        <div class="sidebar-brand">Simplo</div>
+        <div class="sidebar-brand" style="font-size:17px">Simplo Estudante</div>
         <div class="sidebar-semester">UNIVALI · 2026/1</div>
       </div>
       <nav class="sidebar-nav">
@@ -561,15 +561,16 @@ async function doForgot(){
   if(error)aMsg(error.message,'error');else aMsg('Email enviado!','success');
 }
 async function doLogout(){
-  try {
-    await SB.auth.signOut();
-  } catch(e) {}
+  try { await SB.auth.signOut(); } catch(e) {}
   discs=[];evts=[];U=null;
+  try { closeDrawer(); } catch(e) {}
   $('app').style.display='none';
   $('auth').style.display='flex';
-  document.querySelector('.bottom-nav').style.display='none';
-  $('a-email').value='';
-  $('a-pass').value='';
+  try {
+    const bn = document.querySelector('.bottom-nav');
+    if(bn) bn.setAttribute('style','display:none!important');
+  } catch(e) {}
+  try { $('a-email').value=''; $('a-pass').value=''; } catch(e) {}
   $('auth-msg').className='auth-msg';
   $('auth-msg').textContent='';
   setTab('login');
@@ -595,7 +596,7 @@ async function boot(u){
   U=u;
   $('s-email').textContent=u.email;
   $('app').style.display='block';
-  document.querySelector('.bottom-nav').style.display='';
+  try { const bn=document.querySelector('.bottom-nav'); if(bn) bn.removeAttribute('style'); } catch(e) {}
   await loadAll();
   badges();render();
 }
