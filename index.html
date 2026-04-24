@@ -200,7 +200,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 /* ─── OVERLAY / MODAL ─── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:9000;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:var(--radius-lg);padding:26px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,.15);animation:modalIn .2s ease}
+.modal{background:var(--surface);border-radius:20px;padding:22px 24px;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .2s ease}
 @keyframes modalIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .modal-title{font-size:17px;font-weight:700;color:var(--text)}
@@ -248,7 +248,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
   .filters::-webkit-scrollbar{display:none}
   .filter{white-space:nowrap;flex-shrink:0}
   .overlay{align-items:flex-end}
-  .modal{border-radius:20px 20px 0 0;width:100%;max-width:100%;margin:0;padding:8px 22px 32px;max-height:92vh}
+  .modal{border-radius:22px 22px 0 0;width:100%;max-width:100%;margin:0;padding:6px 20px 28px;max-height:88vh}
   .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:8px auto 16px}
   .bottom-nav{display:flex!important;pointer-events:auto!important}
   #btn-hamburger{display:flex!important}
@@ -371,7 +371,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 
 <!-- MODAL EVENTO -->
 <div class="overlay" id="m-evento">
-<div class="modal" style="max-width:500px">
+<div class="modal" style="max-width:440px">
   <div class="modal-head">
     <div class="modal-title" id="m-evento-title">Novo evento</div>
     <button class="modal-close" onclick="closeModal('evento')">✕</button>
@@ -406,7 +406,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 
 <!-- MODAL DISCIPLINA -->
 <div class="overlay" id="m-disc">
-<div class="modal" style="max-width:420px">
+<div class="modal" style="max-width:380px">
   <div class="modal-head">
     <div class="modal-title" id="m-disc-title">Nova disciplina</div>
     <button class="modal-close" onclick="closeModal('disc')">✕</button>
@@ -479,7 +479,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 
 <!-- MODAL CONFIG -->
 <div class="overlay" id="m-cfg">
-<div class="modal" style="max-width:400px">
+<div class="modal" style="max-width:370px">
   <div class="modal-head">
     <div class="modal-title">⚙️ Configurações</div>
     <button class="modal-close" onclick="closeModal('cfg')">✕</button>
@@ -567,7 +567,7 @@ async function doLogout(){
   discs=[];evts=[];U=null;
   $('app').style.display='none';
   $('auth').style.display='flex';
-  // Resetar campos de auth
+  document.querySelector('.bottom-nav').style.display='none';
   $('a-email').value='';
   $('a-pass').value='';
   $('auth-msg').className='auth-msg';
@@ -595,6 +595,7 @@ async function boot(u){
   U=u;
   $('s-email').textContent=u.email;
   $('app').style.display='block';
+  document.querySelector('.bottom-nav').style.display='';
   await loadAll();
   badges();render();
 }
@@ -768,7 +769,7 @@ function openModal(id){
   else if(id==='cfg')openCfg();
 }
 function closeModal(id){$('m-'+id).classList.remove('open')}
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+// Modais só fecham pelo X ou Cancelar
 
 // ── EVENTO ──
 function fillDiscs(id){
