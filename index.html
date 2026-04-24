@@ -1132,7 +1132,7 @@ function rGruposPage() {
 
 // Abrir/fechar modal grupo entry
 function openGrupoEntry(aba) {
-  setGrupoTab(aba || 'criar');
+  setGrupoTab(aba===2?'entrar':'criar');
   $('m-grupo-entry').classList.add('open');
 }
 
@@ -1213,7 +1213,7 @@ function renderMural() {
   const meuMembro = grupoMembros.find(m => m.user_id === U.id);
   const codigo = grupoAtual.codigo;
   let html = '<div class="code-box"><div class="code-num">'+codigo+'</div><div class="code-label">Compartilhe este código para convidar colegas</div></div>';
-  html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="document.getElementById('m-aviso').classList.add('open')">📢 Novo aviso</button></div>';
+  html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="abrirAviso()">📢 Novo aviso</button></div>';
   if (!grupoAvisos.length) {
     html += '<div class="empty"><div class="empty-icon">📢</div><div class="empty-title">Nenhum aviso ainda</div><div class="empty-sub">Poste um aviso para o grupo!</div></div>';
   } else {
@@ -1255,7 +1255,7 @@ function tarefaHTML(t) {
 }
 
 function renderEventosGrupo() {
-  let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="document.getElementById('m-gevento').classList.add('open')">📅 Novo evento</button></div>';
+  let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="abrirGevento()">📅 Novo evento</button></div>';
   if (!grupoEventos.length) {
     return html + '<div class="empty"><div class="empty-icon">📅</div><div class="empty-title">Nenhum evento do grupo</div></div>';
   }
@@ -1294,6 +1294,9 @@ async function postarAviso() {
 }
 
 // Criar tarefa
+function abrirAviso(){ $('m-aviso').classList.add('open'); }
+function abrirGevento(){ $('m-gevento').classList.add('open'); }
+
 function abrirModalTarefa() {
   const sel = $('tar-atrib');
   sel.innerHTML = '<option value="">Sem atribuição</option>' + grupoMembros.map(m => '<option value="'+m.user_id+'">'+m.nome+'</option>').join('');
