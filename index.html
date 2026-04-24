@@ -43,6 +43,17 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 
 
+
+.arquivo-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;border:1px solid var(--border);margin-bottom:6px}
+.arquivo-icon{font-size:22px;flex-shrink:0}
+.arquivo-body{flex:1;min-width:0}
+.arquivo-nome{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arquivo-meta{font-size:11px;color:var(--text-3);margin-top:1px}
+.storage-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin:8px 0}
+.storage-fill{height:100%;border-radius:4px;background:var(--brand);transition:width .3s}
+.storage-fill.warn{background:var(--amber)}
+.storage-fill.full{background:var(--red)}
+
 /* ── GRUPOS ── */
 .grupo-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);transition:box-shadow .15s;cursor:pointer}
 .grupo-card:hover{box-shadow:var(--shadow-md)}
@@ -571,10 +582,11 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <div class="modal-title" id="m-grupo-nome">Grupo</div>
     <button class="modal-close" onclick="closeModal('grupo')">✕</button>
   </div>
-  <div class="tabs">
+  <div class="tabs" style="flex-wrap:wrap;gap:3px">
     <button class="tab on" onclick="setAbaGrupo('mural')">📢 Mural</button>
     <button class="tab" onclick="setAbaGrupo('tarefas')">✅ Tarefas</button>
     <button class="tab" onclick="setAbaGrupo('eventos')">📅 Eventos</button>
+    <button class="tab" onclick="setAbaGrupo('arquivos')">📎 Arquivos</button>
     <button class="tab" onclick="setAbaGrupo('membros')">👥 Membros</button>
   </div>
   <div id="grupo-content"></div>
@@ -1193,22 +1205,24 @@ async function abrirGrupo(id) {
 
 async function carregarDadosGrupo() {
   const id = grupoAtual.id;
-  const [r1, r2, r3, r4] = await Promise.all([
+  const [r1, r2, r3, r4, r5] = await Promise.all([
     SB.from('grupo_membros').select('*').eq('grupo_id', id).order('created_at'),
     SB.from('grupo_avisos').select('*').eq('grupo_id', id).order('created_at', {ascending: false}),
     SB.from('grupo_tarefas').select('*').eq('grupo_id', id).order('created_at'),
-    SB.from('grupo_eventos').select('*').eq('grupo_id', id).order('data')
+    SB.from('grupo_eventos').select('*').eq('grupo_id', id).order('data'),
+    SB.from('grupo_arquivos').select('*').eq('grupo_id', id).order('created_at', {ascending: false})
   ]);
   grupoMembros = r1.data || [];
   grupoAvisos = r2.data || [];
   grupoTarefas = r3.data || [];
   grupoEventos = r4.data || [];
+  grupoArquivos = r5.data || [];
   renderAbaGrupo();
 }
 
 function setAbaGrupo(aba) {
   abaGrupo = aba;
-  const abas = ['mural','tarefas','eventos','membros'];
+  const abas = ['mural','tarefas','eventos','arquivos','membros'];
   document.querySelectorAll('#m-grupo .tab').forEach((t,i) => t.classList.toggle('on', abas[i]===aba));
   renderAbaGrupo();
 }
@@ -1354,6 +1368,127 @@ async function criarEventoGrupo() {
   $('gev-nome').value = ''; $('gev-data').value = ''; $('gev-hora').value = '';
   closeModal('gevento');
   await carregarDadosGrupo();
+}
+
+
+// ── ARQUIVOS DO GRUPO ──
+let grupoArquivos = [];
+const LIMITE_BYTES = 50 * 1024 * 1024; // 50MB por grupo
+
+async function carregarArquivos() {
+  const { data } = await SB.from('grupo_arquivos').select('*').eq('grupo_id', grupoAtual.id).order('created_at', {ascending: false});
+  grupoArquivos = data || [];
+}
+
+function usoTotal() {
+  return grupoArquivos.reduce((acc, f) => acc + f.tamanho, 0);
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+function getFileIcon(tipo) {
+  if (tipo.includes('pdf')) return '📄';
+  if (tipo.includes('word') || tipo.includes('document')) return '📝';
+  if (tipo.includes('sheet') || tipo.includes('excel')) return '📊';
+  if (tipo.includes('image')) return '🖼️';
+  if (tipo.includes('zip') || tipo.includes('rar')) return '🗜️';
+  return '📎';
+}
+
+function renderArquivos() {
+  const uso = usoTotal();
+  const pct = Math.min(100, (uso / LIMITE_BYTES) * 100);
+  const fillClass = pct >= 100 ? 'full' : pct >= 80 ? 'warn' : '';
+  const bloqueado = pct >= 100;
+
+  let html = '<div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+      + '<span style="font-size:12px;font-weight:600;color:var(--text-2)">Espaço usado</span>'
+      + '<span style="font-size:12px;color:'+(pct>=100?'var(--red)':pct>=80?'var(--amber)':'var(--text-3)')+'">'+formatBytes(uso)+' / 50MB</span>'
+    + '</div>'
+    + '<div class="storage-bar"><div class="storage-fill '+fillClass+'" style="width:'+pct+'%"></div></div>'
+    + (pct >= 80 && pct < 100 ? '<div style="font-size:11px;color:var(--amber);margin-top:4px">⚠ Espaço quase cheio! Delete arquivos para liberar.</div>' : '')
+    + (pct >= 100 ? '<div style="font-size:11px;color:var(--red);margin-top:4px">🚫 Limite atingido! Delete arquivos para enviar novos.</div>' : '')
+  + '</div>';
+
+  if (!bloqueado) {
+    html += '<div style="margin-bottom:12px">'
+      + '<label style="display:block;background:var(--brand-light);border:1.5px dashed var(--brand);border-radius:10px;padding:14px;text-align:center;cursor:pointer">'
+        + '<input type="file" id="inp-arquivo" style="display:none" onchange="uploadArquivo(event)" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.jpg,.png">'
+        + '<div style="font-size:22px;margin-bottom:4px">📎</div>'
+        + '<div style="font-size:13px;font-weight:600;color:var(--brand)">Clique para anexar arquivo</div>'
+        + '<div style="font-size:11px;color:var(--text-3);margin-top:2px">PDF, Word, Excel, imagens... (máx. 10MB por arquivo)</div>'
+      + '</label>'
+    + '</div>';
+  }
+
+  if (!grupoArquivos.length) {
+    html += '<div class="empty"><div class="empty-icon">📎</div><div class="empty-title">Nenhum arquivo ainda</div><div class="empty-sub">Anexe arquivos para compartilhar com o grupo.</div></div>';
+  } else {
+    html += grupoArquivos.map(f => {
+      const membro = grupoMembros.find(m => m.user_id === f.user_id);
+      const isMe = f.user_id === U.id;
+      const dt = new Date(f.created_at).toLocaleDateString('pt-BR', {day:'2-digit',month:'short'});
+      const url = SB.storage.from('grupo-arquivos').getPublicUrl(f.storage_path).data.publicUrl;
+      return '<div class="arquivo-item">'
+        + '<div class="arquivo-icon">'+getFileIcon(f.tipo)+'</div>'
+        + '<div class="arquivo-body">'
+          + '<div class="arquivo-nome">'+f.nome_original+'</div>'
+          + '<div class="arquivo-meta">'+formatBytes(f.tamanho)+' · '+(membro?.nome||'Membro')+' · '+dt+'</div>'
+        + '</div>'
+        + '<a href="'+url+'" target="_blank" class="btn btn-secondary btn-sm" style="flex-shrink:0">⬇ Baixar</a>'
+        + (isMe ? '<button class="btn btn-danger btn-sm" style="flex-shrink:0" data-path="'+f.storage_path+'" data-id="'+f.id+'" onclick="deletarArquivo(this)">🗑</button>' : '')
+      + '</div>';
+    }).join('');
+  }
+  return html;
+}
+
+async function uploadArquivo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const uso = usoTotal();
+  if (uso + file.size > LIMITE_BYTES) {
+    alert('Espaço insuficiente! O arquivo é maior que o espaço disponível no grupo.');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    alert('Arquivo muito grande! O limite por arquivo é 10MB.');
+    return;
+  }
+
+  const path = U.id + '/' + grupoAtual.id + '/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  
+  const uploadBtn = document.querySelector('label[for="inp-arquivo"]') || document.querySelector('#inp-arquivo')?.parentElement;
+  if (uploadBtn) uploadBtn.innerHTML = '<div style="font-size:13px;color:var(--brand)">Enviando...</div>';
+
+  const { error: upErr } = await SB.storage.from('grupo-arquivos').upload(path, file);
+  if (upErr) { alert('Erro no upload: ' + upErr.message); renderAbaGrupo(); return; }
+
+  const { error: dbErr } = await SB.from('grupo_arquivos').insert({
+    grupo_id: grupoAtual.id, user_id: U.id,
+    nome_original: file.name, storage_path: path,
+    tamanho: file.size, tipo: file.type
+  });
+  if (dbErr) { alert('Erro ao salvar: ' + dbErr.message); return; }
+
+  await carregarArquivos();
+  renderAbaGrupo();
+}
+
+async function deletarArquivo(btn) {
+  if (!confirm('Excluir este arquivo?')) return;
+  const path = btn.getAttribute('data-path');
+  const id = btn.getAttribute('data-id');
+  await SB.storage.from('grupo-arquivos').remove([path]);
+  await SB.from('grupo_arquivos').delete().eq('id', id);
+  await carregarArquivos();
+  renderAbaGrupo();
 }
 
 // ── NOTIFICAÇÕES ──
