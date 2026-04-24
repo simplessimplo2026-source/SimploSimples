@@ -557,7 +557,12 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <button class="tab" onclick="setGrupoTab('entrar')">Entrar com código</button>
   </div>
   <div id="ge-criar">
-    <div class="field"><label>Nome do grupo</label><input type="text" id="ge-nome" placeholder="Ex: Turma Psico 2026"></div>
+    <div class="field"><label>Nome do grupo</label><input type="text" id="ge-nome" placeholder="Ex: Caso M2.1 Psicopatologia"></div>
+    <div class="field"><label>Vincular a uma disciplina (opcional)</label>
+      <select id="ge-disc" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:#fff;color:var(--text)">
+        <option value="">Sem disciplina</option>
+      </select>
+    </div>
     <div class="field"><label>Seu nome no grupo</label><input type="text" id="ge-meu-nome" placeholder="Como quer ser chamado"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('grupo-entry')">Cancelar</button>
@@ -579,8 +584,14 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 <div class="overlay" id="m-grupo">
 <div class="modal">
   <div class="modal-head">
-    <div class="modal-title" id="m-grupo-nome">Grupo</div>
-    <button class="modal-close" onclick="closeModal('grupo')">✕</button>
+    <div style="flex:1">
+      <div class="modal-title" id="m-grupo-nome">Grupo</div>
+      <div id="m-grupo-disc" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button id="btn-excluir-grupo" class="btn btn-danger btn-sm" style="display:none" onclick="excluirGrupo()">🗑 Excluir</button>
+      <button class="modal-close" onclick="closeModal('grupo')">✕</button>
+    </div>
   </div>
   <div class="tabs" style="flex-wrap:wrap;gap:3px">
     <button class="tab on" onclick="setAbaGrupo('mural')">📢 Mural</button>
@@ -1151,6 +1162,11 @@ function rGruposPage() {
 // Abrir/fechar modal grupo entry
 function openGrupoEntry(aba) {
   setGrupoTab(aba==='entrar'||aba===2?'entrar':'criar');
+  // Preencher disciplinas
+  const sel = $('ge-disc');
+  if (sel) {
+    sel.innerHTML = '<option value="">Sem disciplina</option>' + discs.map(d => '<option value="'+d.id+'">'+d.nome+'</option>').join('');
+  }
   $('m-grupo-entry').classList.add('open');
 }
 
@@ -1167,7 +1183,8 @@ async function criarGrupo() {
   const nome = $('ge-nome').value.trim();
   const meuNome = $('ge-meu-nome').value.trim();
   if (!nome || !meuNome) { alert('Preencha todos os campos!'); return; }
-  const { data: grupo, error } = await SB.from('grupos').insert({ nome, criado_por: U.id }).select().single();
+  const discId = $('ge-disc').value || null;
+  const { data: grupo, error } = await SB.from('grupos').insert({ nome, criado_por: U.id, disciplina_id: discId }).select().single();
   if (error) { alert('Erro: ' + error.message); return; }
   await SB.from('grupo_membros').insert({ grupo_id: grupo.id, user_id: U.id, nome: meuNome, role: 'admin' });
   await loadGrupos();
@@ -1197,6 +1214,12 @@ async function abrirGrupo(id) {
   grupoAtual = grupos.find(g => g.id === id);
   if (!grupoAtual) return;
   $('m-grupo-nome').textContent = grupoAtual.nome;
+  // Mostrar disciplina vinculada
+  const disc = grupoAtual.disciplina_id ? discs.find(d => d.id === grupoAtual.disciplina_id) : null;
+  $('m-grupo-disc').textContent = disc ? '📚 ' + disc.nome : '';
+  // Mostrar botão excluir só pro admin/criador
+  const btnExcluir = $('btn-excluir-grupo');
+  if (btnExcluir) btnExcluir.style.display = grupoAtual.criado_por === U.id ? 'inline-flex' : 'none';
   abaGrupo = 'mural';
   document.querySelectorAll('#m-grupo .tab').forEach((t,i) => t.classList.toggle('on', i===0));
   $('m-grupo').classList.add('open');
@@ -1490,6 +1513,21 @@ async function deletarArquivo(btn) {
   await SB.from('grupo_arquivos').delete().eq('id', id);
   await carregarArquivos();
   renderAbaGrupo();
+}
+
+
+async function excluirGrupo() {
+  if (!confirm('Excluir o grupo "'+grupoAtual.nome+'"? Todos os dados serão perdidos.')) return;
+  if (!confirm('Tem certeza? Esta ação não pode ser desfeita!')) return;
+  // Deletar arquivos do storage
+  const { data: arqs } = await SB.from('grupo_arquivos').select('storage_path').eq('grupo_id', grupoAtual.id);
+  if (arqs && arqs.length) {
+    await SB.storage.from('grupo-arquivos').remove(arqs.map(a => a.storage_path));
+  }
+  await SB.from('grupos').delete().eq('id', grupoAtual.id);
+  await loadGrupos();
+  closeModal('grupo');
+  render();
 }
 
 // ── NOTIFICAÇÕES ──
