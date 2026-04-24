@@ -250,7 +250,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
   .overlay{align-items:flex-end}
   .modal{border-radius:22px 22px 0 0;width:100%;max-width:100%;margin:0;padding:6px 20px 28px;max-height:88vh}
   .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:8px auto 16px}
-  .bottom-nav{display:flex!important;pointer-events:auto!important}
+  .bottom-nav.visible{display:flex!important;pointer-events:auto!important}
   #btn-hamburger{display:flex!important}
   .event-card:hover{transform:none}
 }
@@ -334,7 +334,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="bottom-nav" id="bottom-nav" style="display:none">
+<nav class="bottom-nav" id="bottom-nav">
   <div class="bnav-item on" id="bn-resumo" onclick="go('resumo');bnav('resumo')"><span class="bnav-icon">📋</span>Resumo</div>
   <div class="bnav-item" id="bn-calendario" onclick="go('calendario');bnav('calendario')"><span class="bnav-icon">📅</span>Agenda</div>
   <div class="bnav-fab" onclick="openModal('evento')"><div class="bnav-fab-btn">+</div></div>
@@ -566,7 +566,7 @@ async function doLogout(){
   try { closeDrawer(); } catch(e) {}
   $('app').style.display='none';
   $('auth').style.display='flex';
-  try { $('bottom-nav').style.display='none'; } catch(e) {}
+  try { $('bottom-nav').classList.remove('visible'); } catch(e) {}
   try { $('a-email').value=''; $('a-pass').value=''; } catch(e) {}
   $('auth-msg').className='auth-msg';
   $('auth-msg').textContent='';
@@ -593,7 +593,7 @@ async function boot(u){
   U=u;
   $('s-email').textContent=u.email;
   $('app').style.display='block';
-  $('bottom-nav').style.display='';
+  $('bottom-nav').classList.add('visible');
   await loadAll();
   badges();render();
 }
