@@ -42,6 +42,36 @@
 html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
 body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 
+
+/* ── GRUPOS ── */
+.grupo-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);transition:box-shadow .15s;cursor:pointer}
+.grupo-card:hover{box-shadow:var(--shadow-md)}
+.grupo-nome{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.grupo-code{font-size:12px;color:var(--text-3);font-family:monospace;background:var(--bg);padding:2px 8px;border-radius:6px;display:inline-block;margin-bottom:8px;letter-spacing:1px}
+.grupo-stats{display:flex;gap:12px;font-size:12px;color:var(--text-2)}
+.aviso-card{background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--brand)}
+.aviso-text{font-size:13px;color:var(--text);margin-bottom:4px}
+.aviso-meta{font-size:11px;color:var(--text-3)}
+.tarefa-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;border:1px solid var(--border);margin-bottom:6px}
+.tarefa-item.done{opacity:.5}
+.tarefa-check{width:18px;height:18px;accent-color:var(--brand);cursor:pointer;flex-shrink:0;margin-top:1px}
+.tarefa-body{flex:1}
+.tarefa-titulo{font-size:13px;font-weight:600;color:var(--text)}
+.tarefa-atrib{font-size:11px;color:var(--brand);margin-top:2px}
+.tarefa-desc{font-size:11px;color:var(--text-3);margin-top:1px}
+.evento-grupo-card{background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.tabs{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:16px}
+.tab{flex:1;text-align:center;padding:7px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-3);transition:all .15s;border:none;background:none;font-family:inherit}
+.tab.on{background:var(--surface);color:var(--brand);box-shadow:var(--shadow)}
+.membro-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.membro-avatar{width:32px;height:32px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--brand);flex-shrink:0}
+.membro-info{flex:1}
+.membro-nome{font-size:13px;font-weight:600;color:var(--text)}
+.membro-role{font-size:11px;color:var(--text-3)}
+.code-box{background:var(--brand-light);border:1.5px dashed var(--brand);border-radius:10px;padding:14px;text-align:center;margin-bottom:16px}
+.code-num{font-size:28px;font-weight:700;letter-spacing:6px;color:var(--brand);font-family:monospace}
+.code-label{font-size:11px;color:var(--text-3);margin-top:4px}
+
 /* ─── LOADING ─── */
 #loading{position:fixed;inset:0;background:var(--brand);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999}
 .loading-logo{font-family:'Playfair Display',serif;font-size:36px;color:#fff;letter-spacing:-1px}
@@ -310,6 +340,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <button class="nav-btn" onclick="go('eventos','apresentacao')"><span class="icon">🎤</span>Apresentações</button>
         <div class="nav-group">Config</div>
         <button class="nav-btn" onclick="go('disciplinas')"><span class="icon">🏫</span>Disciplinas</button>
+        <button class="nav-btn" onclick="go('grupos')"><span class="icon">👥</span>Grupos</button>
         <button class="nav-btn" onclick="openModal('cfg')"><span class="icon">⚙️</span>Configurações</button>
       </nav>
       <div class="sidebar-bottom">
@@ -362,6 +393,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <div class="drawer-item" onclick="go('eventos','outro');closeDrawer()"><span class="icon">📌</span>Outros</div>
     <div style="font-size:10px;font-weight:700;color:var(--text-3);padding:8px 18px 2px;text-transform:uppercase">Config</div>
     <div class="drawer-item" onclick="go('disciplinas');closeDrawer()"><span class="icon">🏫</span>Disciplinas</div>
+    <div class="drawer-item" onclick="go('grupos');closeDrawer()"><span class="icon">👥</span>Grupos</div>
     <div class="drawer-item" onclick="openModal('cfg');closeDrawer()"><span class="icon">⚙️</span>Configurações</div>
     <div class="drawer-item" onclick="openModal('import');closeDrawer()"><span class="icon">📎</span>Importar cronograma</div>
   </nav>
@@ -501,6 +533,119 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 </div>
 </div>
 
+
+<!-- MODAL: CRIAR/ENTRAR GRUPO -->
+<div class="overlay" id="m-grupo-entry">
+<div class="modal" style="max-width:400px">
+  <div class="modal-head">
+    <div class="modal-title" id="m-grupo-entry-title">Criar grupo</div>
+    <button class="modal-close" onclick="closeModal('grupo-entry')">✕</button>
+  </div>
+  <div class="tabs" id="grupo-entry-tabs">
+    <button class="tab on" onclick="setGrupoTab('criar')">Criar grupo</button>
+    <button class="tab" onclick="setGrupoTab('entrar')">Entrar com código</button>
+  </div>
+  <div id="ge-criar">
+    <div class="field"><label>Nome do grupo</label><input type="text" id="ge-nome" placeholder="Ex: Turma Psico 2026"></div>
+    <div class="field"><label>Seu nome no grupo</label><input type="text" id="ge-meu-nome" placeholder="Como quer ser chamado"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('grupo-entry')">Cancelar</button>
+      <button class="btn btn-primary" onclick="criarGrupo()">Criar grupo</button>
+    </div>
+  </div>
+  <div id="ge-entrar" style="display:none">
+    <div class="field"><label>Código do grupo</label><input type="text" id="ge-codigo" placeholder="Ex: AB12CD" style="text-transform:uppercase;letter-spacing:3px;font-size:18px;text-align:center"></div>
+    <div class="field"><label>Seu nome no grupo</label><input type="text" id="ge-meu-nome2" placeholder="Como quer ser chamado"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('grupo-entry')">Cancelar</button>
+      <button class="btn btn-primary" onclick="entrarGrupo()">Entrar no grupo</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: GRUPO DETALHE -->
+<div class="overlay" id="m-grupo">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-title" id="m-grupo-nome">Grupo</div>
+    <button class="modal-close" onclick="closeModal('grupo')">✕</button>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="setAbaGrupo('mural')">📢 Mural</button>
+    <button class="tab" onclick="setAbaGrupo('tarefas')">✅ Tarefas</button>
+    <button class="tab" onclick="setAbaGrupo('eventos')">📅 Eventos</button>
+    <button class="tab" onclick="setAbaGrupo('membros')">👥 Membros</button>
+  </div>
+  <div id="grupo-content"></div>
+</div>
+</div>
+
+<!-- MODAL: NOVO AVISO -->
+<div class="overlay" id="m-aviso">
+<div class="modal" style="max-width:400px">
+  <div class="modal-head">
+    <div class="modal-title">📢 Novo aviso</div>
+    <button class="modal-close" onclick="closeModal('aviso')">✕</button>
+  </div>
+  <div class="field"><label>Mensagem</label>
+    <textarea id="av-texto" placeholder="Ex: Pessoal, mudou a data da prova!" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;min-height:80px;resize:vertical"></textarea>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-secondary" onclick="closeModal('aviso')">Cancelar</button>
+    <button class="btn btn-primary" onclick="postarAviso()">Postar aviso</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: NOVA TAREFA -->
+<div class="overlay" id="m-tarefa">
+<div class="modal" style="max-width:420px">
+  <div class="modal-head">
+    <div class="modal-title">✅ Nova tarefa</div>
+    <button class="modal-close" onclick="closeModal('tarefa')">✕</button>
+  </div>
+  <div class="field"><label>Título da tarefa</label><input type="text" id="tar-titulo" placeholder="Ex: Fazer introdução do trabalho"></div>
+  <div class="field"><label>Descrição (opcional)</label>
+    <textarea id="tar-desc" placeholder="Detalhes..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;min-height:60px;resize:vertical"></textarea>
+  </div>
+  <div class="field"><label>Atribuir para</label>
+    <select id="tar-atrib" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:#fff;color:var(--text)"></select>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-secondary" onclick="closeModal('tarefa')">Cancelar</button>
+    <button class="btn btn-primary" onclick="criarTarefa()">Criar tarefa</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: NOVO EVENTO GRUPO -->
+<div class="overlay" id="m-gevento">
+<div class="modal" style="max-width:420px">
+  <div class="modal-head">
+    <div class="modal-title">📅 Evento do grupo</div>
+    <button class="modal-close" onclick="closeModal('gevento')">✕</button>
+  </div>
+  <div class="field-row">
+    <div class="field"><label>Tipo</label>
+      <select id="gev-tipo" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:#fff">
+        <option value="prova">📝 Prova</option>
+        <option value="trabalho">📂 Trabalho</option>
+        <option value="apresentacao">🎤 Apresentação</option>
+        <option value="outro">📌 Outro</option>
+      </select>
+    </div>
+    <div class="field"><label>Data</label><input type="date" id="gev-data" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none"></div>
+  </div>
+  <div class="field"><label>Nome</label><input type="text" id="gev-nome" placeholder="Ex: Prova AV1"></div>
+  <div class="field"><label>Horário (opcional)</label><input type="time" id="gev-hora" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none"></div>
+  <div class="modal-actions">
+    <button class="btn btn-secondary" onclick="closeModal('gevento')">Cancelar</button>
+    <button class="btn btn-primary" onclick="criarEventoGrupo()">Adicionar evento</button>
+  </div>
+</div>
+</div>
+
 <script>
 // ── SUPABASE ──
 const SB = supabase.createClient(
@@ -596,6 +741,7 @@ async function boot(u){
   $('app').style.display='block';
   $('bottom-nav').classList.add('visible');
   await loadAll();
+  await loadGrupos();
   badges();render();
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
@@ -652,6 +798,7 @@ function render(){
   else if(pg==='eventos')el.innerHTML=rEventos();
   else if(pg==='calendario')el.innerHTML=rCal();
   else if(pg==='disciplinas')el.innerHTML=rDiscsPage();
+  else if(pg==='grupos')el.innerHTML=rGruposPage();
 }
 
 function cardHTML(ev){
@@ -947,6 +1094,245 @@ document.getElementById('btn-confirmar').addEventListener('click', function(e) {
   e.preventDefault(); e.stopPropagation(); confirmar();
 });
 
+
+
+// ── GRUPOS ──
+let grupos = [], grupoAtual = null, abaGrupo = 'mural';
+let grupoMembros = [], grupoAvisos = [], grupoTarefas = [], grupoEventos = [];
+
+// Carregar grupos do usuário
+async function loadGrupos() {
+  const { data } = await SB.from('grupo_membros').select('grupo_id, grupos(*)').eq('user_id', U.id);
+  grupos = (data || []).map(d => d.grupos).filter(Boolean);
+}
+
+// Render página grupos
+function rGruposPage() {
+  if (!grupos.length) {
+    return '<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">Nenhum grupo ainda</div><div class="empty-sub">Crie um grupo ou entre com um código de convite.</div></div>'
+      + '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'
+      + '<button class="btn btn-primary" onclick="openGrupoEntry()">+ Criar grupo</button>'
+      + '<button class="btn btn-secondary" onclick="openGrupoEntry('entrar')">Entrar com código</button>'
+      + '</div>';
+  }
+  const cards = grupos.map(g => `
+    <div class="grupo-card" onclick="abrirGrupo('${g.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="grupo-nome">${g.nome}</div>
+        <span class="grupo-code">${g.codigo}</span>
+      </div>
+      <div class="grupo-stats"><span>👥 Membros</span><span>📢 Mural</span><span>✅ Tarefas</span></div>
+    </div>`).join('');
+  return '<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">'
+    + '<button class="btn btn-secondary" onclick="openGrupoEntry('entrar')">Entrar com código</button>'
+    + '<button class="btn btn-primary" onclick="openGrupoEntry()">+ Criar grupo</button>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:10px">' + cards + '</div>';
+}
+
+// Abrir/fechar modal grupo entry
+function openGrupoEntry(aba) {
+  setGrupoTab(aba || 'criar');
+  $('m-grupo-entry').classList.add('open');
+}
+
+function setGrupoTab(aba) {
+  document.querySelectorAll('#grupo-entry-tabs .tab').forEach((t,i) => t.classList.toggle('on', i===(aba==='criar'?0:1)));
+  $('ge-criar').style.display = aba==='criar'?'block':'none';
+  $('ge-entrar').style.display = aba==='entrar'?'block':'none';
+}
+
+async function criarGrupo() {
+  const nome = $('ge-nome').value.trim();
+  const meuNome = $('ge-meu-nome').value.trim();
+  if (!nome || !meuNome) { alert('Preencha todos os campos!'); return; }
+  const { data: grupo, error } = await SB.from('grupos').insert({ nome, criado_por: U.id }).select().single();
+  if (error) { alert('Erro: ' + error.message); return; }
+  await SB.from('grupo_membros').insert({ grupo_id: grupo.id, user_id: U.id, nome: meuNome, role: 'admin' });
+  await loadGrupos();
+  closeModal('grupo-entry');
+  render();
+  abrirGrupo(grupo.id);
+}
+
+async function entrarGrupo() {
+  const codigo = $('ge-codigo').value.trim().toUpperCase();
+  const meuNome = $('ge-meu-nome2').value.trim();
+  if (!codigo || !meuNome) { alert('Preencha todos os campos!'); return; }
+  const { data: grupo, error } = await SB.from('grupos').select('*').eq('codigo', codigo).single();
+  if (error || !grupo) { alert('Código inválido!'); return; }
+  const { error: e2 } = await SB.from('grupo_membros').insert({ grupo_id: grupo.id, user_id: U.id, nome: meuNome, role: 'membro' });
+  if (e2) { alert(e2.code === '23505' ? 'Você já está neste grupo!' : 'Erro: ' + e2.message); return; }
+  await loadGrupos();
+  closeModal('grupo-entry');
+  render();
+  abrirGrupo(grupo.id);
+}
+
+async function abrirGrupo(id) {
+  grupoAtual = grupos.find(g => g.id === id);
+  if (!grupoAtual) return;
+  $('m-grupo-nome').textContent = grupoAtual.nome;
+  abaGrupo = 'mural';
+  document.querySelectorAll('#m-grupo .tab').forEach((t,i) => t.classList.toggle('on', i===0));
+  $('m-grupo').classList.add('open');
+  await carregarDadosGrupo();
+}
+
+async function carregarDadosGrupo() {
+  const id = grupoAtual.id;
+  const [r1, r2, r3, r4] = await Promise.all([
+    SB.from('grupo_membros').select('*').eq('grupo_id', id).order('created_at'),
+    SB.from('grupo_avisos').select('*').eq('grupo_id', id).order('created_at', {ascending: false}),
+    SB.from('grupo_tarefas').select('*').eq('grupo_id', id).order('created_at'),
+    SB.from('grupo_eventos').select('*').eq('grupo_id', id).order('data')
+  ]);
+  grupoMembros = r1.data || [];
+  grupoAvisos = r2.data || [];
+  grupoTarefas = r3.data || [];
+  grupoEventos = r4.data || [];
+  renderAbaGrupo();
+}
+
+function setAbaGrupo(aba) {
+  abaGrupo = aba;
+  const abas = ['mural','tarefas','eventos','membros'];
+  document.querySelectorAll('#m-grupo .tab').forEach((t,i) => t.classList.toggle('on', abas[i]===aba));
+  renderAbaGrupo();
+}
+
+function renderAbaGrupo() {
+  const el = $('grupo-content');
+  if (abaGrupo === 'mural') el.innerHTML = renderMural();
+  else if (abaGrupo === 'tarefas') el.innerHTML = renderTarefas();
+  else if (abaGrupo === 'eventos') el.innerHTML = renderEventosGrupo();
+  else if (abaGrupo === 'membros') el.innerHTML = renderMembros();
+}
+
+function renderMural() {
+  const meuMembro = grupoMembros.find(m => m.user_id === U.id);
+  const codigo = grupoAtual.codigo;
+  let html = '<div class="code-box"><div class="code-num">'+codigo+'</div><div class="code-label">Compartilhe este código para convidar colegas</div></div>';
+  html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="$(`m-aviso`).classList.add(`open`)">📢 Novo aviso</button></div>';
+  if (!grupoAvisos.length) {
+    html += '<div class="empty"><div class="empty-icon">📢</div><div class="empty-title">Nenhum aviso ainda</div><div class="empty-sub">Poste um aviso para o grupo!</div></div>';
+  } else {
+    html += grupoAvisos.map(a => {
+      const membro = grupoMembros.find(m => m.user_id === a.criado_por);
+      const dt = new Date(a.created_at).toLocaleDateString('pt-BR', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      return '<div class="aviso-card"><div class="aviso-text">'+a.texto+'</div><div class="aviso-meta">'+( membro?.nome||'Membro')+' · '+dt+'</div></div>';
+    }).join('');
+  }
+  return html;
+}
+
+function renderTarefas() {
+  const pendentes = grupoTarefas.filter(t => !t.concluida);
+  const concluidas = grupoTarefas.filter(t => t.concluida);
+  let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="abrirModalTarefa()">✅ Nova tarefa</button></div>';
+  if (!grupoTarefas.length) {
+    return html + '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Nenhuma tarefa ainda</div></div>';
+  }
+  html += pendentes.map(t => tarefaHTML(t)).join('');
+  if (concluidas.length) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin:12px 0 6px">Concluídas</div>';
+    html += concluidas.map(t => tarefaHTML(t)).join('');
+  }
+  return html;
+}
+
+function tarefaHTML(t) {
+  const atrib = grupoMembros.find(m => m.user_id === t.atribuido_para);
+  const criador = grupoMembros.find(m => m.user_id === t.criado_por);
+  return '<div class="tarefa-item'+(t.concluida?' done':'')+'">'
+    + '<input type="checkbox" class="tarefa-check" '+(t.concluida?'checked':'')+' onchange="toggleTarefa(''+t.id+'','+t.concluida+')">'
+    + '<div class="tarefa-body">'
+      + '<div class="tarefa-titulo">'+t.titulo+'</div>'
+      + (atrib?'<div class="tarefa-atrib">→ '+atrib.nome+'</div>':'')
+      + (t.descricao?'<div class="tarefa-desc">'+t.descricao+'</div>':'')
+    + '</div>'
+  + '</div>';
+}
+
+function renderEventosGrupo() {
+  let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="$(`m-gevento`).classList.add(`open`)">📅 Novo evento</button></div>';
+  if (!grupoEventos.length) {
+    return html + '<div class="empty"><div class="empty-icon">📅</div><div class="empty-title">Nenhum evento do grupo</div></div>';
+  }
+  return html + grupoEventos.map(ev => {
+    const d = new Date(ev.data+'T00:00:00');
+    const dl = dLeft(ev.data);
+    return '<div class="evento-grupo-card">'
+      + '<div style="text-align:center;min-width:36px"><div style="font-size:18px;font-weight:700;font-family:'Playfair Display',serif">'+d.getDate()+'</div><div style="font-size:9px;color:var(--text-3);text-transform:uppercase">'+d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'</div></div>'
+      + '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+ev.nome+'</div><div style="display:flex;gap:5px;margin-top:3px"><span class="badge b-'+ev.tipo+'">'+ftipo(ev.tipo)+'</span>'+dBadge(dl)+'</div></div>'
+    + '</div>';
+  }).join('');
+}
+
+function renderMembros() {
+  return '<div style="margin-bottom:12px">'
+    + grupoMembros.map(m => {
+      const inicial = m.nome.charAt(0).toUpperCase();
+      const isMe = m.user_id === U.id;
+      return '<div class="membro-item">'
+        + '<div class="membro-avatar">'+inicial+'</div>'
+        + '<div class="membro-info"><div class="membro-nome">'+m.nome+(isMe?' (você)':'')+'</div><div class="membro-role">'+m.role+'</div></div>'
+      + '</div>';
+    }).join('')
+  + '</div>';
+}
+
+// Postar aviso
+async function postarAviso() {
+  const texto = $('av-texto').value.trim();
+  if (!texto) { alert('Digite um aviso!'); return; }
+  const { error } = await SB.from('grupo_avisos').insert({ grupo_id: grupoAtual.id, criado_por: U.id, texto });
+  if (error) { alert('Erro: ' + error.message); return; }
+  $('av-texto').value = '';
+  closeModal('aviso');
+  await carregarDadosGrupo();
+}
+
+// Criar tarefa
+function abrirModalTarefa() {
+  const sel = $('tar-atrib');
+  sel.innerHTML = '<option value="">Sem atribuição</option>' + grupoMembros.map(m => '<option value="'+m.user_id+'">'+m.nome+'</option>').join('');
+  $('m-tarefa').classList.add('open');
+}
+
+async function criarTarefa() {
+  const titulo = $('tar-titulo').value.trim();
+  if (!titulo) { alert('Informe o título!'); return; }
+  const { error } = await SB.from('grupo_tarefas').insert({
+    grupo_id: grupoAtual.id, criado_por: U.id,
+    atribuido_para: $('tar-atrib').value || null,
+    titulo, descricao: $('tar-desc').value.trim()
+  });
+  if (error) { alert('Erro: ' + error.message); return; }
+  $('tar-titulo').value = ''; $('tar-desc').value = '';
+  closeModal('tarefa');
+  await carregarDadosGrupo();
+}
+
+async function toggleTarefa(id, atual) {
+  await SB.from('grupo_tarefas').update({ concluida: !atual }).eq('id', id);
+  await carregarDadosGrupo();
+}
+
+// Criar evento do grupo
+async function criarEventoGrupo() {
+  const nome = $('gev-nome').value.trim();
+  const data = $('gev-data').value;
+  if (!nome || !data) { alert('Preencha nome e data!'); return; }
+  const { error } = await SB.from('grupo_eventos').insert({
+    grupo_id: grupoAtual.id, criado_por: U.id,
+    tipo: $('gev-tipo').value, nome, data, hora: $('gev-hora').value || ''
+  });
+  if (error) { alert('Erro: ' + error.message); return; }
+  $('gev-nome').value = ''; $('gev-data').value = ''; $('gev-hora').value = '';
+  closeModal('gevento');
+  await carregarDadosGrupo();
+}
 
 // ── NOTIFICAÇÕES ──
 async function pedirPermissaoNotificacao() {
