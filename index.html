@@ -394,7 +394,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
   <div class="modal-actions">
     <button class="btn btn-danger btn-sm" id="btn-del-ev" style="margin-right:auto;display:none" onclick="delEvento()">🗑 Excluir</button>
     <button class="btn btn-secondary" onclick="closeModal('evento')">Cancelar</button>
-    <button class="btn btn-primary" onclick="salvarEvento()">Salvar evento</button>
+    <button class="btn btn-primary" id="btn-salvar-ev">Salvar evento</button>
   </div>
 </div>
 </div>
@@ -421,7 +421,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
   <div class="modal-actions">
     <button class="btn btn-danger btn-sm" id="btn-del-disc" style="margin-right:auto;display:none" onclick="delDisc()">🗑 Excluir</button>
     <button class="btn btn-secondary" onclick="closeModal('disc')">Cancelar</button>
-    <button class="btn btn-primary" onclick="salvarDisc()">Salvar</button>
+    <button class="btn btn-primary" id="btn-salvar-disc">Salvar</button>
   </div>
 </div>
 </div>
@@ -460,7 +460,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="imp1()">← Voltar</button>
-      <button class="btn btn-primary" onclick="confirmar()">Importar selecionados</button>
+      <button class="btn btn-primary" id="btn-confirmar">Importar selecionados</button>
     </div>
   </div>
   <div id="imp3" style="display:none;text-align:center;padding:24px 0">
@@ -921,6 +921,17 @@ function closeDrawer(){
   d.style.transform='translateX(-100%)';o.style.pointerEvents='none';
   setTimeout(()=>{d.style.display='none';o.style.display='none'},250);
 }
+
+// Listeners dos botões críticos
+document.getElementById('btn-salvar-disc').addEventListener('click', function(e) {
+  e.preventDefault(); e.stopPropagation(); salvarDisc();
+});
+document.getElementById('btn-salvar-ev').addEventListener('click', function(e) {
+  e.preventDefault(); e.stopPropagation(); salvarEvento();
+});
+document.getElementById('btn-confirmar').addEventListener('click', function(e) {
+  e.preventDefault(); e.stopPropagation(); confirmar();
+});
 
 init();
 </script>
