@@ -1243,13 +1243,14 @@ function renderTarefas() {
 
 function tarefaHTML(t) {
   const atrib = grupoMembros.find(m => m.user_id === t.atribuido_para);
-  const criador = grupoMembros.find(m => m.user_id === t.criado_por);
-  return '<div class="tarefa-item'+(t.concluida?' done':'')+'">'
-    + '<input type="checkbox" class="tarefa-check" '+(t.concluida?'checked':'')+' onchange="toggleTarefa(''+t.id+'','+t.concluida+')">'
+  const chk = t.concluida ? 'checked' : '';
+  const done = t.concluida ? ' done' : '';
+  return '<div class="tarefa-item'+done+'">'
+    + '<input type="checkbox" class="tarefa-check" '+chk+' data-id="'+t.id+'" data-done="'+t.concluida+'" onchange="onToggleTarefa(this)">'
     + '<div class="tarefa-body">'
       + '<div class="tarefa-titulo">'+t.titulo+'</div>'
-      + (atrib?'<div class="tarefa-atrib">→ '+atrib.nome+'</div>':'')
-      + (t.descricao?'<div class="tarefa-desc">'+t.descricao+'</div>':'')
+      + (atrib ? '<div class="tarefa-atrib">→ '+atrib.nome+'</div>' : '')
+      + (t.descricao ? '<div class="tarefa-desc">'+t.descricao+'</div>' : '')
     + '</div>'
   + '</div>';
 }
@@ -1315,6 +1316,12 @@ async function criarTarefa() {
   $('tar-titulo').value = ''; $('tar-desc').value = '';
   closeModal('tarefa');
   await carregarDadosGrupo();
+}
+
+function onToggleTarefa(el) {
+  const id = el.getAttribute('data-id');
+  const atual = el.getAttribute('data-done') === 'true';
+  toggleTarefa(id, atual);
 }
 
 async function toggleTarefa(id, atual) {
