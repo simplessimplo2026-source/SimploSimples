@@ -1264,7 +1264,7 @@ function renderEventosGrupo() {
     const d = new Date(ev.data+'T00:00:00');
     const dl = dLeft(ev.data);
     return '<div class="evento-grupo-card">'
-      + '<div style="text-align:center;min-width:36px"><div style="font-size:18px;font-weight:700;font-family:'Playfair Display',serif">'+d.getDate()+'</div><div style="font-size:9px;color:var(--text-3);text-transform:uppercase">'+d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'</div></div>'
+      + '<div style="text-align:center;min-width:36px"><div style="font-size:18px;font-weight:700">'+d.getDate()+'</div><div style="font-size:9px;color:var(--text-3);text-transform:uppercase">'+d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'</div></div>'
       + '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+ev.nome+'</div><div style="display:flex;gap:5px;margin-top:3px"><span class="badge b-'+ev.tipo+'">'+ftipo(ev.tipo)+'</span>'+dBadge(dl)+'</div></div>'
     + '</div>';
   }).join('');
