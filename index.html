@@ -1112,7 +1112,7 @@ function rGruposPage() {
     return '<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">Nenhum grupo ainda</div><div class="empty-sub">Crie um grupo ou entre com um código de convite.</div></div>'
       + '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'
       + '<button class="btn btn-primary" onclick="openGrupoEntry()">+ Criar grupo</button>'
-      + '<button class="btn btn-secondary" onclick="openGrupoEntry('entrar')">Entrar com código</button>'
+      + '<button class="btn btn-secondary" onclick="openGrupoEntry(&quot;entrar&quot;)">Entrar com código</button>'
       + '</div>';
   }
   const cards = grupos.map(g => `
@@ -1124,7 +1124,7 @@ function rGruposPage() {
       <div class="grupo-stats"><span>👥 Membros</span><span>📢 Mural</span><span>✅ Tarefas</span></div>
     </div>`).join('');
   return '<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">'
-    + '<button class="btn btn-secondary" onclick="openGrupoEntry('entrar')">Entrar com código</button>'
+    + '<button class="btn btn-secondary" onclick="openGrupoEntry(&quot;entrar&quot;)">Entrar com código</button>'
     + '<button class="btn btn-primary" onclick="openGrupoEntry()">+ Criar grupo</button>'
     + '</div>'
     + '<div style="display:flex;flex-direction:column;gap:10px">' + cards + '</div>';
@@ -1213,7 +1213,7 @@ function renderMural() {
   const meuMembro = grupoMembros.find(m => m.user_id === U.id);
   const codigo = grupoAtual.codigo;
   let html = '<div class="code-box"><div class="code-num">'+codigo+'</div><div class="code-label">Compartilhe este código para convidar colegas</div></div>';
-  html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="$(`m-aviso`).classList.add(`open`)">📢 Novo aviso</button></div>';
+  html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="document.getElementById('m-aviso').classList.add('open')">📢 Novo aviso</button></div>';
   if (!grupoAvisos.length) {
     html += '<div class="empty"><div class="empty-icon">📢</div><div class="empty-title">Nenhum aviso ainda</div><div class="empty-sub">Poste um aviso para o grupo!</div></div>';
   } else {
@@ -1255,7 +1255,7 @@ function tarefaHTML(t) {
 }
 
 function renderEventosGrupo() {
-  let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="$(`m-gevento`).classList.add(`open`)">📅 Novo evento</button></div>';
+  let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="document.getElementById('m-gevento').classList.add('open')">📅 Novo evento</button></div>';
   if (!grupoEventos.length) {
     return html + '<div class="empty"><div class="empty-icon">📅</div><div class="empty-title">Nenhum evento do grupo</div></div>';
   }
