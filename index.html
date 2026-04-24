@@ -1132,14 +1132,17 @@ function rGruposPage() {
 
 // Abrir/fechar modal grupo entry
 function openGrupoEntry(aba) {
-  setGrupoTab(aba===2?'entrar':'criar');
+  setGrupoTab(aba==='entrar'||aba===2?'entrar':'criar');
   $('m-grupo-entry').classList.add('open');
 }
 
 function setGrupoTab(aba) {
-  document.querySelectorAll('#grupo-entry-tabs .tab').forEach((t,i) => t.classList.toggle('on', i===(aba==='criar'?0:1)));
-  $('ge-criar').style.display = aba==='criar'?'block':'none';
-  $('ge-entrar').style.display = aba==='entrar'?'block':'none';
+  const tabs = document.querySelectorAll('#grupo-entry-tabs .tab');
+  if (tabs[0]) tabs[0].classList.toggle('on', aba==='criar');
+  if (tabs[1]) tabs[1].classList.toggle('on', aba==='entrar');
+  $('ge-criar').style.display = aba==='criar' ? 'block' : 'none';
+  $('ge-entrar').style.display = aba==='entrar' ? 'block' : 'none';
+  $('m-grupo-entry-title').textContent = aba==='criar' ? 'Criar grupo' : 'Entrar com código';
 }
 
 async function criarGrupo() {
