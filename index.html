@@ -353,9 +353,11 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <div class="nav-group">Config</div>
         <button class="nav-btn" onclick="go('disciplinas')"><span class="icon">🏫</span>Disciplinas</button>
         <button class="nav-btn" onclick="go('grupos')"><span class="icon">👥</span>Grupos</button>
+        <button class="nav-btn" onclick="openModal('perfil')"><span class="icon">👤</span>Meu Perfil</button>
         <button class="nav-btn" onclick="openModal('cfg')"><span class="icon">⚙️</span>Configurações</button>
       </nav>
       <div class="sidebar-bottom">
+        <div id="s-nome" style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px"></div>
         <div class="sidebar-email" id="s-email"></div>
         <button class="btn btn-secondary btn-sm btn-block" onclick="doLogout()">Sair</button>
       </div>
@@ -406,6 +408,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <div style="font-size:10px;font-weight:700;color:var(--text-3);padding:8px 18px 2px;text-transform:uppercase">Config</div>
     <div class="drawer-item" onclick="go('disciplinas');closeDrawer()"><span class="icon">🏫</span>Disciplinas</div>
     <div class="drawer-item" onclick="go('grupos');closeDrawer()"><span class="icon">👥</span>Grupos</div>
+    <div class="drawer-item" onclick="openModal('perfil');closeDrawer()"><span class="icon">👤</span>Meu Perfil</div>
     <div class="drawer-item" onclick="openModal('cfg');closeDrawer()"><span class="icon">⚙️</span>Configurações</div>
     <div class="drawer-item" onclick="openModal('import');closeDrawer()"><span class="icon">📎</span>Importar cronograma</div>
   </nav>
@@ -670,6 +673,37 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 </div>
 </div>
 
+
+<!-- MODAL PERFIL -->
+<div class="overlay" id="m-perfil">
+<div class="modal" style="max-width:420px">
+  <div class="modal-head">
+    <div class="modal-title">👤 Meu Perfil</div>
+    <button class="modal-close" onclick="closeModal('perfil')">✕</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;background:var(--brand-light);border-radius:12px;padding:14px;margin-bottom:18px">
+    <div id="perfil-avatar" style="width:52px;height:52px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0">?</div>
+    <div>
+      <div id="perfil-nome-display" style="font-size:15px;font-weight:700;color:var(--text)">Sem nome</div>
+      <div id="perfil-curso-display" style="font-size:12px;color:var(--text-3);margin-top:1px"></div>
+    </div>
+  </div>
+  <div class="field"><label>Nome completo</label><input type="text" id="p-nome" placeholder="Ex: Emanuel Silva"></div>
+  <div class="field-row">
+    <div class="field"><label>Curso</label><input type="text" id="p-curso" placeholder="Ex: Psicologia"></div>
+    <div class="field"><label>Semestre</label><input type="text" id="p-semestre" placeholder="Ex: 4°"></div>
+  </div>
+  <div class="field"><label>Instituição</label><input type="text" id="p-inst" placeholder="Ex: UNIVALI"></div>
+  <div class="field"><label>Bio (opcional)</label>
+    <textarea id="p-bio" placeholder="Conte um pouco sobre você..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;min-height:60px;resize:vertical"></textarea>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-secondary" onclick="closeModal('perfil')">Cancelar</button>
+    <button class="btn btn-primary" onclick="salvarPerfil()">Salvar perfil</button>
+  </div>
+</div>
+</div>
+
 <script>
 // ── SUPABASE ──
 const SB = supabase.createClient(
@@ -766,6 +800,7 @@ async function boot(u){
   $('bottom-nav').classList.add('visible');
   await loadAll();
   await loadGrupos();
+  await loadPerfil();
   badges();render();
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
@@ -934,7 +969,8 @@ function rDiscsPage(){
 
 // ── MODALS ──
 function openModal(id){
-  if(id==='evento')openEvento(null);
+  if(id==='perfil')openPerfil();
+  else if(id==='evento')openEvento(null);
   else if(id==='disc')openDisc(null);
   else if(id==='import')openImport();
   else if(id==='cfg')openCfg();
@@ -1126,6 +1162,66 @@ document.getElementById('btn-confirmar').addEventListener('click', function(e) {
 
 
 
+
+// ── PERFIL ──
+let perfil = null;
+
+async function loadPerfil() {
+  const { data } = await SB.from('perfis').select('*').eq('id', U.id).single();
+  if (data) {
+    perfil = data;
+  } else {
+    // Criar perfil se não existir
+    await SB.from('perfis').insert({ id: U.id });
+    perfil = { nome: '', curso: '', semestre: '', instituicao: 'UNIVALI', bio: '' };
+  }
+  atualizarUIperfil();
+}
+
+function atualizarUIperfil() {
+  if (!perfil) return;
+  const nome = perfil.nome || '';
+  const inicial = nome ? nome.charAt(0).toUpperCase() : U.email.charAt(0).toUpperCase();
+  // Sidebar
+  const sNome = $('s-nome');
+  if (sNome) sNome.textContent = nome || U.email.split('@')[0];
+  // Sidebar semester
+  const inst = perfil.instituicao || 'UNIVALI';
+  const sem = perfil.semestre ? perfil.semestre + '° Sem' : '2026/1';
+  document.querySelector('.sidebar-semester').textContent = inst + ' · ' + sem;
+}
+
+function openPerfil() {
+  if (!perfil) return;
+  const nome = perfil.nome || '';
+  const inicial = nome ? nome.charAt(0).toUpperCase() : U.email.charAt(0).toUpperCase();
+  $('perfil-avatar').textContent = inicial;
+  $('perfil-nome-display').textContent = nome || 'Sem nome';
+  $('perfil-curso-display').textContent = [perfil.curso, perfil.semestre ? perfil.semestre+'° Semestre' : '', perfil.instituicao].filter(Boolean).join(' · ');
+  $('p-nome').value = perfil.nome || '';
+  $('p-curso').value = perfil.curso || '';
+  $('p-semestre').value = perfil.semestre || '';
+  $('p-inst').value = perfil.instituicao || 'UNIVALI';
+  $('p-bio').value = perfil.bio || '';
+  $('m-perfil').classList.add('open');
+}
+
+async function salvarPerfil() {
+  const dados = {
+    nome: $('p-nome').value.trim(),
+    curso: $('p-curso').value.trim(),
+    semestre: $('p-semestre').value.trim(),
+    instituicao: $('p-inst').value.trim() || 'UNIVALI',
+    bio: $('p-bio').value.trim(),
+    updated_at: new Date().toISOString()
+  };
+  const { error } = await SB.from('perfis').upsert({ id: U.id, ...dados });
+  if (error) { alert('Erro: ' + error.message); return; }
+  perfil = { ...perfil, ...dados };
+  atualizarUIperfil();
+  closeModal('perfil');
+}
+
 // ── GRUPOS ──
 let grupos = [], grupoAtual = null, abaGrupo = 'mural';
 let grupoMembros = [], grupoAvisos = [], grupoTarefas = [], grupoEventos = [];
@@ -1168,6 +1264,10 @@ function openGrupoEntry(aba) {
   if (sel) {
     sel.innerHTML = '<option value="">Sem disciplina</option>' + discs.map(d => '<option value="'+d.id+'">'+d.nome+'</option>').join('');
   }
+  // Pré-preencher nome do usuário
+  const preNome = perfil?.nome || '';
+  if ($('ge-meu-nome') && !$('ge-meu-nome').value) $('ge-meu-nome').value = preNome;
+  if ($('ge-meu-nome2') && !$('ge-meu-nome2').value) $('ge-meu-nome2').value = preNome;
   $('m-grupo-entry').classList.add('open');
 }
 
@@ -1182,8 +1282,8 @@ function setGrupoTab(aba) {
 
 async function criarGrupo() {
   const nome = $('ge-nome').value.trim();
-  const meuNome = $('ge-meu-nome').value.trim();
-  if (!nome || !meuNome) { alert('Preencha todos os campos!'); return; }
+  const meuNome = $('ge-meu-nome').value.trim() || (perfil?.nome) || U.email.split('@')[0];
+  if (!nome) { alert('Preencha o nome do grupo!'); return; }
   const discId = $('ge-disc').value || null;
   const { data: grupo, error } = await SB.from('grupos').insert({ nome, criado_por: U.id, disciplina_id: discId }).select().single();
   if (error) { alert('Erro: ' + error.message); return; }
