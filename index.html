@@ -571,18 +571,26 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <div class="modal-title">⚙️ Configurações</div>
     <button class="modal-close" onclick="closeModal('cfg')">✕</button>
   </div>
-  <div style="background:var(--amber-light);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#92400E;font-weight:500">
-    🔒 Sua API key fica salva só no seu navegador — nunca vai para o servidor.
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px">
+    <span style="font-size:13px;font-weight:600;color:var(--text)">🌙 Modo escuro</span>
+    <div id="dark-toggle" onclick="toggleDark()" style="width:44px;height:24px;border-radius:12px;background:var(--border);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0">
+      <div id="dark-knob" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>
+    </div>
   </div>
-  <div class="field"><label>OpenAI API Key</label>
-    <input type="password" id="cfg-key" placeholder="sk-proj-...">
-    <div style="font-size:11px;color:var(--text-3);margin-top:4px">Necessária para importar com GPT. Obtenha em platform.openai.com</div>
+  <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:12px;font-weight:600;color:var(--text)">🤖 OpenAI API Key</span>
+      <span id="cfg-status" style="font-size:11px"></span>
+    </div>
+    <div style="display:flex;gap:6px">
+      <input type="password" id="cfg-key" placeholder="sk-proj-..." style="flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;outline:none;background:var(--bg);color:var(--text)">
+      <button class="btn btn-primary btn-sm" onclick="salvarCfg()">Salvar</button>
+      <button class="btn btn-danger btn-sm" onclick="removeKey()">✕</button>
+    </div>
+    <div style="font-size:10px;color:var(--text-3);margin-top:5px">🔒 Salva só no seu navegador · platform.openai.com</div>
   </div>
-  <div id="cfg-status" style="font-size:12px;margin-bottom:8px"></div>
-  <div class="modal-actions">
-    <button class="btn btn-danger btn-sm" onclick="removeKey()" style="margin-right:auto">Remover key</button>
-    <button class="btn btn-secondary" onclick="closeModal('cfg')">Cancelar</button>
-    <button class="btn btn-primary" onclick="salvarCfg()">Salvar</button>
+  <div class="modal-actions" style="padding-top:0;border-top:none;margin-top:0">
+    <button class="btn btn-secondary btn-block" onclick="closeModal('cfg')">Fechar</button>
   </div>
 </div>
 </div>
