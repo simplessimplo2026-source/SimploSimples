@@ -1267,7 +1267,7 @@ function renderMural() {
   const appUrl = window.location.origin + window.location.pathname + '?join=' + codigo;
   let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
     + '<span style="font-size:12px;color:var(--text-3)">Código: <b style="color:var(--brand);letter-spacing:2px;font-family:monospace">'+codigo+'</b></span>'
-    + '<button onclick="setAbaGrupo('membros')" style="background:var(--brand-light);border:none;color:var(--brand);font-size:11px;font-weight:600;cursor:pointer;padding:4px 10px;border-radius:6px;font-family:inherit">👥 Convidar →</button>'
+    + '<button onclick="irParaMembros()" style="background:var(--brand-light);border:none;color:var(--brand);font-size:11px;font-weight:600;cursor:pointer;padding:4px 10px;border-radius:6px;font-family:inherit">&#128101; Convidar &rarr;</button>'
   + '</div>';
   html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="abrirAviso()">📢 Novo aviso</button></div>';
   if (!grupoAvisos.length) {
