@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Simplo Estudante</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -1213,6 +1214,7 @@ async function entrarGrupo() {
 async function abrirGrupo(id) {
   grupoAtual = grupos.find(g => g.id === id);
   if (!grupoAtual) return;
+  qrGerado = false;
   $('m-grupo-nome').textContent = grupoAtual.nome;
   // Mostrar disciplina vinculada
   const disc = grupoAtual.disciplina_id ? discs.find(d => d.id === grupoAtual.disciplina_id) : null;
@@ -1262,7 +1264,13 @@ function renderAbaGrupo() {
 function renderMural() {
   const meuMembro = grupoMembros.find(m => m.user_id === U.id);
   const codigo = grupoAtual.codigo;
-  let html = '<div class="code-box"><div class="code-num">'+codigo+'</div><div class="code-label">Compartilhe este código para convidar colegas</div></div>';
+  const appUrl = window.location.origin + window.location.pathname + '?join=' + codigo;
+  let html = '<div class="code-box">'
+    + '<div class="code-num">'+codigo+'</div>'
+    + '<div class="code-label">Compartilhe este código para convidar colegas</div>'
+    + '<div id="qrcode-box" style="display:flex;justify-content:center;margin-top:10px"></div>'
+    + '<button onclick="toggleQR()" id="btn-qr" style="background:none;border:none;color:var(--brand);font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;font-family:inherit">📱 Mostrar QR Code</button>'
+  + '</div>';
   html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="abrirAviso()">📢 Novo aviso</button></div>';
   if (!grupoAvisos.length) {
     html += '<div class="empty"><div class="empty-icon">📢</div><div class="empty-title">Nenhum aviso ainda</div><div class="empty-sub">Poste um aviso para o grupo!</div></div>';
@@ -1530,6 +1538,33 @@ async function excluirGrupo() {
   render();
 }
 
+
+// ── QR CODE ──
+let qrGerado = false;
+function toggleQR() {
+  const box = $('qrcode-box');
+  const btn = $('btn-qr');
+  if (!box) return;
+  if (qrGerado) {
+    box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+    btn.textContent = box.style.display === 'none' ? '📱 Mostrar QR Code' : '📱 Ocultar QR Code';
+    return;
+  }
+  const appUrl = window.location.origin + window.location.pathname + '?join=' + grupoAtual.codigo;
+  box.style.display = 'flex';
+  box.style.justifyContent = 'center';
+  new QRCode(box, {
+    text: appUrl,
+    width: 140,
+    height: 140,
+    colorDark: '#2563EB',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+  qrGerado = true;
+  btn.textContent = '📱 Ocultar QR Code';
+}
+
 // ── NOTIFICAÇÕES ──
 async function pedirPermissaoNotificacao() {
   if (!('Notification' in window)) return;
@@ -1585,6 +1620,18 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log('SW registrado'))
     .catch(e => console.log('SW erro:', e));
 }
+
+
+  // Auto-preencher código se veio por link/QR
+  const urlParams = new URLSearchParams(window.location.search);
+  const joinCode = urlParams.get('join');
+  if (joinCode) {
+    setTimeout(() => {
+      openGrupoEntry('entrar');
+      const inp = $('ge-codigo');
+      if (inp) inp.value = joinCode.toUpperCase();
+    }, 1000);
+  }
 
 init();
 </script>
