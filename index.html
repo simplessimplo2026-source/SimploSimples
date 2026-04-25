@@ -84,6 +84,45 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 .code-num{font-size:28px;font-weight:700;letter-spacing:6px;color:var(--brand);font-family:monospace}
 .code-label{font-size:11px;color:var(--text-3);margin-top:4px}
 
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --brand: #3B82F6;
+  --brand-light: #1E3A5F;
+  --brand-dark: #60A5FA;
+  --bg: #0F172A;
+  --surface: #1E293B;
+  --border: #334155;
+  --text: #F1F5F9;
+  --text-2: #94A3B8;
+  --text-3: #64748B;
+  --red-light: #3B1A1A;
+  --green-light: #0F2A1F;
+  --amber-light: #2A1F0A;
+  --purple-light: #1E1A3B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] .auth-card { background: #1E293B; }
+[data-theme="dark"] #loading { background: #1D4ED8; }
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field textarea,
+[data-theme="dark"] select { background: #0F172A !important; color: #F1F5F9 !important; border-color: #334155 !important; }
+[data-theme="dark"] .auth-tabs { background: #0F172A; }
+[data-theme="dark"] .tab.on { background: #1E293B; }
+[data-theme="dark"] .bnav-fab-btn { background: #3B82F6; }
+[data-theme="dark"] .drop-zone:hover { background: #1E3A5F; }
+[data-theme="dark"] .imp-item { background: #0F172A; }
+[data-theme="dark"] .aviso-card { background: #0F172A; }
+[data-theme="dark"] .tarefa-item { background: #1E293B; }
+[data-theme="dark"] .evento-grupo-card { background: #1E293B; }
+[data-theme="dark"] .arquivo-item { background: #1E293B; }
+[data-theme="dark"] .storage-bar { background: #334155; }
+[data-theme="dark"] .code-box { background: #1E3A5F; border-color: #3B82F6; }
+[data-theme="dark"] .membro-item { border-color: #334155; }
+[data-theme="dark"] .membro-avatar { background: #1E3A5F; }
+
 /* ─── LOADING ─── */
 #loading{position:fixed;inset:0;background:var(--brand);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999}
 .loading-logo{font-family:'Playfair Display',serif;font-size:36px;color:#fff;letter-spacing:-1px}
@@ -794,6 +833,7 @@ async function init(){
 }
 
 async function boot(u){
+  initDark();
   U=u;
   $('s-email').textContent=u.email;
   $('app').style.display='block';
@@ -1739,6 +1779,7 @@ if ('serviceWorker' in navigator) {
     }, 1000);
   }
 
+initDark();
 init();
 </script>
 </body>
