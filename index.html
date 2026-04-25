@@ -744,6 +744,12 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 </div>
 
 <script>
+// ── DARK MODE INIT ──
+(function(){
+  const saved = localStorage.getItem('dark_mode');
+  if (saved === '1') document.documentElement.setAttribute('data-theme','dark');
+})();
+
 // ── SUPABASE ──
 const SB = supabase.createClient(
   'https://xfqxhiwfhdylwtusnbsh.supabase.co',
@@ -833,7 +839,6 @@ async function init(){
 }
 
 async function boot(u){
-  initDark();
   U=u;
   $('s-email').textContent=u.email;
   $('app').style.display='block';
@@ -1779,7 +1784,6 @@ if ('serviceWorker' in navigator) {
     }, 1000);
   }
 
-initDark();
 init();
 </script>
 </body>
