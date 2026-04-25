@@ -1265,11 +1265,9 @@ function renderMural() {
   const meuMembro = grupoMembros.find(m => m.user_id === U.id);
   const codigo = grupoAtual.codigo;
   const appUrl = window.location.origin + window.location.pathname + '?join=' + codigo;
-  let html = '<div class="code-box">'
-    + '<div class="code-num">'+codigo+'</div>'
-    + '<div class="code-label">Compartilhe este código para convidar colegas</div>'
-    + '<div id="qrcode-box" style="display:flex;justify-content:center;margin-top:10px"></div>'
-    + '<button onclick="toggleQR()" id="btn-qr" style="background:none;border:none;color:var(--brand);font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;font-family:inherit">📱 Mostrar QR Code</button>'
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
+    + '<span style="font-size:12px;color:var(--text-3)">Código: <b style="color:var(--brand);letter-spacing:2px;font-family:monospace">'+codigo+'</b></span>'
+    + '<button onclick="setAbaGrupo('membros')" style="background:var(--brand-light);border:none;color:var(--brand);font-size:11px;font-weight:600;cursor:pointer;padding:4px 10px;border-radius:6px;font-family:inherit">👥 Convidar →</button>'
   + '</div>';
   html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="abrirAviso()">📢 Novo aviso</button></div>';
   if (!grupoAvisos.length) {
@@ -1329,7 +1327,14 @@ function renderEventosGrupo() {
 }
 
 function renderMembros() {
-  return '<div style="margin-bottom:12px">'
+  const codigo = grupoAtual.codigo;
+  return '<div class="code-box" style="margin-bottom:16px">'
+    + '<div style="font-size:11px;color:var(--text-3);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Código de convite</div>'
+    + '<div class="code-num" style="font-size:22px;letter-spacing:6px">'+codigo+'</div>'
+    + '<div id="qrcode-box" style="display:none;justify-content:center;margin-top:10px"></div>'
+    + '<button onclick="toggleQR()" id="btn-qr" style="background:none;border:none;color:var(--brand);font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;font-family:inherit">📱 Mostrar QR Code</button>'
+  + '</div>'
+  + '<div>'
     + grupoMembros.map(m => {
       const inicial = m.nome.charAt(0).toUpperCase();
       const isMe = m.user_id === U.id;
