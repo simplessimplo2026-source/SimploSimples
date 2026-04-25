@@ -1216,6 +1216,22 @@ document.getElementById('btn-confirmar').addEventListener('click', function(e) {
 
 
 
+
+// ── DARK MODE ──
+function applyDark(on) {
+  document.documentElement.setAttribute('data-theme', on ? 'dark' : '');
+  const toggle = document.getElementById('dark-toggle');
+  const knob = document.getElementById('dark-knob');
+  if (toggle) toggle.style.background = on ? '#3B82F6' : '';
+  if (knob) knob.style.left = on ? '22px' : '2px';
+}
+
+function toggleDark() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  applyDark(!isDark);
+  localStorage.setItem('dark_mode', isDark ? '0' : '1');
+}
+
 // ── PERFIL ──
 let perfil = null;
 
