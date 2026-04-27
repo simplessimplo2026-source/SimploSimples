@@ -530,6 +530,24 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .topbar-title{transition:opacity .15s,transform .15s}
 .topbar-title.fade{opacity:0;transform:translateY(-4px)}
 
+/* ══ FAB MENU ══ */
+.fab-backdrop{position:fixed;inset:0;z-index:198;background:rgba(10,5,30,.4);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .22s}
+.fab-backdrop.open{opacity:1;pointer-events:auto}
+.fab-menu{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:199;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;opacity:0;transition:opacity .2s}
+.fab-menu.open{opacity:1;pointer-events:auto}
+.fab-item{display:flex;align-items:center;gap:10px;background:var(--surface-solid);border:1px solid var(--glass-border);border-radius:16px;padding:11px 18px;box-shadow:var(--shadow-md);cursor:pointer;min-width:190px;transition:transform .15s,box-shadow .15s;transform:translateY(10px);opacity:0;-webkit-tap-highlight-color:transparent}
+.fab-menu.open .fab-item{transform:translateY(0);opacity:1}
+.fab-item:nth-child(1){transition-delay:.05s}
+.fab-item:nth-child(2){transition-delay:.08s}
+.fab-item:nth-child(3){transition-delay:.11s}
+.fab-item:nth-child(4){transition-delay:.14s}
+.fab-item:nth-child(5){transition-delay:.17s}
+.fab-item:active{transform:scale(.96)}
+.fab-item-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.fab-item-label{font-size:13px;font-weight:600;color:var(--text)}
+.fab-item-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.bnav-fab-btn.open{transform:rotate(45deg) scale(1.05)}
+
 /* ══ PREMIUM ══ */
 .premium-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
 .premium-lock{display:inline-flex;align-items:center;gap:4px;background:var(--amber-light);color:#92400E;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;border:1px solid rgba(245,158,11,.3)}
@@ -672,10 +690,35 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 <nav class="bottom-nav" id="bottom-nav">
   <div class="bnav-item on" id="bn-resumo" onclick="go('resumo');bnav('resumo')"><span class="bnav-icon">📋</span>Resumo</div>
   <div class="bnav-item" id="bn-calendario" onclick="go('calendario');bnav('calendario')"><span class="bnav-icon">📅</span>Agenda</div>
-  <div class="bnav-fab" onclick="openModal('evento')"><div class="bnav-fab-btn">+</div></div>
+  <div class="bnav-fab" onclick="toggleFabMenu()"><div class="bnav-fab-btn" id="fab-btn">+</div></div>
   <div class="bnav-item" id="bn-eventos" onclick="go('eventos','todos');bnav('eventos')"><span class="bnav-icon">📚</span>Eventos</div>
   <div class="bnav-item" id="bn-mais" onclick="openDrawer()"><span class="bnav-icon">☰</span>Mais</div>
 </nav>
+
+<!-- FAB MENU -->
+<div class="fab-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
+<div class="fab-menu" id="fab-menu">
+  <div class="fab-item" onclick="closeFabMenu();openModal('evento')">
+    <span class="fab-item-icon">📝</span>
+    <div><div class="fab-item-label">Novo evento</div><div class="fab-item-sub">Prova, trabalho, apresentação...</div></div>
+  </div>
+  <div class="fab-item" onclick="closeFabMenu();openModal('disc')">
+    <span class="fab-item-icon">📚</span>
+    <div><div class="fab-item-label">Nova disciplina</div><div class="fab-item-sub">Adicionar matéria</div></div>
+  </div>
+  <div class="fab-item" onclick="closeFabMenu();abrirImportComGate()">
+    <span class="fab-item-icon">🤖</span>
+    <div><div class="fab-item-label">Importar com IA</div><div class="fab-item-sub" id="fab-import-sub">Requer Premium</div></div>
+  </div>
+  <div class="fab-item" onclick="closeFabMenu();openGrupoEntry('criar')">
+    <span class="fab-item-icon">👥</span>
+    <div><div class="fab-item-label">Criar grupo</div><div class="fab-item-sub">Novo grupo de estudo</div></div>
+  </div>
+  <div class="fab-item" onclick="closeFabMenu();openPomo()">
+    <span class="fab-item-icon">🍅</span>
+    <div><div class="fab-item-label">Pomodoro</div><div class="fab-item-sub">Iniciar sessão de foco</div></div>
+  </div>
+</div>
 
 <!-- DRAWER -->
 <div class="drawer-bg" id="dbg" onclick="closeDrawer()"></div>
@@ -2356,6 +2399,71 @@ if ('serviceWorker' in navigator) {
     }, 1000);
   }
 
+
+// ── FAB MENU ──
+let fabOpen = false;
+
+function toggleFabMenu() {
+  if (fabOpen) closeFabMenu(); else openFabMenu();
+}
+
+function openFabMenu() {
+  fabOpen = true;
+  $('fab-backdrop').classList.add('open');
+  $('fab-menu').classList.add('open');
+  $('fab-btn').classList.add('open');
+  // Atualizar sub do import conforme premium
+  const sub = $('fab-import-sub');
+  if (sub) sub.textContent = isPremium() ? 'Importar cronograma' : '🔒 Requer Premium';
+}
+
+function closeFabMenu() {
+  fabOpen = false;
+  $('fab-backdrop').classList.remove('open');
+  $('fab-menu').classList.remove('open');
+  $('fab-btn').classList.remove('open');
+}
+
+// Fechar ao navegar
+const _origGo = go;
+function go(p, f) {
+  closeFabMenu();
+  _origGo(p, f);
+}
+
+// ── EDGE FUNCTION (IA via Supabase) ──
+async function importarComIA(texto) {
+  // Verifica premium antes de chamar
+  if (!isPremium()) {
+    openModal('premium');
+    return null;
+  }
+
+  try {
+    const { data: { session } } = await SB.auth.getSession();
+    const token = session?.access_token;
+
+    const res = await fetch(`${SB.supabaseUrl}/functions/v1/importar-ia`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ texto })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Erro na Edge Function');
+    }
+
+    return await res.json();
+  } catch (e) {
+    console.error('Edge Function error:', e);
+    alert('Erro ao processar com IA: ' + e.message);
+    return null;
+  }
+}
 
 // ── PREMIUM ──
 function isPremium() {
