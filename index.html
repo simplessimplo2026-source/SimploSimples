@@ -8,8 +8,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="apple-touch-icon" href="logo.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Simplo">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1218,13 +1220,30 @@ function aMsg(msg,type){const e=$('auth-msg');e.textContent=msg;e.className='aut
 async function doAuth(){
   const email=$('a-email').value.trim(),pass=$('a-pass').value;
   if(!email||!pass){aMsg('Preencha email e senha!','error');return}
+  if(aMode==='register'){
+    const nome=$('a-nome')?.value.trim()||'';
+    if(!nome){aMsg('Preencha seu nome!','error');return}
+  }
   $('auth-btn').textContent='...';$('auth-btn').disabled=true;
   try{
-    let r=aMode==='login'
-      ?await SB.auth.signInWithPassword({email,password:pass})
-      :await SB.auth.signUp({email,password:pass});
-    if(r.error)throw r.error;
-    if(aMode==='register'){aMsg('Conta criada! Verifique seu email.','success');$('auth-btn').textContent='Criar conta';$('auth-btn').disabled=false;return}
+    if(aMode==='login'){
+      const r=await SB.auth.signInWithPassword({email,password:pass});
+      if(r.error)throw r.error;
+    } else {
+      const nome=$('a-nome')?.value.trim()||'';
+      // 1. Criar usuário
+      const r=await SB.auth.signUp({email,password:pass,options:{data:{nome}}});
+      if(r.error)throw r.error;
+      // 2. Se confirmação de email desativada, criar perfil já
+      if(r.data?.user && !r.data.user.identities?.length===0){
+        try{
+          await SB.from('perfis').upsert({id:r.data.user.id,nome,instituicao:'UNIVALI'},{onConflict:'id'});
+        }catch(e){ console.log('Perfil será criado no primeiro login') }
+      }
+      aMsg('Conta criada! Verifique seu email para confirmar.','success');
+      $('auth-btn').textContent='Criar conta';$('auth-btn').disabled=false;
+      return;
+    }
   }catch(e){
     const m={'Invalid login credentials':'Email ou senha incorretos.','Email not confirmed':'Confirme seu email antes de entrar.','User already registered':'Email já cadastrado.'};
     aMsg(m[e.message]||e.message,'error');
