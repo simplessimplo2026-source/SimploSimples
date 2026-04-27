@@ -530,6 +530,22 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .topbar-title{transition:opacity .15s,transform .15s}
 .topbar-title.fade{opacity:0;transform:translateY(-4px)}
 
+/* ══ PREMIUM ══ */
+.premium-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.premium-lock{display:inline-flex;align-items:center;gap:4px;background:var(--amber-light);color:#92400E;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;border:1px solid rgba(245,158,11,.3)}
+.premium-card{background:linear-gradient(135deg,#1E3A5F 0%,#0C4A6E 50%,#0284C7 100%);border-radius:var(--radius-xl);padding:28px 24px;color:#fff;position:relative;overflow:hidden;margin-bottom:20px}
+.premium-card::before{content:'⭐';position:absolute;right:-10px;top:-10px;font-size:100px;opacity:.08;line-height:1}
+.premium-card-title{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;letter-spacing:-.5px;margin-bottom:6px}
+.premium-card-sub{font-size:13px;opacity:.8;margin-bottom:20px;line-height:1.5}
+.premium-feature{display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:10px;opacity:.9}
+.premium-feature-icon{font-size:18px;flex-shrink:0}
+.premium-pix{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:16px;margin-top:18px;text-align:center}
+.premium-pix-key{font-size:15px;font-weight:700;letter-spacing:.5px;margin:6px 0;font-family:monospace}
+.premium-pix-label{font-size:11px;opacity:.7}
+.premium-status{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:13px;font-weight:600}
+.premium-status.active{background:var(--green-light);color:#065F46;border:1px solid rgba(16,185,129,.2)}
+.premium-status.inactive{background:var(--amber-light);color:#92400E;border:1px solid rgba(245,158,11,.2)}
+
 /* ══ MOBILE ══ */
 @media(max-width:768px){
   /* Desativar animações pesadas no mobile */
@@ -627,7 +643,11 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
       </nav>
       <div class="sidebar-bottom">
         <div id="s-nome" style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px"></div>
-        <div class="sidebar-email" id="s-email"></div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <div class="sidebar-email" id="s-email" style="margin-bottom:0"></div>
+          <span id="s-premium-badge" style="display:none"></span>
+        </div>
+        <button class="btn btn-secondary btn-sm btn-block" style="margin-bottom:6px" onclick="openModal('premium')">✨ Premium</button>
         <button class="btn btn-secondary btn-sm btn-block" onclick="doLogout()">Sair</button>
       </div>
     </aside>
@@ -639,7 +659,7 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
           <span class="topbar-title" id="page-title">Resumo</span>
         </div>
         <div class="topbar-actions">
-          <button class="btn btn-secondary" onclick="openModal('import')">📎 Importar</button>
+          <button class="btn btn-secondary" onclick="abrirImportComGate()">📎 Importar</button>
           <button class="btn btn-primary" onclick="openModal('evento')">+ Novo evento</button>
         </div>
       </header>
@@ -1030,6 +1050,40 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
     <button class="btn btn-danger btn-sm" id="btn-del-tarefa" style="margin-right:auto" onclick="deletarTarefa()">🗑 Excluir</button>
     <button class="btn btn-secondary" onclick="closeModal('editar-tarefa')">Cancelar</button>
     <button class="btn btn-primary" onclick="salvarEdicaoTarefa()">Salvar</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: PREMIUM -->
+<div class="overlay" id="m-premium">
+<div class="modal" style="max-width:420px">
+  <div class="modal-head">
+    <div class="modal-title">✨ Simplo Premium</div>
+    <button class="modal-close" onclick="closeModal('premium')">✕</button>
+  </div>
+
+  <div id="premium-status-bar"></div>
+
+  <div class="premium-card">
+    <div class="premium-card-title">Desbloqueie a IA</div>
+    <div class="premium-card-sub">Importe cronogramas automaticamente, deixe a IA organizar seus eventos em segundos.</div>
+    <div class="premium-feature"><span class="premium-feature-icon">🤖</span><span>Importação de cronograma por IA</span></div>
+    <div class="premium-feature"><span class="premium-feature-icon">📅</span><span>Leitura automática de PDF/foto</span></div>
+    <div class="premium-feature"><span class="premium-feature-icon">⚡</span><span>Criação de múltiplos eventos de uma vez</span></div>
+    <div class="premium-feature"><span class="premium-feature-icon">🔄</span><span>Atualizações futuras incluídas</span></div>
+    <div class="premium-pix">
+      <div class="premium-pix-label">Acesso vitalício por apenas</div>
+      <div class="premium-pix-key">R$ 9,90</div>
+      <div class="premium-pix-label" style="margin-top:8px">Pague via PIX e envie o comprovante</div>
+      <div class="premium-pix-key" id="pix-key" style="margin-top:6px;cursor:pointer" onclick="copyPix()">emanu0707@gmail.com</div>
+      <div id="pix-copied" style="font-size:11px;opacity:0;transition:opacity .3s;margin-top:4px">✓ Copiado!</div>
+    </div>
+  </div>
+
+  <div style="font-size:12px;color:var(--text-3);text-align:center;line-height:1.6">
+    Após o pagamento, envie o comprovante para<br>
+    <strong style="color:var(--brand-mid)">emanu0707@gmail.com</strong><br>
+    e seu acesso será liberado em até 24h. 🚀
   </div>
 </div>
 </div>
@@ -1697,11 +1751,11 @@ async function loadPerfil() {
   if (data) {
     perfil = data;
   } else {
-    // Criar perfil se não existir
     await SB.from('perfis').insert({ id: U.id });
     perfil = { nome: '', curso: '', semestre: '', instituicao: 'UNIVALI', bio: '' };
   }
   atualizarUIperfil();
+  atualizarUIPremium();
 }
 
 function atualizarUIperfil() {
@@ -2303,7 +2357,50 @@ if ('serviceWorker' in navigator) {
   }
 
 
-// ── POMODORO ──
+// ── PREMIUM ──
+function isPremium() {
+  return perfil && perfil.premium === true;
+}
+
+function abrirImportComGate() {
+  if (isPremium()) {
+    openModal('import');
+  } else {
+    openModal('premium');
+  }
+}
+
+function copyPix() {
+  navigator.clipboard.writeText('emanu0707@gmail.com').then(() => {
+    const el = $('pix-copied');
+    if (el) { el.style.opacity = '1'; setTimeout(() => el.style.opacity = '0', 2000); }
+  });
+}
+
+function atualizarUIPremium() {
+  const badge = $('s-premium-badge');
+  const statusBar = $('premium-status-bar');
+  if (!badge) return;
+
+  if (isPremium()) {
+    badge.style.display = 'inline-flex';
+    badge.innerHTML = '<span class="premium-badge">⭐ Premium</span>';
+    if (statusBar) statusBar.innerHTML = '<div class="premium-status active">✅ Sua conta tem acesso Premium ativo!</div>';
+  } else {
+    badge.style.display = 'none';
+    if (statusBar) statusBar.innerHTML = '<div class="premium-status inactive">🔒 Você ainda não tem acesso Premium</div>';
+  }
+}
+
+// Interceptar openImport para verificar premium
+const _origOpenImport = openImport;
+function openImport() {
+  if (!isPremium()) {
+    openModal('premium');
+    return;
+  }
+  _origOpenImport();
+}
 const POMO_DURATIONS = { foco: 25*60, curto: 5*60, longo: 15*60 };
 let pomoState = {
   mode: 'foco', running: false, timer: null,
