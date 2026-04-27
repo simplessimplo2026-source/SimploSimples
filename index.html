@@ -1252,6 +1252,40 @@ document.getElementById('btn-confirmar').addEventListener('click', function(e) {
 
 
 
+
+// ── WHATSAPP ──
+function compartilharWpp(id) {
+  const ev = evts.find(e => e.id === id);
+  if (!ev) return;
+  const disc = gDisc(ev.disciplina_id);
+  const d = new Date(ev.data + 'T00:00:00');
+  const dataFmt = d.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+  const dl = dLeft(ev.data);
+  const urgencia = dl === 0 ? '🚨 HOJE!' : dl === 1 ? '⚠️ AMANHÃ!' : dl <= 3 ? '⏰ Em ' + dl + ' dias!' : '📅 Em ' + dl + ' dias';
+  
+  const emoji = {prova:'📝', trabalho:'📂', apresentacao:'🎤', outro:'📌'}[ev.tipo] || '📌';
+  const tipo = ftipo(ev.tipo).toUpperCase();
+  
+  let msg = emoji + ' *' + tipo + '* ' + urgencia + '
+
+';
+  msg += '📚 *' + ev.nome + '*
+';
+  if (disc) msg += '🏫 ' + disc.nome + '
+';
+  msg += '📅 ' + dataFmt.charAt(0).toUpperCase() + dataFmt.slice(1);
+  if (ev.hora) msg += ' às ' + ev.hora;
+  msg += '
+';
+  if (ev.notas) msg += '📝 ' + ev.notas + '
+';
+  msg += '
+_Compartilhado via Simplo Estudante_ 🎓';
+  
+  const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+
 // ── DARK MODE ──
 function applyDark(on) {
   document.documentElement.setAttribute('data-theme', on ? 'dark' : '');
