@@ -511,8 +511,8 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .swipe-wrap{position:relative;overflow:hidden;border-radius:var(--radius-lg);margin-bottom:8px}
 .swipe-wrap .event-card{margin-bottom:0;border-radius:var(--radius-lg);position:relative;z-index:1;will-change:transform;transition:transform .25s cubic-bezier(.4,0,.2,1)}
 .swipe-wrap.dragging .event-card{transition:none}
-.swipe-actions{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;z-index:0;border-radius:0 var(--radius-lg) var(--radius-lg) 0;overflow:hidden}
-.swipe-action{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:72px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:min-width .2s}
+.swipe-actions{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;z-index:0;border-radius:0 var(--radius-lg) var(--radius-lg) 0;overflow:hidden;width:0}
+.swipe-action{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:74px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
 .swipe-action-done{background:var(--green);color:#fff}
 .swipe-action-del{background:var(--red);color:#fff}
 .swipe-action span{font-size:20px;line-height:1}
@@ -1178,7 +1178,7 @@ async function boot(u){
   await loadGrupos();
   await loadPerfil();
   badges(); render();
-  setTimeout(() => { initGestures(); wrapEventCards(); }, 300);
+  setTimeout(() => { initGestures(); }, 300);
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
 
@@ -1254,7 +1254,7 @@ function render(){
   // Se primeira vez (sem animação), só injeta
   if(prevPg === pg || !el.innerHTML){
     el.innerHTML = html;
-    setTimeout(()=>{ wrapEventCards(); initAllSwipeModals(); }, 260);
+    setTimeout(()=>{ wrapEventCards(); }, 260);
     return;
   }
 
@@ -1268,8 +1268,7 @@ function render(){
     el.classList.add(goingForward ? 'page-enter' : 'page-enter-back');
     el.scrollTo({top:0, behavior:'smooth'});
     setTimeout(()=> el.classList.remove('page-enter','page-enter-back'), 250);
-    // Gestos após DOM atualizar
-    setTimeout(()=>{ wrapEventCards(); initAllSwipeModals(); }, 260);
+    setTimeout(()=>{ wrapEventCards(); }, 260);
   }, 140);
 }
 
@@ -2659,7 +2658,10 @@ function initAllSwipeModals() {
 
 // ── 2. SWIPE NO CARD (revelar ações) ──
 function wrapEventCards() {
-  const cards = document.querySelectorAll('.event-list .event-card:not(.swipe-wrapped)');
+  // Só wrappa cards dentro do conteúdo principal, não nos modais
+  const content = $('content');
+  if (!content) return;
+  const cards = content.querySelectorAll('.event-list .event-card:not(.swipe-wrapped)');
   cards.forEach(card => {
     const evId = extractEvId(card);
     if (!evId) return;
@@ -2689,40 +2691,43 @@ function wrapEventCards() {
 
     card.addEventListener('touchstart', e => {
       startX = e.touches[0].clientX;
+      curX = 0;
       dragging = true;
       wrap.classList.add('dragging');
     }, { passive: true });
 
     card.addEventListener('touchmove', e => {
       if (!dragging) return;
-      curX = e.touches[0].clientX - startX;
-      if (curX > 0) { curX = 0; return; }
-      const x = Math.max(-MAX, curX);
-      card.style.transform = `translateX(${x}px)`;
-      // Revelar ações proporcionalmente
-      const pct = Math.abs(x) / MAX;
-      actions.querySelectorAll('.swipe-action').forEach(a => {
-        a.style.minWidth = (72 * pct) + 'px';
-      });
+      const dx = e.touches[0].clientX - startX;
+      // Ignorar movimentos verticais ou para direita
+      if (dx > 0) { actions.style.width = '0'; card.style.transform = ''; return; }
+      curX = Math.max(-MAX, dx);
+      card.style.transform = `translateX(${curX}px)`;
+      actions.style.width = Math.abs(curX) + 'px';
     }, { passive: true });
 
     card.addEventListener('touchend', () => {
       if (!dragging) return;
       dragging = false;
       wrap.classList.remove('dragging');
+      card.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
+      actions.style.transition = 'width .22s cubic-bezier(.4,0,.2,1)';
       if (curX < -80) {
-        // Manter aberto
-        card.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
         card.style.transform = `translateX(-${MAX}px)`;
+        actions.style.width = MAX + 'px';
       } else {
-        // Fechar
-        card.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
         card.style.transform = '';
-        actions.querySelectorAll('.swipe-action').forEach(a => a.style.minWidth = '');
+        actions.style.width = '0';
       }
-      setTimeout(() => card.style.transition = '', 220);
+      setTimeout(() => {
+        card.style.transition = '';
+        actions.style.transition = '';
+      }, 220);
       curX = 0;
     });
+
+    // Fechar swipe ao tocar em qualquer outro lugar
+    card.addEventListener('touchstart', () => {}, { passive: true });
   });
 }
 
