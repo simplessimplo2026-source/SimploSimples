@@ -1313,6 +1313,7 @@ const PAGE_ORDER = ['resumo','calendario','eventos','disciplinas','grupos'];
 let prevPg = 'resumo';
 
 function go(p,f){
+  closeFabMenu();
   prevPg = pg;
   pg=p; if(f) flt=f;
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
@@ -1564,10 +1565,14 @@ function salvarCfg(){
 function removeKey(){if(!confirm('Remover?'))return;localStorage.removeItem('oai_key');closeModal('cfg')}
 
 // ── IMPORT ──
-function openImport(){
+function _abrirImportModal(){
   $('imp1').style.display='block';$('imp2').style.display='none';$('imp3').style.display='none';
   $('imp-text').value='';$('pdf-msg').style.display='none';
   $('m-import').classList.add('open');
+}
+function openImport(){
+  if(!isPremium()){ openModal('premium'); return; }
+  _abrirImportModal();
 }
 function imp1(){$('imp1').style.display='block';$('imp2').style.display='none'}
 function onDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')exPDF(f)}
@@ -2424,13 +2429,6 @@ function closeFabMenu() {
   $('fab-btn').classList.remove('open');
 }
 
-// Fechar ao navegar
-const _origGo = go;
-function go(p, f) {
-  closeFabMenu();
-  _origGo(p, f);
-}
-
 // ── EDGE FUNCTION (IA via Supabase) ──
 async function importarComIA(texto) {
   // Verifica premium antes de chamar
@@ -2500,15 +2498,6 @@ function atualizarUIPremium() {
   }
 }
 
-// Interceptar openImport para verificar premium
-const _origOpenImport = openImport;
-function openImport() {
-  if (!isPremium()) {
-    openModal('premium');
-    return;
-  }
-  _origOpenImport();
-}
 const POMO_DURATIONS = { foco: 25*60, curto: 5*60, longo: 15*60 };
 let pomoState = {
   mode: 'foco', running: false, timer: null,
