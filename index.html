@@ -875,18 +875,7 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
       <div id="glass-knob" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:22px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>
     </div>
   </div>
-  <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:12px;font-weight:600;color:var(--text)">🤖 OpenAI API Key</span>
-      <span id="cfg-status" style="font-size:11px"></span>
-    </div>
-    <div style="display:flex;gap:6px">
-      <input type="password" id="cfg-key" placeholder="sk-proj-..." style="flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;outline:none;background:var(--bg);color:var(--text)">
-      <button class="btn btn-primary btn-sm" onclick="salvarCfg()">Salvar</button>
-      <button class="btn btn-danger btn-sm" onclick="removeKey()">✕</button>
-    </div>
-    <div style="font-size:10px;color:var(--text-3);margin-top:5px">🔒 Salva só no seu navegador · platform.openai.com</div>
-  </div>
+  <div id="cfg-api-section" style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px"></div>
   <div class="modal-actions" style="padding-top:0;border-top:none;margin-top:0">
     <button class="btn btn-secondary btn-block" onclick="closeModal('cfg')">Fechar</button>
   </div>
@@ -1554,13 +1543,38 @@ async function delDisc(){
 
 // ── CONFIG ──
 function openCfg(){
-  const k=oai();
-  $('cfg-key').value=k?'••••••••••••••••':'';
-  $('cfg-status').textContent=k?'✓ Key configurada':'✗ Nenhuma key';
-  $('cfg-status').style.color=k?'var(--green)':'var(--red)';
   // Sync glass toggle visual
   const glassOn = document.documentElement.getAttribute('data-glass') !== 'off';
   applyGlass(glassOn);
+
+  // Seção de API dinâmica
+  const apiSection = $('cfg-api-section');
+  if (isPremium()) {
+    apiSection.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">⭐</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">IA Premium ativa</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px">Sua conta usa a IA do Simplo automaticamente — sem precisar de chave própria.</div>
+        </div>
+      </div>`;
+  } else {
+    const k = oai();
+    apiSection.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:600;color:var(--text)">🤖 OpenAI API Key</span>
+        <span id="cfg-status" style="font-size:11px;color:${k ? 'var(--green)' : 'var(--red)'}">${k ? '✓ Key configurada' : '✗ Nenhuma key'}</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <input type="password" id="cfg-key" value="${k ? '••••••••••••••••' : ''}" placeholder="sk-proj-..." style="flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;outline:none;background:var(--bg);color:var(--text)">
+        <button class="btn btn-primary btn-sm" onclick="salvarCfg()">Salvar</button>
+        <button class="btn btn-danger btn-sm" onclick="removeKey()">✕</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-3);margin-top:5px">🔒 Salva só no seu navegador · platform.openai.com</div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--text-3)">
+        Ou <span style="color:var(--brand-mid);cursor:pointer;font-weight:600" onclick="closeModal('cfg');openModal('premium')">assine o Premium</span> e use a IA sem configurar nada.
+      </div>`;
+  }
   $('m-cfg').classList.add('open');
 }
 function salvarCfg(){
@@ -1598,25 +1612,26 @@ async function exPDF(file){
 }
 async function analisar(){
   const text=$('imp-text').value.trim();if(!text){alert('Cole o texto ou suba um PDF!');return}
-  const key=oai();if(!key){alert('Configure sua OpenAI API Key nas Configurações ⚙️!');return}
   const btn=$('btn-analisar');btn.textContent='Analisando...';btn.disabled=true;
   try{
     const today=new Date().toISOString().split('T')[0];
     const dnames=discs.map(d=>d.nome).join(', ');
-    const r=await fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:1500,messages:[{role:'user',
-        content:'Analise este cronograma. Hoje: '+today+'. Disciplinas: '+dnames+'\n\n'+text+'\n\nResponda SOMENTE JSON (sem markdown): [{"nome":"...","data":"YYYY-MM-DD","tipo":"prova|trabalho|apresentacao|outro","disciplina":"nome exato ou vazio","hora":"HH:MM ou vazio"}]. Ano padrão: '+new Date().getFullYear()}]})
+    const { data: { session } } = await SB.auth.getSession();
+    const token = session?.access_token;
+    const res = await fetch(`${SB.supabaseUrl}/functions/v1/swift-worker`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ texto: text, disciplinas: dnames, hoje: today })
     });
-    const data=await r.json();if(data.error)throw new Error(data.error.message);
-    impEvts=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
-    if(!impEvts.length){alert('Nenhum evento encontrado.');btn.textContent='Analisar com GPT ✨';btn.disabled=false;return}
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro na análise');
+    impEvts = data.eventos;
+    if(!impEvts.length){alert('Nenhum evento encontrado.');btn.textContent='Analisar com IA ✨';btn.disabled=false;return}
     fillDiscs('imp-disc-def');
     $('imp-list').innerHTML=impEvts.map((e,i)=>'<div class="imp-item"><input type="checkbox" id="ic'+i+'" checked><div style="flex:1;font-size:12px"><div style="font-weight:600;color:var(--text)">'+e.nome+'</div><div style="color:var(--text-3)">'+ftipo(e.tipo)+' · '+e.data+(e.hora?' às '+e.hora:'')+(e.disciplina?' · '+e.disciplina:'')+'</div></div></div>').join('');
     $('imp1').style.display='none';$('imp2').style.display='block';
   }catch(e){alert('Erro: '+e.message)}
-  btn.textContent='Analisar com GPT ✨';btn.disabled=false;
+  btn.textContent='Analisar com IA ✨';btn.disabled=false;
 }
 async function confirmar(){
   if(!U){alert('Sessão expirada!');return}
@@ -2449,7 +2464,7 @@ async function importarComIA(texto) {
     const { data: { session } } = await SB.auth.getSession();
     const token = session?.access_token;
 
-    const res = await fetch(`${SB.supabaseUrl}/functions/v1/importar-ia`, {
+    const res = await fetch(`${SB.supabaseUrl}/functions/v1/swift-worker`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -2474,7 +2489,7 @@ async function importarComIA(texto) {
 // ── PREMIUM ──
 function isPremium() {
   // Admin sempre tem acesso
-  const adminEmails = ['emanu0707@gmail.com', 'simples.simplo2026@gmail.com'];
+  const adminEmails = ['emanu0707@gmail.com'];
   if (U && adminEmails.includes(U.email)) return true;
   // Usuário premium pelo banco
   return perfil && perfil.premium === true;
