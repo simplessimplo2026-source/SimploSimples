@@ -1184,8 +1184,8 @@ async function boot(u){
   await loadAll();
   await loadGrupos();
   await loadPerfil();
+  prevPg = ''; // limpar antes do render
   badges(); render();
-  prevPg = ''; // Garantir que próximo render sempre anima
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
 
@@ -1218,8 +1218,7 @@ const PAGE_ORDER = ['resumo','calendario','eventos','disciplinas','grupos'];
 let prevPg = 'resumo';
 
 function go(p,f){
-  const samePage = pg === p && flt === (f||flt);
-  prevPg = samePage ? '' : pg; // força re-render sem animação se mesma página
+  prevPg = pg;
   pg=p; if(f) flt=f;
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
   const map={resumo:0,calendario:1,todos:2,prova:3,trabalho:4,apresentacao:5,disciplinas:6,cfg:7};
@@ -1247,9 +1246,6 @@ function badges(){
 // ── RENDER ──
 function render(){
   const el=$('content');
-  const prevIdx = PAGE_ORDER.indexOf(prevPg);
-  const nextIdx = PAGE_ORDER.indexOf(pg);
-  const goingForward = nextIdx >= prevIdx;
 
   let html = '';
   if(pg==='resumo') html=rResumo();
@@ -1258,19 +1254,23 @@ function render(){
   else if(pg==='disciplinas') html=rDiscsPage();
   else if(pg==='grupos') html=rGruposPage();
 
-  // Se mesma página, só atualiza conteúdo sem animação
+  // Sem página anterior definida = sem animação (boot ou reload)
+  if(!prevPg){
+    el.innerHTML = html;
+    return;
+  }
+
+  const prevIdx = PAGE_ORDER.indexOf(prevPg);
+  const nextIdx = PAGE_ORDER.indexOf(pg);
+  const goingForward = nextIdx >= prevIdx;
+
+  // Mesma página = só atualiza
   if(prevPg === pg){
     el.innerHTML = html;
     return;
   }
 
-  // Primeira vez — sem animação
-  if(!el.innerHTML || el.innerHTML.trim() === ''){
-    el.innerHTML = html;
-    return;
-  }
-
-  // Exit animation
+  // Animação de transição
   el.classList.remove('page-enter','page-enter-back','page-exit','page-exit-back');
   el.classList.add(goingForward ? 'page-exit' : 'page-exit-back');
 
@@ -1280,7 +1280,7 @@ function render(){
     el.classList.add(goingForward ? 'page-enter' : 'page-enter-back');
     el.scrollTo({top:0, behavior:'smooth'});
     setTimeout(()=> el.classList.remove('page-enter','page-enter-back'), 250);
-    }, 140);
+  }, 140);
 }
 
 function cardHTML(ev){
