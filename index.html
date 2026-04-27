@@ -501,6 +501,18 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .widget-hoje-stat-label{font-size:10px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
 .widget-hoje-divider{width:1px;height:32px;background:rgba(255,255,255,.2)}
 
+/* ══ PAGE TRANSITIONS ══ */
+@keyframes pageIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pageInLeft{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pageOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-18px)}}
+@keyframes pageOutRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(18px)}}
+#content.page-enter{animation:pageIn .22s cubic-bezier(.4,0,.2,1) both}
+#content.page-enter-back{animation:pageInLeft .22s cubic-bezier(.4,0,.2,1) both}
+#content.page-exit{animation:pageOut .14s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
+#content.page-exit-back{animation:pageOutRight .14s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
+.topbar-title{transition:opacity .15s,transform .15s}
+.topbar-title.fade{opacity:0;transform:translateY(-4px)}
+
 /* ══ MOBILE ══ */
 @media(max-width:768px){
   .sidebar{display:none}
@@ -1166,22 +1178,32 @@ async function rDiscs(){const{data}=await SB.from('disciplinas').select('*').ord
 async function rEvts(){const{data}=await SB.from('eventos').select('*').order('data');evts=data||[]}
 
 // ── NAV ──
+// ── NAV ──
+const PAGE_ORDER = ['resumo','calendario','eventos','disciplinas','grupos'];
+let prevPg = 'resumo';
+
 function go(p,f){
-  pg=p;if(f)flt=f;
+  prevPg = pg;
+  pg=p; if(f) flt=f;
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
   const map={resumo:0,calendario:1,todos:2,prova:3,trabalho:4,apresentacao:5,disciplinas:6,cfg:7};
   const btns=document.querySelectorAll('.nav-btn');
-  const k=f||p;if(map[k]!==undefined&&btns[map[k]])btns[map[k]].classList.add('active');
-  const titles={resumo:'Resumo',calendario:'Calendário',todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros',disciplinas:'Disciplinas'};
-  $('page-title').textContent=titles[f||p]||'';
+  const k=f||p; if(map[k]!==undefined&&btns[map[k]]) btns[map[k]].classList.add('active');
+  const titles={resumo:'Resumo',calendario:'Calendário',todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros',disciplinas:'Disciplinas',grupos:'Grupos'};
+  // Animar título
+  const titleEl = $('page-title');
+  titleEl.classList.add('fade');
+  setTimeout(()=>{ titleEl.textContent=titles[f||p]||''; titleEl.classList.remove('fade'); }, 150);
   render();
 }
+
 function bnav(k){
   document.querySelectorAll('.bnav-item').forEach(e=>e.classList.remove('on'));
-  const e=$('bn-'+k);if(e)e.classList.add('on');
+  const e=$('bn-'+k); if(e) e.classList.add('on');
 }
+
 function badges(){
-  const t=new Date();t.setHours(0,0,0,0);
+  const t=new Date(); t.setHours(0,0,0,0);
   const p=evts.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=t);
   const ball=$('b-all'); if(ball) ball.textContent=p.length;
   const bprova=$('b-prova'); if(bprova) bprova.textContent=p.filter(e=>e.tipo==='prova').length;
@@ -1190,11 +1212,36 @@ function badges(){
 // ── RENDER ──
 function render(){
   const el=$('content');
-  if(pg==='resumo')el.innerHTML=rResumo();
-  else if(pg==='eventos')el.innerHTML=rEventos();
-  else if(pg==='calendario')el.innerHTML=rCal();
-  else if(pg==='disciplinas')el.innerHTML=rDiscsPage();
-  else if(pg==='grupos')el.innerHTML=rGruposPage();
+  const prevIdx = PAGE_ORDER.indexOf(prevPg);
+  const nextIdx = PAGE_ORDER.indexOf(pg);
+  const goingForward = nextIdx >= prevIdx;
+
+  // Determinar novo HTML
+  let html = '';
+  if(pg==='resumo') html=rResumo();
+  else if(pg==='eventos') html=rEventos();
+  else if(pg==='calendario') html=rCal();
+  else if(pg==='disciplinas') html=rDiscsPage();
+  else if(pg==='grupos') html=rGruposPage();
+
+  // Se primeira vez (sem animação), só injeta
+  if(prevPg === pg || !el.innerHTML){
+    el.innerHTML = html;
+    return;
+  }
+
+  // Exit animation
+  el.classList.remove('page-enter','page-enter-back','page-exit','page-exit-back');
+  el.classList.add(goingForward ? 'page-exit' : 'page-exit-back');
+
+  setTimeout(()=>{
+    el.innerHTML = html;
+    el.classList.remove('page-exit','page-exit-back');
+    el.classList.add(goingForward ? 'page-enter' : 'page-enter-back');
+    // Scroll to top suavemente
+    el.scrollTo({top:0, behavior:'smooth'});
+    setTimeout(()=> el.classList.remove('page-enter','page-enter-back'), 250);
+  }, 140);
 }
 
 function cardHTML(ev){
