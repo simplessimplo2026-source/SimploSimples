@@ -419,11 +419,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <div class="nav-group">Principal</div>
         <button class="nav-btn active" onclick="go('resumo')"><span class="icon">📋</span>Resumo</button>
         <button class="nav-btn" onclick="go('calendario')"><span class="icon">📅</span>Calendário</button>
-        <div class="nav-group">Eventos</div>
-        <button class="nav-btn" onclick="go('eventos','todos')"><span class="icon">📚</span>Todos<span class="nav-badge" id="b-all">0</span></button>
-        <button class="nav-btn" onclick="go('eventos','prova')"><span class="icon">📝</span>Provas<span class="nav-badge" id="b-prova">0</span></button>
-        <button class="nav-btn" onclick="go('eventos','trabalho')"><span class="icon">📂</span>Trabalhos</button>
-        <button class="nav-btn" onclick="go('eventos','apresentacao')"><span class="icon">🎤</span>Apresentações</button>
+        <button class="nav-btn" onclick="go('eventos','todos')"><span class="icon">📚</span>Eventos<span class="nav-badge" id="b-all">0</span></button>
         <div class="nav-group">Config</div>
         <button class="nav-btn" onclick="go('disciplinas')"><span class="icon">🏫</span>Disciplinas</button>
         <button class="nav-btn" onclick="go('grupos')"><span class="icon">👥</span>Grupos</button>
@@ -474,11 +470,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <div class="drawer-item" onclick="go('resumo');closeDrawer()"><span class="icon">📋</span>Resumo</div>
     <div class="drawer-item" onclick="go('calendario');closeDrawer()"><span class="icon">📅</span>Calendário</div>
     <div style="font-size:10px;font-weight:700;color:var(--text-3);padding:8px 18px 2px;text-transform:uppercase">Eventos</div>
-    <div class="drawer-item" onclick="go('eventos','todos');closeDrawer()"><span class="icon">📚</span>Todos</div>
-    <div class="drawer-item" onclick="go('eventos','prova');closeDrawer()"><span class="icon">📝</span>Provas</div>
-    <div class="drawer-item" onclick="go('eventos','trabalho');closeDrawer()"><span class="icon">📂</span>Trabalhos</div>
-    <div class="drawer-item" onclick="go('eventos','apresentacao');closeDrawer()"><span class="icon">🎤</span>Apresentações</div>
-    <div class="drawer-item" onclick="go('eventos','outro');closeDrawer()"><span class="icon">📌</span>Outros</div>
+    <div class="drawer-item" onclick="go('eventos','todos');closeDrawer()"><span class="icon">📚</span>Eventos</div>
     <div style="font-size:10px;font-weight:700;color:var(--text-3);padding:8px 18px 2px;text-transform:uppercase">Config</div>
     <div class="drawer-item" onclick="go('disciplinas');closeDrawer()"><span class="icon">🏫</span>Disciplinas</div>
     <div class="drawer-item" onclick="go('grupos');closeDrawer()"><span class="icon">👥</span>Grupos</div>
@@ -719,7 +711,10 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <textarea id="tar-desc" placeholder="Detalhes..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;min-height:60px;resize:vertical"></textarea>
   </div>
   <div class="field"><label>Atribuir para</label>
-    <select id="tar-atrib" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:#fff;color:var(--text)"></select>
+    <select id="tar-atrib" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--surface);color:var(--text)"></select>
+  </div>
+  <div class="field"><label>Vincular a evento do cronograma (opcional)</label>
+    <select id="tar-evento" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--surface);color:var(--text)"></select>
   </div>
   <div class="modal-actions">
     <button class="btn btn-secondary" onclick="closeModal('tarefa')">Cancelar</button>
@@ -1530,11 +1525,13 @@ function tarefaHTML(t) {
   const atrib = grupoMembros.find(m => m.user_id === t.atribuido_para);
   const chk = t.concluida ? 'checked' : '';
   const done = t.concluida ? ' done' : '';
+  const evVinc = t.evento_id ? evts.find(e => e.id === t.evento_id) : null;
   return '<div class="tarefa-item'+done+'">'
     + '<input type="checkbox" class="tarefa-check" '+chk+' data-id="'+t.id+'" data-done="'+t.concluida+'" onchange="onToggleTarefa(this)">'
     + '<div class="tarefa-body">'
       + '<div class="tarefa-titulo">'+t.titulo+'</div>'
       + (atrib ? '<div class="tarefa-atrib">→ '+atrib.nome+'</div>' : '')
+      + (evVinc ? '<div style="font-size:10px;color:var(--brand);margin-top:2px">📅 '+evVinc.nome.substring(0,35)+'</div>' : '')
       + (t.descricao ? '<div class="tarefa-desc">'+t.descricao+'</div>' : '')
     + '</div>'
   + '</div>';
@@ -1594,6 +1591,15 @@ function abrirGevento(){ $('m-gevento').classList.add('open'); }
 function abrirModalTarefa() {
   const sel = $('tar-atrib');
   sel.innerHTML = '<option value="">Sem atribuição</option>' + grupoMembros.map(m => '<option value="'+m.user_id+'">'+m.nome+'</option>').join('');
+  // Preencher eventos do cronograma
+  const selEv = $('tar-evento');
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const proxEvts = evts.filter(e => !e.concluido && new Date(e.data+'T00:00:00') >= hoje).sort((a,b) => new Date(a.data)-new Date(b.data));
+  selEv.innerHTML = '<option value="">Nenhum evento</option>' + proxEvts.map(e => {
+    const d = new Date(e.data+'T00:00:00');
+    const dt = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+    return '<option value="'+e.id+'">'+dt+' · '+e.nome.substring(0,40)+'</option>';
+  }).join('');
   $('m-tarefa').classList.add('open');
 }
 
@@ -1603,6 +1609,7 @@ async function criarTarefa() {
   const { error } = await SB.from('grupo_tarefas').insert({
     grupo_id: grupoAtual.id, criado_por: U.id,
     atribuido_para: $('tar-atrib').value || null,
+    evento_id: $('tar-evento').value || null,
     titulo, descricao: $('tar-desc').value.trim()
   });
   if (error) { alert('Erro: ' + error.message); return; }
