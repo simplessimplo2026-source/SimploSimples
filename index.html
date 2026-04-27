@@ -1185,6 +1185,7 @@ async function boot(u){
   await loadGrupos();
   await loadPerfil();
   badges(); render();
+  prevPg = ''; // Garantir que próximo render sempre anima
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
 
@@ -1217,14 +1218,14 @@ const PAGE_ORDER = ['resumo','calendario','eventos','disciplinas','grupos'];
 let prevPg = 'resumo';
 
 function go(p,f){
-  prevPg = pg;
+  const samePage = pg === p && flt === (f||flt);
+  prevPg = samePage ? '' : pg; // força re-render sem animação se mesma página
   pg=p; if(f) flt=f;
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
   const map={resumo:0,calendario:1,todos:2,prova:3,trabalho:4,apresentacao:5,disciplinas:6,cfg:7};
   const btns=document.querySelectorAll('.nav-btn');
   const k=f||p; if(map[k]!==undefined&&btns[map[k]]) btns[map[k]].classList.add('active');
   const titles={resumo:'Resumo',calendario:'Calendário',todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros',disciplinas:'Disciplinas',grupos:'Grupos'};
-  // Animar título
   const titleEl = $('page-title');
   titleEl.classList.add('fade');
   setTimeout(()=>{ titleEl.textContent=titles[f||p]||''; titleEl.classList.remove('fade'); }, 150);
@@ -1257,8 +1258,14 @@ function render(){
   else if(pg==='disciplinas') html=rDiscsPage();
   else if(pg==='grupos') html=rGruposPage();
 
-  // Se primeira vez (sem animação), só injeta
-  if(prevPg === pg || !el.innerHTML){
+  // Se mesma página, só atualiza conteúdo sem animação
+  if(prevPg === pg){
+    el.innerHTML = html;
+    return;
+  }
+
+  // Primeira vez — sem animação
+  if(!el.innerHTML || el.innerHTML.trim() === ''){
     el.innerHTML = html;
     return;
   }
