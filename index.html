@@ -1179,12 +1179,10 @@ async function boot(u){
   $('s-email').textContent=u.email;
   $('app').style.display='block';
   $('bottom-nav').classList.add('visible');
-  // Skeleton enquanto carrega
-  $('content').innerHTML='<div class="stats" style="margin-bottom:22px">'+'<div class="stat skeleton sk-stat"></div>'.repeat(4)+'</div>'+'<div class="sk-card skeleton"></div>'.repeat(4);
   await loadAll();
   await loadGrupos();
   await loadPerfil();
-  prevPg = ''; // limpar antes do render
+  prevPg = '';
   badges(); render();
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
