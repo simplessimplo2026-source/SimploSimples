@@ -738,7 +738,7 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
     <div class="drawer-item" onclick="go('grupos');closeDrawer()"><span class="icon">👥</span>Grupos</div>
     <div class="drawer-item" onclick="openModal('perfil');closeDrawer()"><span class="icon">👤</span>Meu Perfil</div>
     <div class="drawer-item" onclick="openModal('cfg');closeDrawer()"><span class="icon">⚙️</span>Configurações</div>
-    <div class="drawer-item" onclick="openModal('import');closeDrawer()"><span class="icon">📎</span>Importar cronograma</div>
+    <div class="drawer-item" onclick="abrirImportComGate();closeDrawer()"><span class="icon">📎</span>Importar cronograma</div>
   </nav>
   <div style="padding:14px 18px;border-top:1px solid var(--border)">
     <button class="btn btn-secondary btn-block" onclick="doLogout()">Sair da conta</button>
@@ -2465,6 +2465,10 @@ async function importarComIA(texto) {
 
 // ── PREMIUM ──
 function isPremium() {
+  // Admin sempre tem acesso
+  const adminEmails = ['emanu0707@gmail.com', 'simples.simplo2026@gmail.com'];
+  if (U && adminEmails.includes(U.email)) return true;
+  // Usuário premium pelo banco
   return perfil && perfil.premium === true;
 }
 
