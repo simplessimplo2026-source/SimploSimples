@@ -392,6 +392,10 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
       <div class="auth-tab" onclick="setTab('register')">Criar conta</div>
     </div>
     <div id="auth-msg" class="auth-msg"></div>
+    <div class="field" id="field-nome" style="display:none">
+      <label>Nome completo</label>
+      <input type="text" id="a-nome" placeholder="Ex: Emanuel Goncalves">
+    </div>
     <div class="field">
       <label>Email</label>
       <input type="email" id="a-email" placeholder="seu@email.com">
@@ -641,7 +645,6 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <option value="">Sem disciplina</option>
       </select>
     </div>
-    <div class="field"><label>Seu nome no grupo</label><input type="text" id="ge-meu-nome" placeholder="Como quer ser chamado"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('grupo-entry')">Cancelar</button>
       <button class="btn btn-primary" id="btn-criar-grupo">Criar grupo</button>
@@ -649,7 +652,6 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   </div>
   <div id="ge-entrar" style="display:none">
     <div class="field"><label>Código do grupo</label><input type="text" id="ge-codigo" placeholder="Ex: AB12CD" style="text-transform:uppercase;letter-spacing:3px;font-size:18px;text-align:center"></div>
-    <div class="field"><label>Seu nome no grupo</label><input type="text" id="ge-meu-nome2" placeholder="Como quer ser chamado"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('grupo-entry')">Cancelar</button>
       <button class="btn btn-primary" id="btn-entrar-grupo">Entrar no grupo</button>
@@ -870,6 +872,7 @@ function setTab(m){
   $('auth-btn').textContent=m==='login'?'Entrar':'Criar conta';
   $('forgot-wrap').style.display=m==='login'?'block':'none';
   $('auth-msg').className='auth-msg';$('auth-msg').textContent='';
+  const fn=$('field-nome');if(fn)fn.style.display=m==='register'?'block':'none';
 }
 function aMsg(msg,type){const e=$('auth-msg');e.textContent=msg;e.className='auth-msg '+type}
 async function doAuth(){
@@ -1503,10 +1506,6 @@ function openGrupoEntry(aba) {
   if (sel) {
     sel.innerHTML = '<option value="">Sem disciplina</option>' + discs.map(d => '<option value="'+d.id+'">'+d.nome+'</option>').join('');
   }
-  // Pré-preencher nome do usuário
-  const preNome = perfil?.nome || '';
-  if ($('ge-meu-nome') && !$('ge-meu-nome').value) $('ge-meu-nome').value = preNome;
-  if ($('ge-meu-nome2') && !$('ge-meu-nome2').value) $('ge-meu-nome2').value = preNome;
   $('m-grupo-entry').classList.add('open');
 }
 
@@ -1521,7 +1520,7 @@ function setGrupoTab(aba) {
 
 async function criarGrupo() {
   const nome = $('ge-nome').value.trim();
-  const meuNome = $('ge-meu-nome').value.trim() || (perfil?.nome) || U.email.split('@')[0];
+  const meuNome = perfil?.nome || U.email.split('@')[0];
   if (!nome) { alert('Preencha o nome do grupo!'); return; }
   const discId = $('ge-disc').value || null;
   const { data: grupo, error } = await SB.from('grupos').insert({ nome, criado_por: U.id, disciplina_id: discId }).select().single();
@@ -1535,9 +1534,8 @@ async function criarGrupo() {
 
 async function entrarGrupo() {
   const codigo = $('ge-codigo').value.trim().toUpperCase().replace(/\s/g,'');
-  const meuNome = $('ge-meu-nome2').value.trim();
+  const meuNome = perfil?.nome || U.email.split('@')[0];
   if (!codigo) { alert('Digite o código do grupo!'); return; }
-  if (!meuNome) { alert('Digite seu nome!'); return; }
   const { data: grupos_found, error } = await SB.from('grupos').select('*').ilike('codigo', codigo);
   if (error) { alert('Erro: ' + error.message); return; }
   if (!grupos_found || !grupos_found.length) { alert('Código inválido! Verifique e tente novamente.'); return; }
