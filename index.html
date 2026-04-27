@@ -69,6 +69,40 @@
   --blur-sm: blur(12px) saturate(1.5);
 }
 
+/* ══ MODO SÓLIDO (sem glass) ══ */
+[data-glass="off"] {
+  --surface: #FFFFFF;
+  --surface-2: #F8FAFF;
+  --glass: #FFFFFF;
+  --glass-border: #DBEAFE;
+  --blur: none;
+  --blur-sm: none;
+}
+[data-glass="off"] .sidebar,
+[data-glass="off"] .topbar,
+[data-glass="off"] .bottom-nav,
+[data-glass="off"] .drawer,
+[data-glass="off"] .modal,
+[data-glass="off"] .pomo-modal,
+[data-glass="off"] .event-card,
+[data-glass="off"] .stat,
+[data-glass="off"] .disc-card,
+[data-glass="off"] .grupo-card,
+[data-glass="off"] .cal-cell,
+[data-glass="off"] .prog-ring-card,
+[data-glass="off"] .arquivo-item,
+[data-glass="off"] .tarefa-item,
+[data-glass="off"] .evento-grupo-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-glass="off"][data-theme="dark"] {
+  --surface: #0F1E33;
+  --surface-2: #0A1628;
+  --glass: #0F1E33;
+  --glass-border: #1E3A5F;
+}
+
 /* ── DARK MODE ── */
 [data-theme="dark"] {
   --brand: #0EA5E9;
@@ -447,6 +481,26 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .prog-ring-label{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;text-align:center}
 .prog-ring-num{font-size:19px;font-weight:700;font-family:'Playfair Display',serif;color:var(--text);margin-bottom:2px;letter-spacing:-.5px}
 
+
+/* ══ WIDGET HOJE ══ */
+.widget-hoje{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);border-radius:var(--radius-xl);padding:22px 22px 18px;margin-bottom:22px;color:#fff;box-shadow:0 8px 28px var(--brand-glow);position:relative;overflow:hidden}
+.widget-hoje::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
+.widget-hoje::after{content:'';position:absolute;bottom:-40px;right:40px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none}
+.widget-hoje-data{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-bottom:4px}
+.widget-hoje-titulo{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;letter-spacing:-.5px;margin-bottom:16px;line-height:1.2}
+.widget-hoje-items{display:flex;flex-direction:column;gap:8px;position:relative;z-index:1}
+.widget-hoje-item{background:rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.2);cursor:pointer;transition:background .15s}
+.widget-hoje-item:hover{background:rgba(255,255,255,.22)}
+.widget-hoje-item-hora{font-size:11px;font-weight:700;opacity:.8;min-width:38px;flex-shrink:0}
+.widget-hoje-item-nome{font-size:13px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.widget-hoje-item-disc{font-size:11px;opacity:.7;flex-shrink:0;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.widget-hoje-vazio{text-align:center;padding:12px 0;opacity:.75;font-size:13px;font-weight:500}
+.widget-hoje-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
+.widget-hoje-stat{text-align:center}
+.widget-hoje-stat-num{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;line-height:1}
+.widget-hoje-stat-label{font-size:10px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.widget-hoje-divider{width:1px;height:32px;background:rgba(255,255,255,.2)}
+
 /* ══ MOBILE ══ */
 @media(max-width:768px){
   .sidebar{display:none}
@@ -704,10 +758,19 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
     <div class="modal-title">⚙️ Configurações</div>
     <button class="modal-close" onclick="closeModal('cfg')">✕</button>
   </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:4px">
     <span style="font-size:13px;font-weight:600;color:var(--text)">🌙 Modo escuro</span>
     <div id="dark-toggle" onclick="toggleDark()" style="width:44px;height:24px;border-radius:12px;background:var(--border);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0">
       <div id="dark-knob" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px">
+    <div>
+      <span style="font-size:13px;font-weight:600;color:var(--text)">🪟 Efeito vidro (Glass)</span>
+      <div style="font-size:11px;color:var(--text-3);margin-top:2px">Superfícies translúcidas com blur</div>
+    </div>
+    <div id="glass-toggle" onclick="toggleGlass()" style="width:44px;height:24px;border-radius:12px;background:var(--brand-mid);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0">
+      <div id="glass-knob" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:22px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>
     </div>
   </div>
   <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px">
@@ -971,6 +1034,9 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 (function(){
   const saved = localStorage.getItem('dark_mode');
   if (saved === '1') document.documentElement.setAttribute('data-theme','dark');
+  // Glass init
+  const glass = localStorage.getItem('glass_mode');
+  if (glass === '0') document.documentElement.setAttribute('data-glass','off');
 })();
 
 // ── SUPABASE ──
@@ -1303,6 +1369,9 @@ function openCfg(){
   $('cfg-key').value=k?'••••••••••••••••':'';
   $('cfg-status').textContent=k?'✓ Key configurada':'✗ Nenhuma key';
   $('cfg-status').style.color=k?'var(--green)':'var(--red)';
+  // Sync glass toggle visual
+  const glassOn = document.documentElement.getAttribute('data-glass') !== 'off';
+  applyGlass(glassOn);
   $('m-cfg').classList.add('open');
 }
 function salvarCfg(){
@@ -1507,7 +1576,7 @@ function applyDark(on) {
   document.documentElement.setAttribute('data-theme', on ? 'dark' : '');
   const toggle = document.getElementById('dark-toggle');
   const knob = document.getElementById('dark-knob');
-  if (toggle) toggle.style.background = on ? '#3B82F6' : '';
+  if (toggle) toggle.style.background = on ? 'var(--brand-mid)' : '';
   if (knob) knob.style.left = on ? '22px' : '2px';
 }
 
@@ -1515,6 +1584,25 @@ function toggleDark() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   applyDark(!isDark);
   localStorage.setItem('dark_mode', isDark ? '0' : '1');
+}
+
+// ── GLASS MODE ──
+function applyGlass(on) {
+  if (on) {
+    document.documentElement.removeAttribute('data-glass');
+  } else {
+    document.documentElement.setAttribute('data-glass', 'off');
+  }
+  const toggle = document.getElementById('glass-toggle');
+  const knob = document.getElementById('glass-knob');
+  if (toggle) toggle.style.background = on ? 'var(--brand-mid)' : 'var(--border)';
+  if (knob) knob.style.left = on ? '22px' : '2px';
+}
+
+function toggleGlass() {
+  const isOn = document.documentElement.getAttribute('data-glass') !== 'off';
+  applyGlass(!isOn);
+  localStorage.setItem('glass_mode', isOn ? '0' : '1');
 }
 
 // ── PERFIL ──
@@ -2230,6 +2318,88 @@ function renderPomoDots() {
   ).join('');
 }
 
+// ── WIDGET HOJE ──
+function rWidgetHoje() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const amanha = new Date(hoje); amanha.setDate(amanha.getDate() + 1);
+
+  const toStr = d => d.toISOString().split('T')[0];
+  const hojeStr = toStr(hoje);
+  const amanhaStr = toStr(amanha);
+
+  const evHoje = evts.filter(e => e.data === hojeStr && !e.concluido)
+    .sort((a,b) => (a.hora||'99:99').localeCompare(b.hora||'99:99'));
+  const evAmanha = evts.filter(e => e.data === amanhaStr && !e.concluido);
+  const semana = evts.filter(e => {
+    const d = new Date(e.data+'T00:00:00');
+    return !e.concluido && d >= hoje && d <= new Date(hoje.getTime() + 7*86400000);
+  }).length;
+
+  const diasSemana = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const dataLabel = `${diasSemana[hoje.getDay()]}, ${hoje.getDate()} de ${meses[hoje.getMonth()]}`;
+
+  let titulo = '';
+  if (evHoje.length === 0 && evAmanha.length === 0) titulo = 'Dia livre! 🎉';
+  else if (evHoje.length === 0) titulo = `${evAmanha.length} evento${evAmanha.length>1?'s':''} amanhã`;
+  else titulo = `${evHoje.length} evento${evHoje.length>1?'s':''} hoje`;
+
+  const itemsHtml = evHoje.length > 0
+    ? evHoje.slice(0,3).map(ev => {
+        const disc = gDisc(ev.disciplina_id);
+        const icones = {prova:'📝',trabalho:'📂',apresentacao:'🎤',outro:'📌'};
+        return `<div class="widget-hoje-item" onclick="openEvento('${ev.id}')">
+          <span style="font-size:16px">${icones[ev.tipo]||'📌'}</span>
+          <span class="widget-hoje-item-hora">${ev.hora||'—'}</span>
+          <span class="widget-hoje-item-nome">${ev.nome}</span>
+          ${disc?`<span class="widget-hoje-item-disc">${disc.nome}</span>`:''}
+        </div>`;
+      }).join('')
+    : evAmanha.length > 0
+      ? evAmanha.slice(0,2).map(ev => {
+          const disc = gDisc(ev.disciplina_id);
+          const icones = {prova:'📝',trabalho:'📂',apresentacao:'🎤',outro:'📌'};
+          return `<div class="widget-hoje-item" onclick="openEvento('${ev.id}')">
+            <span style="font-size:16px">${icones[ev.tipo]||'📌'}</span>
+            <span class="widget-hoje-item-hora" style="opacity:.6">amanhã</span>
+            <span class="widget-hoje-item-nome">${ev.nome}</span>
+            ${disc?`<span class="widget-hoje-item-disc">${disc.nome}</span>`:''}
+          </div>`;
+        }).join('')
+      : '<div class="widget-hoje-vazio">✨ Nenhum evento nos próximos dias</div>';
+
+  const conc = evts.filter(e=>e.concluido).length;
+  const total = evts.length;
+  const pct = total > 0 ? Math.round((conc/total)*100) : 0;
+
+  return `<div class="widget-hoje">
+    <div class="widget-hoje-data">${dataLabel}</div>
+    <div class="widget-hoje-titulo">${titulo}</div>
+    <div class="widget-hoje-items">${itemsHtml}</div>
+    <div class="widget-hoje-footer">
+      <div class="widget-hoje-stat">
+        <div class="widget-hoje-stat-num">${evHoje.length}</div>
+        <div class="widget-hoje-stat-label">Hoje</div>
+      </div>
+      <div class="widget-hoje-divider"></div>
+      <div class="widget-hoje-stat">
+        <div class="widget-hoje-stat-num">${evAmanha.length}</div>
+        <div class="widget-hoje-stat-label">Amanhã</div>
+      </div>
+      <div class="widget-hoje-divider"></div>
+      <div class="widget-hoje-stat">
+        <div class="widget-hoje-stat-num">${semana}</div>
+        <div class="widget-hoje-stat-label">Na semana</div>
+      </div>
+      <div class="widget-hoje-divider"></div>
+      <div class="widget-hoje-stat">
+        <div class="widget-hoje-stat-num">${pct}%</div>
+        <div class="widget-hoje-stat-label">Feitos</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 // ── PROGRESS CHART (resumo) ──
 function rProgressChart() {
   if (!discs.length) return '';
@@ -2314,11 +2484,7 @@ function rResumo(){
     +'</div>';
   }
 
-  return '<div style="margin-bottom:22px;display:flex;align-items:center;justify-content:space-between">'
-    +'<div><div style="font-size:12px;color:var(--text-3);font-weight:500">'+sau+(nome?' '+nome:'')+' 👋</div>'
-    +'<div style="font-size:22px;font-weight:700;font-family:\'Playfair Display\',serif;margin-top:2px;color:var(--text);letter-spacing:-.5px">'+(pend.length===0?'Tudo em dia! 🎉':pend.length+' evento'+(pend.length>1?'s':'')+' pendente'+(pend.length>1?'s':''))+'</div></div>'
-    +'<button onclick="openModal(\'import\')" style="background:var(--brand-light);border:1.5px solid var(--brand);color:var(--brand);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">📎 Importar</button>'
-  +'</div>'
+  return rWidgetHoje()
   +'<div class="stats">'
     +'<div class="stat"><div class="stat-label">Provas</div><div class="stat-num" style="color:var(--red)">'+provas+'</div><div class="stat-desc">pendentes</div></div>'
     +'<div class="stat"><div class="stat-label">Trabalhos</div><div class="stat-num" style="color:var(--brand)">'+trab+'</div><div class="stat-desc">a entregar</div></div>'
