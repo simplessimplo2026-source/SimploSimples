@@ -1244,7 +1244,6 @@ function render(){
   const nextIdx = PAGE_ORDER.indexOf(pg);
   const goingForward = nextIdx >= prevIdx;
 
-  // Determinar novo HTML
   let html = '';
   if(pg==='resumo') html=rResumo();
   else if(pg==='eventos') html=rEventos();
@@ -1255,6 +1254,7 @@ function render(){
   // Se primeira vez (sem animação), só injeta
   if(prevPg === pg || !el.innerHTML){
     el.innerHTML = html;
+    setTimeout(()=>{ wrapEventCards(); initAllSwipeModals(); }, 260);
     return;
   }
 
@@ -1266,9 +1266,10 @@ function render(){
     el.innerHTML = html;
     el.classList.remove('page-exit','page-exit-back');
     el.classList.add(goingForward ? 'page-enter' : 'page-enter-back');
-    // Scroll to top suavemente
     el.scrollTo({top:0, behavior:'smooth'});
     setTimeout(()=> el.classList.remove('page-enter','page-enter-back'), 250);
+    // Gestos após DOM atualizar
+    setTimeout(()=>{ wrapEventCards(); initAllSwipeModals(); }, 260);
   }, 140);
 }
 
@@ -2821,16 +2822,6 @@ function initGestures() {
 }
 
 // Reinicializar swipe nos cards sempre que o conteúdo renderizar
-const _origRender = render;
-function render() {
-  _origRender();
-  // Pequeno delay para o DOM atualizar
-  setTimeout(() => {
-    wrapEventCards();
-    initAllSwipeModals();
-  }, 260);
-}
-
 init();
 </script>
 </body>
