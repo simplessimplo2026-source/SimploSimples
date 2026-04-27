@@ -899,15 +899,15 @@ async function doForgot(){
 }
 async function doLogout(){
   try { await SB.auth.signOut(); } catch(e) {}
-  discs=[];evts=[];U=null;
+  discs=[];evts=[];U=null;perfil=null;grupos=[];
   try { closeDrawer(); } catch(e) {}
+  try { closeModal('grupo'); } catch(e) {}
   $('app').style.display='none';
   $('auth').style.display='flex';
   try { $('bottom-nav').classList.remove('visible'); } catch(e) {}
-  try { $('a-email').value=''; $('a-pass').value=''; } catch(e) {}
-  $('auth-msg').className='auth-msg';
-  $('auth-msg').textContent='';
-  setTab('login');
+  try { $('a-email').value=''; $('a-pass').value=''; $('a-nome').value=''; } catch(e) {}
+  try { $('auth-msg').className='auth-msg'; $('auth-msg').textContent=''; } catch(e) {}
+  try { setTab('login'); } catch(e) {}
 }
 
 // ── INIT ──
@@ -1520,7 +1520,7 @@ function setGrupoTab(aba) {
 
 async function criarGrupo() {
   const nome = $('ge-nome').value.trim();
-  const meuNome = perfil?.nome || U.email.split('@')[0];
+  const meuNome = (perfil && perfil.nome) ? perfil.nome : U.email.split('@')[0];
   if (!nome) { alert('Preencha o nome do grupo!'); return; }
   const discId = $('ge-disc').value || null;
   const { data: grupo, error } = await SB.from('grupos').insert({ nome, criado_por: U.id, disciplina_id: discId }).select().single();
@@ -1534,7 +1534,7 @@ async function criarGrupo() {
 
 async function entrarGrupo() {
   const codigo = $('ge-codigo').value.trim().toUpperCase().replace(/\s/g,'');
-  const meuNome = perfil?.nome || U.email.split('@')[0];
+  const meuNome = (perfil && perfil.nome) ? perfil.nome : U.email.split('@')[0];
   if (!codigo) { alert('Digite o código do grupo!'); return; }
   const { data: grupos_found, error } = await SB.from('grupos').select('*').ilike('codigo', codigo);
   if (error) { alert('Erro: ' + error.message); return; }
@@ -1560,7 +1560,7 @@ async function abrirGrupo(id) {
   const btnExcluir = $('btn-excluir-grupo');
   if (btnExcluir) btnExcluir.style.display = grupoAtual.criado_por === U.id ? 'inline-flex' : 'none';
   const btnEditar = $('btn-editar-grupo');
-  if (btnEditar) btnEditar.style.display = grupoAtual.criado_por === U.id ? 'inline-flex' : 'none';
+  if (btnEditar) btnEditar.style.display = (grupoAtual && grupoAtual.criado_por === U.id) ? 'inline-flex' : 'none';
   abaGrupo = 'mural';
   document.querySelectorAll('#m-grupo .tab').forEach((t,i) => t.classList.toggle('on', i===0));
   $('m-grupo').classList.add('open');
