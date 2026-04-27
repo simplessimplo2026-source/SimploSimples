@@ -1261,29 +1261,20 @@ function compartilharWpp(id) {
   const d = new Date(ev.data + 'T00:00:00');
   const dataFmt = d.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
   const dl = dLeft(ev.data);
-  const urgencia = dl === 0 ? '🚨 HOJE!' : dl === 1 ? '⚠️ AMANHÃ!' : dl <= 3 ? '⏰ Em ' + dl + ' dias!' : '📅 Em ' + dl + ' dias';
-  
-  const emoji = {prova:'📝', trabalho:'📂', apresentacao:'🎤', outro:'📌'}[ev.tipo] || '📌';
+  const urgencia = dl === 0 ? '\u{1F6A8} HOJE!' : dl === 1 ? '\u26A0\uFE0F AMANH\u00C3!' : dl <= 3 ? '\u23F0 Em ' + dl + ' dias!' : '\u{1F4C5} Em ' + dl + ' dias';
+  const emojis = {prova:'\u{1F4DD}', trabalho:'\u{1F4C2}', apresentacao:'\u{1F3A4}', outro:'\u{1F4CC}'};
+  const emoji = emojis[ev.tipo] || '\u{1F4CC}';
   const tipo = ftipo(ev.tipo).toUpperCase();
-  
-  let msg = emoji + ' *' + tipo + '* ' + urgencia + '
-
-';
-  msg += '📚 *' + ev.nome + '*
-';
-  if (disc) msg += '🏫 ' + disc.nome + '
-';
-  msg += '📅 ' + dataFmt.charAt(0).toUpperCase() + dataFmt.slice(1);
-  if (ev.hora) msg += ' às ' + ev.hora;
-  msg += '
-';
-  if (ev.notas) msg += '📝 ' + ev.notas + '
-';
-  msg += '
-_Compartilhado via Simplo Estudante_ 🎓';
-  
-  const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
-  window.open(url, '_blank');
+  const nl = String.fromCharCode(10);
+  let msg = emoji + ' *' + tipo + '* ' + urgencia + nl + nl;
+  msg += '*' + ev.nome + '*' + nl;
+  if (disc) msg += '\u{1F3EB} ' + disc.nome + nl;
+  msg += '\u{1F4C5} ' + dataFmt.charAt(0).toUpperCase() + dataFmt.slice(1);
+  if (ev.hora) msg += ' \u00E0s ' + ev.hora;
+  msg += nl;
+  if (ev.notas) msg += nl + ev.notas + nl;
+  msg += nl + '_Compartilhado via Simplo Estudante_ \u{1F393}';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
 // ── DARK MODE ──
