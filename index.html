@@ -1323,6 +1323,7 @@ async function salvarEdicaoGrupo() {
 }
 
 // ── EDITAR TAREFA ──
+function onTarefaClick(el) { abrirEditarTarefa(el.getAttribute("data-tid")); }
 function abrirEditarTarefa(id) {
   const t = grupoTarefas.find(t => t.id === id);
   if (!t) return;
@@ -1642,7 +1643,7 @@ function tarefaHTML(t) {
   const chk = t.concluida ? 'checked' : '';
   const done = t.concluida ? ' done' : '';
   const evVinc = t.evento_id ? evts.find(e => e.id === t.evento_id) : null;
-  return '<div class="tarefa-item'+done+'" style="cursor:pointer" onclick="abrirEditarTarefa(''+t.id+')">'
+  return '<div class="tarefa-item'+done+'" style="cursor:pointer" data-tid="'+t.id+'" onclick="onTarefaClick(this)">'
     + '<input type="checkbox" class="tarefa-check" '+chk+' data-id="'+t.id+'" data-done="'+t.concluida+'" onchange="event.stopPropagation();onToggleTarefa(this)">'
     + '<div class="tarefa-body">'
       + '<div class="tarefa-titulo">'+t.titulo+'</div>'
