@@ -667,7 +667,8 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
       <div id="m-grupo-disc" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
     </div>
     <div style="display:flex;gap:6px;align-items:center">
-      <button id="btn-excluir-grupo" class="btn btn-danger btn-sm" style="display:none" onclick="excluirGrupo()">🗑 Excluir</button>
+      <button id="btn-editar-grupo" class="btn btn-secondary btn-sm" style="display:none" onclick="abrirEditarGrupo()">✏️ Editar</button>
+      <button id="btn-excluir-grupo" class="btn btn-danger btn-sm" style="display:none" onclick="excluirGrupo()">🗑</button>
       <button class="modal-close" onclick="closeModal('grupo')">✕</button>
     </div>
   </div>
@@ -777,6 +778,52 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   <div class="modal-actions">
     <button class="btn btn-secondary" onclick="closeModal('perfil')">Cancelar</button>
     <button class="btn btn-primary" onclick="salvarPerfil()">Salvar perfil</button>
+  </div>
+</div>
+</div>
+
+
+<!-- MODAL: EDITAR GRUPO -->
+<div class="overlay" id="m-editar-grupo">
+<div class="modal" style="max-width:400px">
+  <div class="modal-head">
+    <div class="modal-title">✏️ Editar grupo</div>
+    <button class="modal-close" onclick="closeModal('editar-grupo')">✕</button>
+  </div>
+  <div class="field"><label>Nome do grupo</label><input type="text" id="eg-nome" placeholder="Nome do grupo"></div>
+  <div class="field"><label>Vincular disciplina</label>
+    <select id="eg-disc" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--surface);color:var(--text)">
+      <option value="">Sem disciplina</option>
+    </select>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-secondary" onclick="closeModal('editar-grupo')">Cancelar</button>
+    <button class="btn btn-primary" onclick="salvarEdicaoGrupo()">Salvar</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: EDITAR TAREFA -->
+<div class="overlay" id="m-editar-tarefa">
+<div class="modal" style="max-width:420px">
+  <div class="modal-head">
+    <div class="modal-title">✏️ Editar tarefa</div>
+    <button class="modal-close" onclick="closeModal('editar-tarefa')">✕</button>
+  </div>
+  <div class="field"><label>Título</label><input type="text" id="et-titulo" placeholder="Título da tarefa"></div>
+  <div class="field"><label>Descrição</label>
+    <textarea id="et-desc" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;min-height:60px;resize:vertical"></textarea>
+  </div>
+  <div class="field"><label>Atribuir para</label>
+    <select id="et-atrib" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--surface);color:var(--text)"></select>
+  </div>
+  <div class="field"><label>Vincular evento</label>
+    <select id="et-evento" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--surface);color:var(--text)"></select>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-danger btn-sm" id="btn-del-tarefa" style="margin-right:auto" onclick="deletarTarefa()">🗑 Excluir</button>
+    <button class="btn btn-secondary" onclick="closeModal('editar-tarefa')">Cancelar</button>
+    <button class="btn btn-primary" onclick="salvarEdicaoTarefa()">Salvar</button>
   </div>
 </div>
 </div>
@@ -1248,6 +1295,73 @@ document.getElementById('btn-confirmar').addEventListener('click', function(e) {
 
 
 
+
+// ── EDITAR GRUPO ──
+let tarefaEditId = null;
+
+function abrirEditarGrupo() {
+  $('eg-nome').value = grupoAtual.nome;
+  const sel = $('eg-disc');
+  sel.innerHTML = '<option value="">Sem disciplina</option>' + discs.map(d => '<option value="'+d.id+'"'+(grupoAtual.disciplina_id===d.id?' selected':'')+'>'+d.nome+'</option>').join('');
+  $('m-editar-grupo').classList.add('open');
+}
+
+async function salvarEdicaoGrupo() {
+  const nome = $('eg-nome').value.trim();
+  if (!nome) { alert('Informe o nome!'); return; }
+  const { error } = await SB.from('grupos').update({
+    nome, disciplina_id: $('eg-disc').value || null
+  }).eq('id', grupoAtual.id);
+  if (error) { alert('Erro: ' + error.message); return; }
+  await loadGrupos();
+  grupoAtual = grupos.find(g => g.id === grupoAtual.id);
+  $('m-grupo-nome').textContent = grupoAtual.nome;
+  const disc = grupoAtual.disciplina_id ? discs.find(d => d.id === grupoAtual.disciplina_id) : null;
+  $('m-grupo-disc').textContent = disc ? '📚 ' + disc.nome : '';
+  closeModal('editar-grupo');
+  await carregarDadosGrupo();
+}
+
+// ── EDITAR TAREFA ──
+function abrirEditarTarefa(id) {
+  const t = grupoTarefas.find(t => t.id === id);
+  if (!t) return;
+  tarefaEditId = id;
+  $('et-titulo').value = t.titulo;
+  $('et-desc').value = t.descricao || '';
+  const selA = $('et-atrib');
+  selA.innerHTML = '<option value="">Sem atribuição</option>' + grupoMembros.map(m => '<option value="'+m.user_id+'"'+(t.atribuido_para===m.user_id?' selected':'')+'>'+m.nome+'</option>').join('');
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const proxEvts = evts.filter(e => !e.concluido && new Date(e.data+'T00:00:00') >= hoje).sort((a,b) => new Date(a.data)-new Date(b.data));
+  const selE = $('et-evento');
+  selE.innerHTML = '<option value="">Nenhum evento</option>' + proxEvts.map(e => {
+    const d = new Date(e.data+'T00:00:00');
+    const dt = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+    return '<option value="'+e.id+'"'+(t.evento_id===e.id?' selected':'')+'>'+dt+' · '+e.nome.substring(0,40)+'</option>';
+  }).join('');
+  $('m-editar-tarefa').classList.add('open');
+}
+
+async function salvarEdicaoTarefa() {
+  const titulo = $('et-titulo').value.trim();
+  if (!titulo) { alert('Informe o título!'); return; }
+  const { error } = await SB.from('grupo_tarefas').update({
+    titulo, descricao: $('et-desc').value.trim(),
+    atribuido_para: $('et-atrib').value || null,
+    evento_id: $('et-evento').value || null
+  }).eq('id', tarefaEditId);
+  if (error) { alert('Erro: ' + error.message); return; }
+  closeModal('editar-tarefa');
+  await carregarDadosGrupo();
+}
+
+async function deletarTarefa() {
+  if (!confirm('Excluir tarefa?')) return;
+  await SB.from('grupo_tarefas').delete().eq('id', tarefaEditId);
+  closeModal('editar-tarefa');
+  await carregarDadosGrupo();
+}
+
 // ── WHATSAPP ──
 function compartilharWpp(id) {
   const ev = evts.find(e => e.id === id);
@@ -1446,6 +1560,8 @@ async function abrirGrupo(id) {
   // Mostrar botão excluir só pro admin/criador
   const btnExcluir = $('btn-excluir-grupo');
   if (btnExcluir) btnExcluir.style.display = grupoAtual.criado_por === U.id ? 'inline-flex' : 'none';
+  const btnEditar = $('btn-editar-grupo');
+  if (btnEditar) btnEditar.style.display = grupoAtual.criado_por === U.id ? 'inline-flex' : 'none';
   abaGrupo = 'mural';
   document.querySelectorAll('#m-grupo .tab').forEach((t,i) => t.classList.toggle('on', i===0));
   $('m-grupo').classList.add('open');
@@ -1526,14 +1642,15 @@ function tarefaHTML(t) {
   const chk = t.concluida ? 'checked' : '';
   const done = t.concluida ? ' done' : '';
   const evVinc = t.evento_id ? evts.find(e => e.id === t.evento_id) : null;
-  return '<div class="tarefa-item'+done+'">'
-    + '<input type="checkbox" class="tarefa-check" '+chk+' data-id="'+t.id+'" data-done="'+t.concluida+'" onchange="onToggleTarefa(this)">'
+  return '<div class="tarefa-item'+done+'" style="cursor:pointer" onclick="abrirEditarTarefa(''+t.id+')">'
+    + '<input type="checkbox" class="tarefa-check" '+chk+' data-id="'+t.id+'" data-done="'+t.concluida+'" onchange="event.stopPropagation();onToggleTarefa(this)">'
     + '<div class="tarefa-body">'
       + '<div class="tarefa-titulo">'+t.titulo+'</div>'
       + (atrib ? '<div class="tarefa-atrib">→ '+atrib.nome+'</div>' : '')
       + (evVinc ? '<div style="font-size:10px;color:var(--brand);margin-top:2px">📅 '+evVinc.nome.substring(0,35)+'</div>' : '')
       + (t.descricao ? '<div class="tarefa-desc">'+t.descricao+'</div>' : '')
     + '</div>'
+    + '<span style="font-size:12px;color:var(--text-3);flex-shrink:0">✏️</span>'
   + '</div>';
 }
 
