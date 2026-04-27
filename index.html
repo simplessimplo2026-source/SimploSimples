@@ -501,33 +501,6 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .widget-hoje-stat-label{font-size:10px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
 .widget-hoje-divider{width:1px;height:32px;background:rgba(255,255,255,.2)}
 
-/* ══ GESTOS iOS ══ */
-
-/* Swipe para fechar modal */
-.modal{touch-action:pan-x pan-y;will-change:transform}
-.modal.dragging{transition:none!important;animation:none!important}
-
-/* Swipe card — ações reveladas */
-.swipe-wrap{position:relative;border-radius:var(--radius-lg);margin-bottom:8px}
-.swipe-wrap .event-card{margin-bottom:0;border-radius:var(--radius-lg);position:relative;z-index:1;will-change:transform}
-.swipe-actions{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;z-index:0;border-radius:0 var(--radius-lg) var(--radius-lg) 0;overflow:hidden;width:0;visibility:hidden}
-.swipe-actions.visible{visibility:visible}
-.swipe-action{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:74px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:inherit;flex-shrink:0}
-.swipe-action-done{background:var(--green);color:#fff}
-.swipe-action-del{background:var(--red);color:#fff}
-.swipe-action span{font-size:20px;line-height:1}
-
-/* Long press menu */
-.ctx-menu{position:fixed;z-index:9500;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--glass-border);border-radius:16px;padding:6px;min-width:190px;box-shadow:var(--shadow-lg);animation:ctxIn .18s cubic-bezier(.34,1.56,.64,1)}
-@keyframes ctxIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
-.ctx-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;transition:background .12s;-webkit-tap-highlight-color:transparent}
-.ctx-item:hover,.ctx-item:active{background:var(--brand-light)}
-.ctx-item.danger{color:var(--red)}
-.ctx-item.danger:hover{background:var(--red-light)}
-.ctx-item-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-.ctx-separator{height:1px;background:var(--border);margin:3px 0}
-.ctx-backdrop{position:fixed;inset:0;z-index:9490;-webkit-tap-highlight-color:transparent}
-
 /* ══ PAGE TRANSITIONS ══ */
 @keyframes pageIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
 @keyframes pageInLeft{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
@@ -1178,7 +1151,6 @@ async function boot(u){
   await loadGrupos();
   await loadPerfil();
   badges(); render();
-  setTimeout(() => { initGestures(); }, 300);
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
 
@@ -1254,7 +1226,6 @@ function render(){
   // Se primeira vez (sem animação), só injeta
   if(prevPg === pg || !el.innerHTML){
     el.innerHTML = html;
-    setTimeout(()=>{ wrapEventCards(); }, 260);
     return;
   }
 
@@ -1268,8 +1239,7 @@ function render(){
     el.classList.add(goingForward ? 'page-enter' : 'page-enter-back');
     el.scrollTo({top:0, behavior:'smooth'});
     setTimeout(()=> el.classList.remove('page-enter','page-enter-back'), 250);
-    setTimeout(()=>{ wrapEventCards(); }, 260);
-  }, 140);
+    }, 140);
 }
 
 function cardHTML(ev){
@@ -2592,255 +2562,6 @@ function rResumo(){
       +'</div>'
     +'</div>';
   }).join(''):'<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nada pendente!</div><div class="empty-sub">Adicione eventos ou importe um cronograma.</div></div>')+'</div>';
-}
-
-
-// ══════════════════════════════════════
-// GESTOS iOS
-// ══════════════════════════════════════
-
-// ── 1. SWIPE PARA FECHAR MODAL ──
-function initSwipeModal(modalEl, closeId) {
-  if (!modalEl) return;
-  let startY = 0, curY = 0, dragging = false;
-  const inner = modalEl.querySelector('.modal');
-  if (!inner) return;
-
-  inner.addEventListener('touchstart', e => {
-    // Só inicia se estiver no topo do scroll
-    if (inner.scrollTop > 10) return;
-    startY = e.touches[0].clientY;
-    dragging = true;
-    inner.classList.add('dragging');
-  }, { passive: true });
-
-  inner.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    curY = e.touches[0].clientY - startY;
-    if (curY < 0) { curY = 0; return; }
-    inner.style.transform = `translateY(${curY}px)`;
-    inner.style.opacity = Math.max(0, 1 - curY / 400);
-  }, { passive: true });
-
-  inner.addEventListener('touchend', () => {
-    if (!dragging) return;
-    dragging = false;
-    inner.classList.remove('dragging');
-    if (curY > 100) {
-      // Fechar com animação
-      inner.style.transition = 'transform .28s cubic-bezier(.4,0,.2,1), opacity .28s';
-      inner.style.transform = `translateY(110%)`;
-      inner.style.opacity = '0';
-      setTimeout(() => {
-        inner.style.transform = '';
-        inner.style.opacity = '';
-        inner.style.transition = '';
-        closeModal(closeId);
-      }, 280);
-    } else {
-      inner.style.transition = 'transform .22s cubic-bezier(.34,1.56,.64,1), opacity .22s';
-      inner.style.transform = '';
-      inner.style.opacity = '';
-      setTimeout(() => inner.style.transition = '', 220);
-    }
-    curY = 0;
-  });
-}
-
-// Inicializar swipe em todos os modais principais
-function initAllSwipeModals() {
-  const ids = ['evento','disc','import','cfg','perfil','grupo','grupo-entry','aviso','tarefa','gevento','editar-grupo','editar-tarefa'];
-  ids.forEach(id => {
-    const el = document.getElementById('m-' + id);
-    if (el) initSwipeModal(el, id);
-  });
-}
-
-// ── 2. SWIPE NO CARD (revelar ações) ──
-function wrapEventCards() {
-  const content = $('content');
-  if (!content) return;
-  const cards = content.querySelectorAll('.event-list .event-card:not(.swipe-wrapped)');
-
-  cards.forEach(card => {
-    const evId = extractEvId(card);
-    if (!evId) return;
-    const ev = evts.find(e => e.id === evId);
-    if (!ev) return;
-
-    card.classList.add('swipe-wrapped');
-
-    const wrap = document.createElement('div');
-    wrap.className = 'swipe-wrap';
-    card.parentNode.insertBefore(wrap, card);
-    wrap.appendChild(card);
-
-    const actions = document.createElement('div');
-    actions.className = 'swipe-actions';
-    actions.innerHTML = `
-      <button class="swipe-action swipe-action-done" onclick="toggleDone('${ev.id}',${ev.concluido})">
-        <span>${ev.concluido ? '↩' : '✓'}</span>${ev.concluido ? 'Reabrir' : 'Feito'}
-      </button>
-      <button class="swipe-action swipe-action-del" onclick="delEventoById('${ev.id}')">
-        <span>🗑</span>Excluir
-      </button>`;
-    wrap.appendChild(actions);
-
-    let startX = 0, startY = 0, curX = 0;
-    let isSwipe = false, decided = false;
-    const MAX = 148;
-
-    wrap.addEventListener('touchstart', e => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      curX = 0;
-      isSwipe = false;
-      decided = false;
-    }, { passive: true });
-
-    wrap.addEventListener('touchmove', e => {
-      const dx = e.touches[0].clientX - startX;
-      const dy = e.touches[0].clientY - startY;
-
-      // Decidir na primeira vez se é swipe horizontal ou scroll vertical
-      if (!decided) {
-        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-        isSwipe = Math.abs(dx) > Math.abs(dy) && dx < 0;
-        decided = true;
-      }
-
-      if (!isSwipe) return;
-
-      curX = Math.max(-MAX, Math.min(0, dx));
-      card.style.transform = `translateX(${curX}px)`;
-
-      if (curX < -2) {
-        actions.classList.add('visible');
-        actions.style.width = Math.abs(curX) + 'px';
-      }
-    }, { passive: true });
-
-    wrap.addEventListener('touchend', () => {
-      if (!isSwipe) return;
-
-      const snap = curX < -70;
-      card.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
-      actions.style.transition = 'width .22s cubic-bezier(.4,0,.2,1)';
-
-      if (snap) {
-        card.style.transform = `translateX(-${MAX}px)`;
-        actions.style.width = MAX + 'px';
-      } else {
-        card.style.transform = '';
-        actions.style.width = '0';
-        setTimeout(() => actions.classList.remove('visible'), 220);
-      }
-
-      setTimeout(() => {
-        card.style.transition = '';
-        actions.style.transition = '';
-      }, 220);
-
-      curX = 0;
-      isSwipe = false;
-      decided = false;
-    });
-  });
-}
-
-function extractEvId(card) {
-  const onclick = card.getAttribute('onclick') || '';
-  const m = onclick.match(/openEvento\('([^']+)'\)/);
-  return m ? m[1] : null;
-}
-
-async function delEventoById(id) {
-  if (!confirm('Excluir este evento?')) return;
-  await SB.from('eventos').delete().eq('id', id);
-  await rEvts(); badges(); render();
-}
-
-// ── 3. LONG PRESS (menu de contexto) ──
-let ctxTimer = null;
-let ctxOpen = false;
-
-function initLongPress() {
-  document.addEventListener('touchstart', e => {
-    const card = e.target.closest('.event-card');
-    if (!card) return;
-    const evId = extractEvId(card);
-    if (!evId) return;
-    ctxTimer = setTimeout(() => {
-      // Vibrar (se suportado)
-      if (navigator.vibrate) navigator.vibrate(40);
-      showContextMenu(e.touches[0].clientX, e.touches[0].clientY, evId);
-    }, 500);
-  }, { passive: true });
-
-  document.addEventListener('touchend', () => {
-    clearTimeout(ctxTimer);
-  }, { passive: true });
-
-  document.addEventListener('touchmove', () => {
-    clearTimeout(ctxTimer);
-  }, { passive: true });
-}
-
-function showContextMenu(x, y, evId) {
-  closeContextMenu();
-  const ev = evts.find(e => e.id === evId);
-  if (!ev) return;
-  ctxOpen = true;
-
-  const backdrop = document.createElement('div');
-  backdrop.className = 'ctx-backdrop';
-  backdrop.onclick = closeContextMenu;
-
-  const menu = document.createElement('div');
-  menu.className = 'ctx-menu';
-  menu.id = 'ctx-menu';
-
-  // Posicionar — garantir que não saia da tela
-  const menuW = 200, menuH = 180;
-  const left = Math.min(x, window.innerWidth - menuW - 12);
-  const top = Math.min(y, window.innerHeight - menuH - 12);
-  menu.style.left = left + 'px';
-  menu.style.top = top + 'px';
-
-  const disc = gDisc(ev.disciplina_id);
-  menu.innerHTML = `
-    <div style="padding:8px 14px 6px;font-size:12px;font-weight:700;color:var(--text-3);letter-spacing:.3px">${ev.nome.length > 28 ? ev.nome.slice(0,28)+'…' : ev.nome}</div>
-    <div class="ctx-separator"></div>
-    <div class="ctx-item" onclick="closeContextMenu();openEvento('${evId}')">
-      <span class="ctx-item-icon">✏️</span>Editar evento
-    </div>
-    <div class="ctx-item" onclick="closeContextMenu();toggleDone('${evId}',${ev.concluido})">
-      <span class="ctx-item-icon">${ev.concluido ? '↩' : '✅'}</span>${ev.concluido ? 'Reabrir' : 'Marcar como feito'}
-    </div>
-    <div class="ctx-item" onclick="closeContextMenu();openPomo('${ev.nome.replace(/'/g,"\\'")}','${disc ? disc.nome.replace(/'/g,"\\'") : ''}')">
-      <span class="ctx-item-icon">🍅</span>Iniciar Pomodoro
-    </div>
-    <div class="ctx-separator"></div>
-    <div class="ctx-item danger" onclick="closeContextMenu();delEventoById('${evId}')">
-      <span class="ctx-item-icon">🗑</span>Excluir evento
-    </div>`;
-
-  document.body.appendChild(backdrop);
-  document.body.appendChild(menu);
-}
-
-function closeContextMenu() {
-  const m = document.getElementById('ctx-menu');
-  const b = document.querySelector('.ctx-backdrop');
-  if (m) m.remove();
-  if (b) b.remove();
-  ctxOpen = false;
-}
-
-// ── INICIALIZAR GESTOS ──
-function initGestures() {
-  initAllSwipeModals();
-  initLongPress();
 }
 
 // Reinicializar swipe nos cards sempre que o conteúdo renderizar
