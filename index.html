@@ -929,8 +929,8 @@ function bnav(k){
 function badges(){
   const t=new Date();t.setHours(0,0,0,0);
   const p=evts.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=t);
-  $('b-all').textContent=p.length;
-  $('b-prova').textContent=p.filter(e=>e.tipo==='prova').length;
+  const ball=$('b-all'); if(ball) ball.textContent=p.length;
+  const bprova=$('b-prova'); if(bprova) bprova.textContent=p.filter(e=>e.tipo==='prova').length;
 }
 
 // ── RENDER ──
@@ -1539,17 +1539,44 @@ function tarefaHTML(t) {
 
 function renderEventosGrupo() {
   let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="abrirGevento()">📅 Novo evento</button></div>';
-  if (!grupoEventos.length) {
-    return html + '<div class="empty"><div class="empty-icon">📅</div><div class="empty-title">Nenhum evento do grupo</div></div>';
+
+  // Eventos da disciplina vinculada
+  const disc = grupoAtual.disciplina_id ? discs.find(d => d.id === grupoAtual.disciplina_id) : null;
+  let discEvts = [];
+  if (disc) {
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    discEvts = evts.filter(e => e.disciplina_id === disc.id && !e.concluido && new Date(e.data+'T00:00:00') >= hoje)
+      .sort((a,b) => new Date(a.data)-new Date(b.data));
   }
-  return html + grupoEventos.map(ev => {
-    const d = new Date(ev.data+'T00:00:00');
-    const dl = dLeft(ev.data);
-    return '<div class="evento-grupo-card">'
-      + '<div style="text-align:center;min-width:36px"><div style="font-size:18px;font-weight:700">'+d.getDate()+'</div><div style="font-size:9px;color:var(--text-3);text-transform:uppercase">'+d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'</div></div>'
-      + '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+ev.nome+'</div><div style="display:flex;gap:5px;margin-top:3px"><span class="badge b-'+ev.tipo+'">'+ftipo(ev.tipo)+'</span>'+dBadge(dl)+'</div></div>'
-    + '</div>';
-  }).join('');
+
+  // Montar lista combinada
+  const todos = [...grupoEventos];
+  let resultado = '';
+
+  if (disc && discEvts.length) {
+    resultado += '<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📚 '+disc.nome+'</div>';
+    resultado += discEvts.map(ev => eventoGrupoCard(ev, true)).join('');
+  }
+
+  if (todos.length) {
+    if (disc) resultado += '<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 8px">Eventos do grupo</div>';
+    resultado += todos.map(ev => eventoGrupoCard(ev, false)).join('');
+  }
+
+  if (!discEvts.length && !todos.length) {
+    resultado = '<div class="empty"><div class="empty-icon">📅</div><div class="empty-title">Nenhum evento ainda</div><div class="empty-sub">'+(disc?'Nenhum evento futuro em '+disc.nome:'Adicione eventos ou vincule uma disciplina ao grupo.')+'</div></div>';
+  }
+
+  return html + resultado;
+}
+
+function eventoGrupoCard(ev, fromDisc) {
+  const d = new Date(ev.data+'T00:00:00');
+  const dl = dLeft(ev.data);
+  return '<div class="evento-grupo-card" style="'+(fromDisc?'border-left:3px solid var(--brand)':'')+'">'
+    + '<div style="text-align:center;min-width:36px"><div style="font-size:18px;font-weight:700">'+d.getDate()+'</div><div style="font-size:9px;color:var(--text-3);text-transform:uppercase">'+d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'</div></div>'
+    + '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+ev.nome+'</div><div style="display:flex;gap:5px;margin-top:3px;flex-wrap:wrap"><span class="badge b-'+ev.tipo+'">'+ftipo(ev.tipo)+'</span>'+dBadge(dl)+'</div></div>'
+  + '</div>';
 }
 
 function renderMembros() {
