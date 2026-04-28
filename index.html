@@ -1391,18 +1391,6 @@ async function loadAll(){
     SB.from('eventos').select('*').order('data')
   ]);
   discs=r1.data||[];evts=r2.data||[];
-  if(!discs.length){
-    const defs=[
-      {nome:'Psicopatologia Infantojuvenil',prof:'Profa. Ana Paula Garcia Dellagiustina',cor:'#EF4444'},
-      {nome:'Psicologia da Velhice',prof:'Prof. Marluci Camila Gomes',cor:'#2563EB'},
-      {nome:'Avaliação Psicológica Infantojuvenil',prof:'Profa. Nathalia Piacentini',cor:'#10B981'},
-      {nome:'Psicanálise',prof:'',cor:'#8B5CF6'}
-    ];
-    for(const d of defs){
-      const{data}=await SB.from('disciplinas').insert({...d,user_id:U.id}).select().single();
-      if(data)discs.push(data);
-    }
-  }
 }
 async function rDiscs(){const{data}=await SB.from('disciplinas').select('*').order('nome');discs=data||[]}
 async function rEvts(){const{data}=await SB.from('eventos').select('*').order('data');evts=data||[]}
