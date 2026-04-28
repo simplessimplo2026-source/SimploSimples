@@ -687,7 +687,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <label>Senha</label>
         <div style="position:relative">
           <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()" style="width:100%;padding-right:40px">
-          <button type="button" onclick="toggleSenha('a-pass','olho-pass')" id="olho-pass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)">👁</button>
+          <button type="button" onclick="toggleSenha('a-pass','olho-pass')" id="olho-pass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-3);line-height:1;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center">👁</button>
         </div>
       </div>
       <button class="btn-auth" id="auth-btn" onclick="doAuth()">Entrar</button>
@@ -707,14 +707,14 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <label>Nova senha</label>
         <div style="position:relative">
           <input type="password" id="reset-pass" placeholder="Mínimo 6 caracteres" style="width:100%;padding-right:40px">
-          <button type="button" onclick="toggleSenha('reset-pass','olho-r1')" id="olho-r1" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)">👁</button>
+          <button type="button" onclick="toggleSenha('reset-pass','olho-r1')" id="olho-r1" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-3);line-height:1;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center">👁</button>
         </div>
       </div>
       <div class="field">
         <label>Confirmar senha</label>
         <div style="position:relative">
           <input type="password" id="reset-pass2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')doReset()" style="width:100%;padding-right:40px">
-          <button type="button" onclick="toggleSenha('reset-pass2','olho-r2')" id="olho-r2" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)">👁</button>
+          <button type="button" onclick="toggleSenha('reset-pass2','olho-r2')" id="olho-r2" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-3);line-height:1;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center">👁</button>
         </div>
       </div>
       <button class="btn-auth" id="reset-btn" onclick="doReset()">Salvar nova senha</button>
@@ -985,7 +985,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('import')">Cancelar</button>
-      <button class="btn btn-primary" id="btn-analisar" onclick="analisar()">Analisar com GPT ✨</button>
+      <button class="btn btn-primary" id="btn-analisar" onclick="analisar()">✨ Analisar com IA</button>
     </div>
   </div>
   <div id="imp2" style="display:none">
@@ -1707,26 +1707,52 @@ async function exPDF(file){
   }catch(e){msg.style.background='var(--red-light)';msg.style.color='var(--red)';msg.textContent='Erro ao ler PDF. Cole o texto manualmente.'}
 }
 async function analisar(){
-  const text=$('imp-text').value.trim();if(!text){alert('Cole o texto ou suba um PDF!');return}
-  const key=oai();if(!key){alert('Configure sua OpenAI API Key nas Configurações ⚙️!');return}
-  const btn=$('btn-analisar');btn.textContent='Analisando...';btn.disabled=true;
+  const text=$('imp-text').value.trim();
+  if(!text){alert('Cole o texto ou suba um PDF!');return}
+  const btn=$('btn-analisar');
+  btn.textContent='Analisando...';btn.disabled=true;
   try{
     const today=new Date().toISOString().split('T')[0];
     const dnames=discs.map(d=>d.nome).join(', ');
-    const r=await fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:1500,messages:[{role:'user',
-        content:'Analise este cronograma. Hoje: '+today+'. Disciplinas: '+dnames+'\n\n'+text+'\n\nResponda SOMENTE JSON (sem markdown): [{"nome":"...","data":"YYYY-MM-DD","tipo":"prova|trabalho|apresentacao|outro","disciplina":"nome exato ou vazio","hora":"HH:MM ou vazio"}]. Ano padrão: '+new Date().getFullYear()}]})
+    const prompt='Analise este cronograma. Hoje: '+today+'. Disciplinas disponíveis: '+dnames+'\n\n'+text
+      +'\n\nResponda SOMENTE com JSON válido (sem markdown, sem explicação): '
+      +'[{"nome":"...","data":"YYYY-MM-DD","tipo":"prova|trabalho|apresentacao|outro","disciplina":"nome exato ou vazio","hora":"HH:MM ou vazio"}]. '
+      +'Ano padrão: '+new Date().getFullYear()+'. Ignore eventos já passados.';
+
+    // Chamar Edge Function swift-worker
+    const{data,error}=await SB.functions.invoke('swift-worker',{
+      body:{prompt, type:'cronograma'}
     });
-    const data=await r.json();if(data.error)throw new Error(data.error.message);
-    impEvts=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
-    if(!impEvts.length){alert('Nenhum evento encontrado.');btn.textContent='Analisar com GPT ✨';btn.disabled=false;return}
+
+    if(error)throw new Error(error.message);
+
+    let resultado=data?.result||data?.content||data;
+    if(typeof resultado==='string'){
+      resultado=resultado.replace(/```json|```/g,'').trim();
+      resultado=JSON.parse(resultado);
+    }
+
+    impEvts=Array.isArray(resultado)?resultado:[];
+    if(!impEvts.length){
+      alert('Nenhum evento encontrado no texto.');
+      btn.textContent='Analisar com IA ✨';btn.disabled=false;
+      return;
+    }
+
     fillDiscs('imp-disc-def');
-    $('imp-list').innerHTML=impEvts.map((e,i)=>'<div class="imp-item"><input type="checkbox" id="ic'+i+'" checked><div style="flex:1;font-size:12px"><div style="font-weight:600;color:var(--text)">'+e.nome+'</div><div style="color:var(--text-3)">'+ftipo(e.tipo)+' · '+e.data+(e.hora?' às '+e.hora:'')+(e.disciplina?' · '+e.disciplina:'')+'</div></div></div>').join('');
+    $('imp-list').innerHTML=impEvts.map((e,i)=>
+      '<div class="imp-item"><input type="checkbox" id="ic'+i+'" checked>'
+      +'<div style="flex:1;font-size:12px">'
+      +'<div style="font-weight:600;color:var(--text)">'+e.nome+'</div>'
+      +'<div style="color:var(--text-3)">'+ftipo(e.tipo)+' · '+e.data+(e.hora?' às '+e.hora:'')+(e.disciplina?' · '+e.disciplina:'')+'</div>'
+      +'</div></div>'
+    ).join('');
     $('imp1').style.display='none';$('imp2').style.display='block';
-  }catch(e){alert('Erro: '+e.message)}
-  btn.textContent='Analisar com GPT ✨';btn.disabled=false;
+  }catch(e){
+    alert('Erro ao analisar: '+e.message);
+    console.error('swift-worker error:',e);
+  }
+  btn.textContent='Analisar com IA ✨';btn.disabled=false;
 }
 async function confirmar(){
   if(!U){alert('Sessão expirada!');return}
