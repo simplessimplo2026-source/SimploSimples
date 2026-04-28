@@ -701,7 +701,10 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
       </div>
       <div class="field">
         <label>Senha</label>
-        <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()">
+        <div style="position:relative">
+          <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()" style="width:100%;padding:11px 42px 11px 14px;border:1.5px solid var(--border-solid);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s;background:rgba(255,255,255,.8);color:var(--text)">
+          <button type="button" onclick="toggleSenha('a-pass','olho-pass')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3);padding:0;line-height:1" id="olho-pass">👁</button>
+        </div>
       </div>
       <button class="btn-auth" id="auth-btn" onclick="doAuth()">Entrar</button>
       <div class="auth-link" id="forgot-wrap">
@@ -719,11 +722,17 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
       <div id="reset-msg" class="auth-msg"></div>
       <div class="field">
         <label>Nova senha</label>
-        <input type="password" id="reset-pass" placeholder="Mínimo 6 caracteres">
+        <div style="position:relative">
+          <input type="password" id="reset-pass" placeholder="Mínimo 6 caracteres" style="width:100%;padding:11px 42px 11px 14px;border:1.5px solid var(--border-solid);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:rgba(255,255,255,.8);color:var(--text)">
+          <button type="button" onclick="toggleSenha('reset-pass','olho-r1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3);padding:0;line-height:1" id="olho-r1">👁</button>
+        </div>
       </div>
       <div class="field">
         <label>Confirmar senha</label>
-        <input type="password" id="reset-pass2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')doReset()">
+        <div style="position:relative">
+          <input type="password" id="reset-pass2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')doReset()" style="width:100%;padding:11px 42px 11px 14px;border:1.5px solid var(--border-solid);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:rgba(255,255,255,.8);color:var(--text)">
+          <button type="button" onclick="toggleSenha('reset-pass2','olho-r2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3);padding:0;line-height:1" id="olho-r2">👁</button>
+        </div>
       </div>
       <button class="btn-auth" id="reset-btn" onclick="doReset()">Salvar nova senha</button>
     </div>
@@ -1297,6 +1306,18 @@ function ftipo(t){return{prova:'Prova',trabalho:'Trabalho',apresentacao:'Apresen
 function gDisc(id){return discs.find(d=>d.id===id)}
 
 // ── AUTH ──
+function toggleSenha(inputId, btnId){
+  const inp=$(inputId), btn=$(btnId);
+  if(!inp) return;
+  if(inp.type==='password'){
+    inp.type='text';
+    if(btn) btn.textContent='🙈';
+  } else {
+    inp.type='password';
+    if(btn) btn.textContent='👁';
+  }
+}
+
 let aMode='login';
 function setTab(m){
   aMode=m;
@@ -1372,16 +1393,33 @@ async function doReset(){
 }
 
 function checkResetFlow(){
-  // Detectar se voltou do email de reset (hash com access_token)
   const hash=window.location.hash;
   const params=new URLSearchParams(window.location.search);
+
+  // Link expirado ou inválido
+  if(hash.includes('error=access_denied')||hash.includes('otp_expired')){
+    hide('loading');
+    $('auth').style.display='flex';
+    $('auth-normal').style.display='block';
+    $('auth-reset').style.display='none';
+    // Mostrar mensagem de erro amigável
+    const msg=$('auth-msg');
+    msg.textContent='⚠️ Link expirado. Solicite uma nova recuperação de senha.';
+    msg.className='auth-msg error';
+    // Limpar hash da URL
+    history.replaceState(null,'',window.location.pathname);
+    return true;
+  }
+
+  // Link válido de recovery
   if(hash.includes('type=recovery')||params.get('reset')==='1'){
+    hide('loading');
     $('auth').style.display='flex';
     $('auth-normal').style.display='none';
     $('auth-reset').style.display='block';
-    hide('loading');
     return true;
   }
+
   return false;
 }
 
