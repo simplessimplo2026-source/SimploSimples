@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js" onload="if(window.lucide)lucide.createIcons()"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -1246,7 +1246,7 @@ async function boot(u){
   await loadPerfil();
   atualizarUIPremium();
   badges();render();
-  initIcons();
+  setTimeout(initIcons, 300);
   checkOnboarding();
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
@@ -2503,7 +2503,11 @@ async function doForgot(){
 }
 // ── LUCIDE ICONS ──
 function initIcons(){
-  if(window.lucide)lucide.createIcons();
+  try {
+    if(window.lucide && window.lucide.createIcons) {
+      window.lucide.createIcons();
+    }
+  } catch(e) { console.log('Lucide error:', e); }
 }
 
 // ── FLATPICKR ──
