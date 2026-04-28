@@ -395,39 +395,86 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 }
 /* ── DARK MODE ── */
 [data-theme="dark"] body{background:var(--bg);color:var(--text)}
-[data-theme="dark"] .sidebar,[data-theme="dark"] .topbar,[data-theme="dark"] .modal,[data-theme="dark"] .bottom-nav,[data-theme="dark"] .auth-card,[data-theme="dark"] .event-card,[data-theme="dark"] .stat,[data-theme="dark"] .disc-card,[data-theme="dark"] .grupo-card,[data-theme="dark"] .cal-cell{background:var(--surface);border-color:var(--border);color:var(--text)}
+[data-theme="dark"] .sidebar,[data-theme="dark"] .topbar,[data-theme="dark"] .modal,[data-theme="dark"] .bottom-nav,[data-theme="dark"] .event-card,[data-theme="dark"] .stat,[data-theme="dark"] .disc-card,[data-theme="dark"] .grupo-card,[data-theme="dark"] .cal-cell,[data-theme="dark"] .auth-card{background:var(--surface);border-color:var(--border)}
 [data-theme="dark"] .field input,[data-theme="dark"] .field textarea,[data-theme="dark"] select{background:var(--surface-2)!important;color:var(--text)!important;border-color:var(--border)!important}
-[data-theme="dark"] .overlay{background:rgba(0,0,0,.6)}
-[data-theme="dark"] .nav-btn:hover{background:var(--brand-light)}
 [data-theme="dark"] .btn-secondary{background:var(--surface-2);border-color:var(--border);color:var(--text-2)}
+[data-theme="dark"] .overlay{background:rgba(0,0,0,.6)}
 [data-theme="dark"] #loading{background:linear-gradient(135deg,#041526,#0369A1)!important}
 [data-theme="dark"] #auth{background:linear-gradient(145deg,#082F49,#0369A1,#0EA5E9)}
-[data-theme="dark"] .auth-card{background:var(--surface)}
 [data-theme="dark"] .cal-cell.today{border-color:var(--brand-mid)}
 [data-theme="dark"] .filter.on{background:var(--brand-mid);color:#fff}
 [data-theme="dark"] .urgency{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2)}
-[data-theme="dark"] .import-banner{background:var(--brand-light);border-color:var(--brand-mid)}
+[data-theme="dark"] .nav-btn.active{background:var(--brand-light);color:var(--brand-mid)}
 [data-theme="dark"] .tabs{background:var(--surface-2)}
 [data-theme="dark"] .tab.on{background:var(--surface)}
-[data-theme="dark"] .nav-badge{background:rgba(239,68,68,.2);color:#FCA5A5}
 [data-theme="dark"] .bnav-fab-btn{background:var(--brand)}
+[data-theme="dark"] .imp-item{background:var(--surface-2)}
+[data-theme="dark"] .drop-zone:hover{background:var(--brand-light)}
+[data-theme="dark"] .import-banner{background:var(--brand-light);border-color:var(--brand-mid)}
 
-/* ── MELHORIAS ── */
-.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-mid));box-shadow:0 4px 12px rgba(14,165,233,.25)}
+/* ── MELHORIAS VISUAIS ── */
+.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-mid));box-shadow:0 4px 12px var(--brand-glow)}
+.btn-auth{background:linear-gradient(135deg,var(--brand),var(--brand-mid));box-shadow:0 4px 16px var(--brand-glow)}
 .sidebar-brand{color:var(--brand)!important}
 .nav-btn.active{background:var(--brand-light);color:var(--brand);font-weight:600}
+.filter.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.bnav-fab-btn{background:linear-gradient(135deg,var(--brand),var(--brand-mid));box-shadow:0 4px 16px var(--brand-glow)}
 .auth-card{background:#fff;border-radius:24px;padding:36px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.2)}
 .auth-brand{font-family:'Playfair Display',serif;font-size:28px;color:var(--brand);margin-bottom:4px}
-.btn-auth{background:linear-gradient(135deg,var(--brand),var(--brand-mid));box-shadow:0 4px 16px rgba(14,165,233,.3)}
-.filter.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.modal{animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PREMIUM ── */
+.premium-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.premium-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;font-weight:600}
+.premium-status.active{background:var(--green-light);color:#065F46;border:1px solid rgba(16,185,129,.2)}
+.premium-status.inactive{background:var(--amber-light);color:#92400E;border:1px solid rgba(245,158,11,.2)}
+.premium-card{background:linear-gradient(135deg,#1E3A5F,#0284C7);border-radius:var(--radius-lg);padding:24px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.premium-card::before{content:'⭐';position:absolute;right:-10px;top:-10px;font-size:80px;opacity:.08}
+.premium-card-title{font-size:20px;font-weight:700;font-family:'Playfair Display',serif;margin-bottom:6px}
+.premium-card-sub{font-size:13px;opacity:.85;margin-bottom:16px;line-height:1.5}
+.premium-feature{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px;opacity:.9}
+.premium-pix{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:14px;margin-top:16px;text-align:center}
+.premium-pix-key{font-size:14px;font-weight:700;letter-spacing:.5px;margin:5px 0;font-family:monospace;cursor:pointer}
+.premium-pix-label{font-size:11px;opacity:.7}
+
+/* ── FAB MENU ── */
+.fab-backdrop{position:fixed;inset:0;z-index:198;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .22s}
+.fab-backdrop.open{opacity:1;pointer-events:auto}
+.fab-menu{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:199;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;opacity:0;transition:opacity .2s}
+.fab-menu.open{opacity:1;pointer-events:auto}
+@media(min-width:769px){.fab-menu{bottom:auto;top:70px;right:24px;left:auto;transform:none;align-items:flex-end}}
+.fab-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 16px 11px 12px;box-shadow:var(--shadow-md);cursor:pointer;width:220px;transition:all .18s;transform:translateY(10px);opacity:0}
+.fab-menu.open .fab-item{transform:translateY(0);opacity:1}
+.fab-item:nth-child(1){transition-delay:.04s}.fab-item:nth-child(2){transition-delay:.07s}
+.fab-item:nth-child(3){transition-delay:.10s}.fab-item:nth-child(4){transition-delay:.13s}
+.fab-item:nth-child(5){transition-delay:.16s}
+.fab-item:hover{transform:translateY(-2px)!important;box-shadow:var(--shadow-lg)}
+.fab-item-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.fab-item-label{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
+.fab-item-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.bnav-fab-btn.open{transform:rotate(45deg)}
+
+/* ── ONBOARDING ── */
+.onboarding{position:fixed;inset:0;z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(145deg,#082F49,#0284C7 60%,#0EA5E9)}
+.onboarding-card{background:#fff;border-radius:24px;padding:36px 28px 28px;width:100%;max-width:380px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.2)}
+.onboarding-icon{font-size:56px;margin-bottom:14px;display:block}
+.onboarding-title{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;color:#082F49;margin-bottom:8px}
+.onboarding-desc{font-size:13px;color:#475569;line-height:1.65;margin-bottom:22px}
+.onboarding-dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.onboarding-dot{width:8px;height:8px;border-radius:50%;background:#BAE6FD;transition:all .25s}
+.onboarding-dot.on{width:22px;border-radius:4px;background:#0EA5E9}
+.onboarding-actions{display:flex;gap:10px}
+.onboarding-skip{flex:1;padding:12px;background:transparent;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;color:#94A3B8;font-family:inherit}
+.onboarding-next{flex:2;padding:12px;background:linear-gradient(135deg,#0284C7,#0EA5E9);border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;font-family:inherit}
 </style>
 </head>
 <body>
 
 <!-- LOADING -->
 <div id="loading" style="background:linear-gradient(145deg,#0C4A6E,#0284C7 50%,#0EA5E9)">
-  <div class="loading-logo">Simplo Estudante</div>
-  <div class="loading-sub">Simplo Estudante</div>
+  <div class="loading-logo">Simplo</div>
+  <div class="loading-sub">sua agenda acadêmica</div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
@@ -460,6 +507,20 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   </div>
 </div>
 
+<!-- ONBOARDING -->
+<div id="onboarding" class="onboarding" style="display:none">
+  <div class="onboarding-card">
+    <span class="onboarding-icon" id="ob-icon">🎓</span>
+    <div class="onboarding-title" id="ob-title">Bem-vindo ao Simplo!</div>
+    <div class="onboarding-desc" id="ob-desc">Sua agenda acadêmica inteligente. Organize provas, trabalhos e apresentações em um só lugar.</div>
+    <div class="onboarding-dots" id="ob-dots"></div>
+    <div class="onboarding-actions">
+      <button class="onboarding-skip" onclick="finishOnboarding()">Pular</button>
+      <button class="onboarding-next" id="ob-next" onclick="nextOnboarding()">Próximo →</button>
+    </div>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <div class="layout">
@@ -480,8 +541,13 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <button class="nav-btn" onclick="openModal('cfg')"><span class="icon">⚙️</span>Configurações</button>
       </nav>
       <div class="sidebar-bottom">
-        <div id="s-nome" style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px"></div>
-        <div class="sidebar-email" id="s-email"></div>
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;min-width:0">
+          <div id="s-nome" style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0"></div>
+          <span id="s-premium-badge" style="display:none;font-size:12px;flex-shrink:0" title="Conta Premium">⭐</span>
+        </div>
+        <div id="s-email" style="font-size:11px;color:var(--text-3);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+        <button class="btn btn-secondary btn-sm btn-block" onclick="doLogout()">Sair</button>
+      </div>
         <button class="btn btn-secondary btn-sm btn-block" onclick="doLogout()">Sair</button>
       </div>
     </aside>
@@ -506,10 +572,61 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 <nav class="bottom-nav" id="bottom-nav">
   <div class="bnav-item on" id="bn-resumo" onclick="go('resumo');bnav('resumo')"><span class="bnav-icon">📋</span>Resumo</div>
   <div class="bnav-item" id="bn-calendario" onclick="go('calendario');bnav('calendario')"><span class="bnav-icon">📅</span>Agenda</div>
-  <div class="bnav-fab" onclick="openModal('evento')"><div class="bnav-fab-btn">+</div></div>
+  <div class="bnav-fab" onclick="toggleFabMenu()"><div class="bnav-fab-btn" id="fab-btn">+</div></div>
   <div class="bnav-item" id="bn-eventos" onclick="go('eventos','todos');bnav('eventos')"><span class="bnav-icon">📚</span>Eventos</div>
   <div class="bnav-item" id="bn-mais" onclick="openDrawer()"><span class="bnav-icon">☰</span>Mais</div>
 </nav>
+
+<!-- FAB MENU -->
+<div class="fab-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
+<div class="fab-menu" id="fab-menu">
+  <div class="fab-item" onclick="closeFabMenu();openModal('evento')">
+    <div class="fab-item-icon" style="background:#EFF6FF">📝</div>
+    <div><div class="fab-item-label">Novo evento</div><div class="fab-item-sub">Prova, trabalho, apresentação</div></div>
+  </div>
+  <div class="fab-item" onclick="closeFabMenu();openModal('disc')">
+    <div class="fab-item-icon" style="background:#F0FDF4">📚</div>
+    <div><div class="fab-item-label">Nova disciplina</div><div class="fab-item-sub">Adicionar matéria</div></div>
+  </div>
+  <div class="fab-item" onclick="closeFabMenu();abrirImportComGate()">
+    <div class="fab-item-icon" style="background:#FFF7ED">🤖</div>
+    <div><div class="fab-item-label">Importar com IA</div><div class="fab-item-sub" id="fab-import-sub">Requer Premium</div></div>
+  </div>
+  <div class="fab-item" onclick="closeFabMenu();openGrupoEntry('criar')">
+    <div class="fab-item-icon" style="background:#F5F3FF">👥</div>
+    <div><div class="fab-item-label">Criar grupo</div><div class="fab-item-sub">Novo grupo de estudo</div></div>
+  </div>
+</div>
+
+<!-- MODAL: PREMIUM -->
+<div class="overlay" id="m-premium">
+<div class="modal" style="max-width:420px">
+  <div class="modal-head">
+    <div class="modal-title">✨ Simplo Premium</div>
+    <button class="modal-close" onclick="closeModal('premium')">✕</button>
+  </div>
+  <div id="premium-status-bar"></div>
+  <div class="premium-card">
+    <div class="premium-card-title">Desbloqueie a IA</div>
+    <div class="premium-card-sub">Importe cronogramas automaticamente, deixe a IA organizar seus eventos em segundos.</div>
+    <div class="premium-feature"><span>🤖</span> Importação de cronograma por IA</div>
+    <div class="premium-feature"><span>📅</span> Leitura automática de PDF</div>
+    <div class="premium-feature"><span>⚡</span> Criação de múltiplos eventos de uma vez</div>
+    <div class="premium-pix">
+      <div class="premium-pix-label">Acesso vitalício por apenas</div>
+      <div class="premium-pix-key">R$ 9,90</div>
+      <div class="premium-pix-label" style="margin-top:8px">Pague via PIX e envie o comprovante</div>
+      <div class="premium-pix-key" onclick="copyPix()">emanu0707@gmail.com</div>
+      <div id="pix-copied" style="font-size:11px;opacity:0;transition:opacity .3s;margin-top:4px">✓ Copiado!</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--text-3);text-align:center;line-height:1.6">
+    Após o pagamento, envie o comprovante para<br>
+    <strong style="color:var(--brand)">emanu0707@gmail.com</strong><br>
+    e seu acesso será liberado em até 24h. 🚀
+  </div>
+</div>
+</div>
 
 <!-- DRAWER -->
 <div class="drawer-bg" id="dbg" onclick="closeDrawer()"></div>
@@ -657,18 +774,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
       <div id="dark-knob" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>
     </div>
   </div>
-  <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:12px;font-weight:600;color:var(--text)">🤖 OpenAI API Key</span>
-      <span id="cfg-status" style="font-size:11px"></span>
-    </div>
-    <div style="display:flex;gap:6px">
-      <input type="password" id="cfg-key" placeholder="sk-proj-..." style="flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;outline:none;background:var(--bg);color:var(--text)">
-      <button class="btn btn-primary btn-sm" onclick="salvarCfg()">Salvar</button>
-      <button class="btn btn-danger btn-sm" onclick="removeKey()">✕</button>
-    </div>
-    <div style="font-size:10px;color:var(--text-3);margin-top:5px">🔒 Salva só no seu navegador · platform.openai.com</div>
-  </div>
+  <div id="cfg-api-section" style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px"></div>
   <div class="modal-actions" style="padding-top:0;border-top:none;margin-top:0">
     <button class="btn btn-secondary btn-block" onclick="closeModal('cfg')">Fechar</button>
   </div>
@@ -886,12 +992,6 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   if (saved === '1') document.documentElement.setAttribute('data-theme','dark');
 })();
 
-// ── DARK MODE INIT ──
-(function(){
-  if(localStorage.getItem('dark_mode')==='1')
-    document.documentElement.setAttribute('data-theme','dark');
-})();
-
 // ── SUPABASE ──
 const SB = supabase.createClient(
   'https://xfqxhiwfhdylwtusnbsh.supabase.co',
@@ -989,7 +1089,9 @@ async function boot(u){
   await loadAll();
   await loadGrupos();
   await loadPerfil();
+  atualizarUIPremium();
   badges();render();
+  checkOnboarding();
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
 
@@ -2073,16 +2175,130 @@ if ('serviceWorker' in navigator) {
     }, 1000);
   }
 
+
+// ── DARK MODE ──
 function applyDark(on){
   document.documentElement.setAttribute('data-theme',on?'dark':'');
   const t=$('dark-toggle'),k=$('dark-knob');
-  if(t)t.style.background=on?'var(--brand)':'';
+  if(t)t.style.background=on?'var(--brand-mid)':'';
   if(k)k.style.left=on?'22px':'2px';
 }
 function toggleDark(){
   const isDark=document.documentElement.getAttribute('data-theme')==='dark';
   applyDark(!isDark);
   localStorage.setItem('dark_mode',isDark?'0':'1');
+}
+
+// ── FAB MENU ──
+let fabOpen=false;
+function toggleFabMenu(){fabOpen?closeFabMenu():openFabMenu()}
+function openFabMenu(){
+  fabOpen=true;
+  $('fab-backdrop').classList.add('open');
+  $('fab-menu').classList.add('open');
+  $('fab-btn').classList.add('open');
+  const sub=$('fab-import-sub');
+  if(sub)sub.textContent=isPremium()?'Importar cronograma':'🔒 Requer Premium';
+}
+function closeFabMenu(){
+  fabOpen=false;
+  $('fab-backdrop').classList.remove('open');
+  $('fab-menu').classList.remove('open');
+  $('fab-btn').classList.remove('open');
+}
+
+// ── PREMIUM ──
+function isPremium(){
+  const adminEmails=['emanu0707@gmail.com'];
+  if(U&&adminEmails.includes(U.email))return true;
+  return perfil&&perfil.premium===true;
+}
+function abrirImportComGate(){
+  if(isPremium())openModal('import');
+  else openModal('premium');
+}
+function copyPix(){
+  navigator.clipboard.writeText('emanu0707@gmail.com').then(()=>{
+    const el=$('pix-copied');
+    if(el){el.style.opacity='1';setTimeout(()=>el.style.opacity='0',2000)}
+  });
+}
+function atualizarUIPremium(){
+  const premium=isPremium();
+  const badge=$('s-premium-badge');
+  if(badge)badge.style.display=premium?'inline':'none';
+  const statusBar=$('premium-status-bar');
+  if(statusBar)statusBar.innerHTML=premium
+    ?'<div class="premium-status active">✅ Conta Premium ativa — IA disponível</div>'
+    :'<div class="premium-status inactive">🔒 Você ainda não tem acesso Premium</div>';
+}
+function openCfg(){
+  applyDark(document.documentElement.getAttribute('data-theme')==='dark');
+  const s=$('cfg-api-section');
+  if(s){
+    if(isPremium()){
+      s.innerHTML='<div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">⭐</span><div><div style="font-size:12px;font-weight:700;color:var(--text)">IA Premium ativa</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">Você tem acesso completo à importação de cronogramas com IA.</div></div></div>';
+    } else {
+      s.innerHTML='<div style="text-align:center;padding:4px 0"><div style="font-size:22px;margin-bottom:8px">🤖</div><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Recurso Premium</div><div style="font-size:12px;color:var(--text-3);margin-bottom:14px;line-height:1.5">A importação com IA está disponível apenas para contas Premium.</div><button class="btn btn-primary btn-sm" onclick="closeModal(\'cfg\');openModal(\'premium\')" style="width:100%">✨ Ver plano Premium</button></div>';
+    }
+  }
+  $('m-cfg').classList.add('open');
+}
+
+// ── ONBOARDING ──
+const OB_STEPS=[
+  {icon:'🎓',title:'Bem-vindo ao Simplo!',desc:'Sua agenda acadêmica inteligente. Organize provas, trabalhos e apresentações em um só lugar.'},
+  {icon:'📅',title:'Gerencie seus eventos',desc:'Adicione provas, trabalhos e apresentações com data, horário e disciplina. Receba alertas antes dos prazos.'},
+  {icon:'🤖',title:'IA que te ajuda',desc:'Com o plano Premium, importe cronogramas enviados pelo professor — a IA extrai todos os eventos automaticamente.'},
+  {icon:'👥',title:'Estude em grupo',desc:'Crie grupos com seus colegas, compartilhe eventos, avisos e tarefas em tempo real.'},
+  {icon:'🚀',title:'Tudo pronto!',desc:'Comece adicionando suas disciplinas e o primeiro evento. Bons estudos! 📚'}
+];
+let obStep=0;
+function showOnboarding(){obStep=0;renderObStep();$('onboarding').style.display='flex'}
+function renderObStep(){
+  const s=OB_STEPS[obStep];
+  $('ob-icon').textContent=s.icon;
+  $('ob-title').textContent=s.title;
+  $('ob-desc').textContent=s.desc;
+  $('ob-next').textContent=obStep===OB_STEPS.length-1?'✓ Começar':'Próximo →';
+  $('ob-dots').innerHTML=Array.from({length:OB_STEPS.length},(_,i)=>`<div class="onboarding-dot${i===obStep?' on':''}"></div>`).join('');
+}
+function nextOnboarding(){obStep<OB_STEPS.length-1?(obStep++,renderObStep()):finishOnboarding()}
+function finishOnboarding(){$('onboarding').style.display='none';localStorage.setItem('ob_done_'+U.id,'1')}
+function checkOnboarding(){if(!localStorage.getItem('ob_done_'+U.id))setTimeout(showOnboarding,800)}
+
+// ── RESET SENHA ──
+function checkResetFlow(){
+  const hash=window.location.hash;
+  if(hash.includes('error=access_denied')||hash.includes('otp_expired')){
+    history.replaceState(null,'',window.location.pathname);
+    return false;
+  }
+  if(hash.includes('type=recovery')){
+    hide('loading');
+    $('auth').style.display='flex';
+    return true;
+  }
+  return false;
+}
+async function doForgot(){
+  const email=$('a-email').value.trim();
+  if(!email){aMsg('Digite seu email primeiro!','error');return}
+  $('auth-btn').textContent='Enviando...';$('auth-btn').disabled=true;
+  const{error}=await SB.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});
+  $('auth-btn').textContent='Entrar';$('auth-btn').disabled=false;
+  if(error)aMsg(error.message,'error');
+  else aMsg('✓ Email enviado! Verifique sua caixa de entrada.','success');
+}
+async function doLogout(){
+  try{await SB.auth.signOut()}catch(e){}
+  window.location.reload();
+}
+
+// ── SERVICE WORKER ──
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/SimploSimples/sw.js')
+    .then(()=>console.log('SW ok')).catch(e=>console.log('SW erro:',e));
 }
 
 init();
