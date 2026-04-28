@@ -557,16 +557,17 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 @media(min-width:769px){
   .fab-menu{bottom:auto;top:70px;right:24px;left:auto;transform:none;align-items:flex-end}
 }
-.fab-item{display:flex;align-items:center;gap:10px;background:var(--surface-solid);border:1px solid var(--glass-border);border-radius:16px;padding:11px 18px;box-shadow:var(--shadow-md);cursor:pointer;min-width:190px;transition:transform .15s,box-shadow .15s;transform:translateY(10px);opacity:0;-webkit-tap-highlight-color:transparent}
+.fab-item{display:flex;align-items:center;gap:12px;background:var(--surface-solid);border:1px solid var(--glass-border);border-radius:14px;padding:11px 16px 11px 12px;box-shadow:var(--shadow-md);cursor:pointer;width:220px;transition:all .18s;transform:translateY(10px);opacity:0;-webkit-tap-highlight-color:transparent}
 .fab-menu.open .fab-item{transform:translateY(0);opacity:1}
-.fab-item:nth-child(1){transition-delay:.05s}
-.fab-item:nth-child(2){transition-delay:.08s}
-.fab-item:nth-child(3){transition-delay:.11s}
-.fab-item:nth-child(4){transition-delay:.14s}
-.fab-item:nth-child(5){transition-delay:.17s}
-.fab-item:active{transform:scale(.96)}
-.fab-item-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
-.fab-item-label{font-size:13px;font-weight:600;color:var(--text)}
+.fab-item:nth-child(1){transition-delay:.04s}
+.fab-item:nth-child(2){transition-delay:.07s}
+.fab-item:nth-child(3){transition-delay:.10s}
+.fab-item:nth-child(4){transition-delay:.13s}
+.fab-item:nth-child(5){transition-delay:.16s}
+.fab-item:hover{transform:translateY(-2px)!important;box-shadow:var(--shadow-lg)}
+.fab-item:active{transform:scale(.96)!important}
+.fab-item-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.fab-item-label{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
 .fab-item-sub{font-size:11px;color:var(--text-3);margin-top:1px}
 .bnav-fab-btn.open{transform:rotate(45deg) scale(1.05)}
 
@@ -838,23 +839,23 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 <div class="fab-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
 <div class="fab-menu" id="fab-menu">
   <div class="fab-item" onclick="closeFabMenu();openModal('evento')">
-    <span class="fab-item-icon">📝</span>
-    <div><div class="fab-item-label">Novo evento</div><div class="fab-item-sub">Prova, trabalho, apresentação...</div></div>
+    <div class="fab-item-icon" style="background:#EFF6FF"><span>📝</span></div>
+    <div><div class="fab-item-label">Novo evento</div><div class="fab-item-sub">Prova, trabalho, apresentação</div></div>
   </div>
   <div class="fab-item" onclick="closeFabMenu();openModal('disc')">
-    <span class="fab-item-icon">📚</span>
+    <div class="fab-item-icon" style="background:#F0FDF4"><span>📚</span></div>
     <div><div class="fab-item-label">Nova disciplina</div><div class="fab-item-sub">Adicionar matéria</div></div>
   </div>
   <div class="fab-item" onclick="closeFabMenu();abrirImportComGate()">
-    <span class="fab-item-icon">🤖</span>
+    <div class="fab-item-icon" style="background:#FFF7ED"><span>🤖</span></div>
     <div><div class="fab-item-label">Importar com IA</div><div class="fab-item-sub" id="fab-import-sub">Requer Premium</div></div>
   </div>
   <div class="fab-item" onclick="closeFabMenu();openGrupoEntry('criar')">
-    <span class="fab-item-icon">👥</span>
+    <div class="fab-item-icon" style="background:#F5F3FF"><span>👥</span></div>
     <div><div class="fab-item-label">Criar grupo</div><div class="fab-item-sub">Novo grupo de estudo</div></div>
   </div>
   <div class="fab-item" onclick="closeFabMenu();openPomo()">
-    <span class="fab-item-icon">🍅</span>
+    <div class="fab-item-icon" style="background:#FFF1F2"><span>🍅</span></div>
     <div><div class="fab-item-label">Pomodoro</div><div class="fab-item-sub">Iniciar sessão de foco</div></div>
   </div>
 </div>
