@@ -377,27 +377,109 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 .drawer-item .icon{font-size:16px;width:20px;text-align:center}
 
 /* ─── MOBILE ─── */
+/* ══ IPAD (768px - 1024px) ══ */
+@media(min-width:768px) and (max-width:1024px){
+  .sidebar{width:200px}
+  .sidebar-top{padding:18px 14px 14px}
+  .sidebar-brand{font-size:16px}
+  .sidebar-semester{font-size:11px}
+  .nav-btn{padding:9px 10px;font-size:12px;gap:7px}
+  .sidebar-bottom{padding:12px 14px}
+  .sidebar-bottom #s-nome{font-size:12px}
+  .topbar{padding:12px 16px}
+  .topbar-title{font-size:15px}
+  .content{padding:16px 18px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat{padding:13px 14px}
+  .stat-num{font-size:26px}
+  .widget-hoje{padding:16px 16px 12px}
+  .widget-hoje-titulo{font-size:18px}
+  .disc-grid{grid-template-columns:1fr}
+  .cal-cell{min-height:62px;padding:5px}
+  .cal-month-title{font-size:18px}
+  .prog-ring-wrap{gap:8px}
+}
+
+/* ══ IPHONE / MOBILE (< 768px) ══ */
 @media(max-width:768px){
   .sidebar{display:none}
-  .main{padding-bottom:72px}
-  .topbar{padding:11px 16px}
+  .main{padding-bottom:76px}
+  .topbar{padding:10px 14px}
+  .topbar-title{font-size:15px;font-weight:700}
   .topbar .btn-secondary,.topbar .btn-primary{display:none}
-  .topbar-title{font-size:15px}
-  .content{padding:14px 16px}
-  .stats{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
-  .stat{padding:13px 14px;border-radius:var(--radius)}
-  .stat-num{font-size:26px}
-  .disc-grid{grid-template-columns:1fr}
-  .field-row{grid-template-columns:1fr}
-  .filters{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+  .content{padding:12px 14px}
+
+  /* Stats */
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+  .stat{padding:12px 13px;border-radius:var(--radius)}
+  .stat-num{font-size:24px}
+  .stat-label{font-size:9px}
+  .stat-desc{font-size:10px}
+
+  /* Widget hoje */
+  .widget-hoje{padding:14px 14px 12px;border-radius:16px;margin-bottom:14px}
+  .widget-hoje-data{font-size:10px}
+  .widget-hoje-titulo{font-size:17px;margin-bottom:10px}
+  .widget-hoje-item{padding:8px 10px;border-radius:9px}
+  .widget-hoje-item-nome{font-size:12px}
+  .widget-hoje-stat-num{font-size:17px}
+  .widget-hoje-stat-label{font-size:8px}
+  .widget-hoje-footer{margin-top:10px;padding-top:10px}
+
+  /* Progresso */
+  .prog-ring-wrap{gap:6px;margin-bottom:14px}
+  .prog-ring-card{padding:10px 6px}
+  .prog-ring-num{font-size:15px}
+  .prog-ring-label{font-size:8px}
+
+  /* Eventos */
+  .event-card{padding:11px 13px;border-radius:12px}
+  .event-day{font-size:20px}
+  .event-mon{font-size:9px}
+  .event-name{font-size:13px}
+  .event-card:hover{transform:none}
+
+  /* Filtros */
+  .filters{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;gap:6px;margin-bottom:12px}
   .filters::-webkit-scrollbar{display:none}
-  .filter{white-space:nowrap;flex-shrink:0}
+  .filter{white-space:nowrap;flex-shrink:0;padding:6px 12px;font-size:12px}
+
+  /* Modais */
   .overlay{align-items:flex-end}
-  .modal{border-radius:22px 22px 0 0;width:100%;max-width:100%;margin:0;padding:6px 20px 28px;max-height:88vh}
-  .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:8px auto 16px}
+  .modal{border-radius:22px 22px 0 0;width:100%;max-width:100%;margin:0;padding:6px 18px 28px;max-height:90vh}
+  .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:8px auto 14px}
+  .modal-title{font-size:15px}
+  .field-row{grid-template-columns:1fr}
+
+  /* Bottom nav */
   .bottom-nav.visible{display:flex!important;pointer-events:auto!important}
   #btn-hamburger{display:flex!important}
-  .event-card:hover{transform:none}
+
+  /* Calendário */
+  .cal-cell{min-height:54px;padding:4px 3px}
+  .cal-num{font-size:11px}
+  .cal-dot{font-size:8px;padding:1px 3px}
+  .cal-month-title{font-size:16px}
+  .cal-nav{margin-bottom:10px}
+
+  /* Grupos */
+  .grupo-card{padding:14px 16px}
+  .disc-grid{grid-template-columns:1fr}
+
+  /* Seção */
+  .section-head{margin-bottom:10px}
+  .section-title{font-size:9px}
+
+  /* Urgency */
+  .urgency{padding:12px 14px;border-radius:12px;margin-bottom:14px}
+
+  /* Auth */
+  .auth-card{padding:28px 22px;border-radius:20px}
+  .auth-brand{font-size:24px}
+
+  /* Touch */
+  .btn{-webkit-tap-highlight-color:transparent}
+  *{-webkit-tap-highlight-color:transparent}
 }
 /* ── DARK MODE ── */
 [data-theme="dark"] body{background:var(--bg);color:var(--text)}
@@ -564,6 +646,12 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 /* ── LUCIDE ICONS ── */
 .nav-btn i,.bnav-item i{display:flex;align-items:center;flex-shrink:0}
 .nav-btn{gap:9px}
+/* ── SAFE AREA (iPhone notch/Dynamic Island) ── */
+@supports(padding: max(0px)){
+  .topbar{padding-top:max(12px, env(safe-area-inset-top))}
+  .bottom-nav{padding-bottom:max(8px, env(safe-area-inset-bottom))}
+  .modal{padding-bottom:max(28px, env(safe-area-inset-bottom))}
+}
 </style>
 </head>
 <body>
