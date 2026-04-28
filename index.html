@@ -1384,7 +1384,13 @@ async function doReset(){
   $('reset-btn').textContent='Salvando...';$('reset-btn').disabled=true;
   const{error}=await SB.auth.updateUser({password:pass});
   if(error){
-    msg.textContent=error.message;msg.className='auth-msg error';
+    const erros={
+      'New password should be different from the old password.':'A nova senha deve ser diferente da senha atual.',
+      'Password should be at least 6 characters.':'A senha deve ter pelo menos 6 caracteres.',
+      'Auth session missing!':'Sessão expirada. Solicite um novo link de recuperação.'
+    };
+    msg.textContent=erros[error.message]||error.message;
+    msg.className='auth-msg error';
     $('reset-btn').textContent='Salvar nova senha';$('reset-btn').disabled=false;
   } else {
     msg.textContent='✓ Senha alterada! Redirecionando...';msg.className='auth-msg success';
