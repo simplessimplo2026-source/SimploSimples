@@ -1196,24 +1196,50 @@ function aMsg(msg,type){const e=$('auth-msg');e.textContent=msg;e.className='aut
 async function doAuth(){
   const email=$('a-email').value.trim(),pass=$('a-pass').value;
   if(!email||!pass){aMsg('Preencha email e senha!','error');return}
+  if(aMode==='register'){
+    const nome=$('a-nome')?.value.trim()||'';
+    if(!nome){aMsg('Preencha seu nome!','error');return}
+  }
   $('auth-btn').textContent='...';$('auth-btn').disabled=true;
   try{
-    let r=aMode==='login'
-      ?await SB.auth.signInWithPassword({email,password:pass})
-      :await SB.auth.signUp({email,password:pass});
-    if(r.error)throw r.error;
-    if(aMode==='register'){aMsg('Conta criada! Verifique seu email.','success');$('auth-btn').textContent='Criar conta';$('auth-btn').disabled=false;return}
+    if(aMode==='login'){
+      const r=await SB.auth.signInWithPassword({email,password:pass});
+      if(r.error)throw r.error;
+    } else {
+      const nome=$('a-nome')?.value.trim()||'';
+      // 1. Criar conta com nome no metadata
+      const r=await SB.auth.signUp({email,password:pass,options:{data:{nome}}});
+      if(r.error)throw r.error;
+      // 2. Salvar nome no perfil via upsert (backup do trigger)
+      if(r.data?.user){
+        const uid=r.data.user.id;
+        setTimeout(async()=>{
+          try{
+            await SB.from('perfis').upsert({id:uid,nome},{onConflict:'id'});
+          }catch(e){console.log('perfil upsert:',e.message)}
+        },1500);
+      }
+      aMsg('Conta criada! Verifique seu email para confirmar.','success');
+      $('auth-btn').textContent='Criar conta';$('auth-btn').disabled=false;
+      return;
+    }
   }catch(e){
     const m={'Invalid login credentials':'Email ou senha incorretos.','Email not confirmed':'Confirme seu email antes de entrar.','User already registered':'Email já cadastrado.'};
     aMsg(m[e.message]||e.message,'error');
     $('auth-btn').textContent=aMode==='login'?'Entrar':'Criar conta';$('auth-btn').disabled=false;
   }
 }
+
 async function doForgot(){
   const email=$('a-email').value.trim();
-  if(!email){aMsg('Digite seu email!','error');return}
-  const{error}=await SB.auth.resetPasswordForEmail(email);
-  if(error)aMsg(error.message,'error');else aMsg('Email enviado!','success');
+  if(!email){aMsg('Digite seu email primeiro!','error');return}
+  $('auth-btn').textContent='Enviando...';$('auth-btn').disabled=true;
+  const{error}=await SB.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.origin+window.location.pathname
+  });
+  $('auth-btn').textContent='Entrar';$('auth-btn').disabled=false;
+  if(error)aMsg(error.message,'error');
+  else aMsg('✓ Email enviado! Verifique sua caixa de entrada.','success');
 }
 async function doLogout(){
   try{await SB.auth.signOut()}catch(e){}
@@ -1222,13 +1248,31 @@ async function doLogout(){
 
 // ── INIT ──
 async function init(){
+  // Detectar link de reset de senha
+  const hash=window.location.hash;
+  if(hash.includes('type=recovery')){
+    hide('loading');
+    $('auth').style.display='flex';
+    $('auth-normal').style.display='none';
+    $('auth-reset').style.display='block';
+    return;
+  }
+  if(hash.includes('error=access_denied')||hash.includes('otp_expired')){
+    history.replaceState(null,'',window.location.pathname);
+  }
   const{data:{session}}=await SB.auth.getSession();
   hide('loading');
   const real=s=>s&&s.user&&s.user.email&&!s.user.is_anonymous;
   if(real(session)){await boot(session.user)}
   else{if(session)await SB.auth.signOut();$('auth').style.display='flex'}
   SB.auth.onAuthStateChange(async(ev,ses)=>{
-    if((ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED')&&real(ses)){
+    if(ev==='PASSWORD_RECOVERY'){
+      $('app').style.display='none';
+      $('auth').style.display='flex';
+      $('auth-normal').style.display='none';
+      $('auth-reset').style.display='block';
+      hide('loading');
+    } else if((ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED')&&real(ses)){
       $('auth').style.display='none';await boot(ses.user);
     }else if(ev==='SIGNED_OUT'){
       discs=[];evts=[];$('app').style.display='none';$('auth').style.display='flex';
