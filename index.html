@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js" onload="if(window.lucide)lucide.createIcons()"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -970,18 +971,18 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <button class="modal-close" onclick="closeModal('import')">✕</button>
   </div>
   <div id="imp1">
-    <div style="background:var(--brand-light);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--brand);font-weight:500">
-      💡 Suba um PDF ou cole o texto — o GPT extrai os eventos automaticamente.
+    <div style="background:var(--brand-light);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--brand);font-weight:600">
+      🤖 A IA lê PDF, Word, foto ou texto e extrai os eventos automaticamente.
     </div>
-    <div class="drop-zone" onclick="document.getElementById('imp-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--brand)'" ondragleave="this.style.borderColor=''" ondrop="onDrop(event)">
-      <div style="font-size:28px;margin-bottom:6px">📄</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text-2)">Clique ou arraste o PDF</div>
-      <div style="font-size:11px;color:var(--text-3);margin-top:2px">Ou cole o texto abaixo</div>
+    <div class="drop-zone" onclick="$('imp-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--brand)'" ondragleave="this.style.borderColor=''" ondrop="onDrop(event)">
+      <div style="font-size:32px;margin-bottom:8px">📂</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-2)">Toque para selecionar arquivo</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:4px">PDF · Word (.docx) · Foto (JPG, PNG)</div>
     </div>
-    <input type="file" id="imp-file" accept=".pdf" style="display:none" onchange="onFile(event)">
+    <input type="file" id="imp-file" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/heic,image/webp" style="display:none;position:absolute;opacity:0" onchange="onFile(event)">
     <div id="pdf-msg" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:10px"></div>
     <div class="field"><label>Ou cole o texto do cronograma</label>
-      <textarea id="imp-text" placeholder="Prova AV1 - Psicopatologia - 15/05&#10;Entrega trabalho - 20/05" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;min-height:100px;resize:vertical"></textarea>
+      <textarea id="imp-text" placeholder="Prova AV1 - Psicopatologia - 15/05&#10;Entrega trabalho - 20/05" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;min-height:90px;resize:vertical"></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('import')">Cancelar</button>
@@ -1692,53 +1693,82 @@ function openImport(){
   $('m-import').classList.add('open');
 }
 function imp1(){$('imp1').style.display='block';$('imp2').style.display='none'}
-function onDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')exPDF(f)}
-function onFile(e){if(e.target.files[0])exPDF(e.target.files[0])}
+function onDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f)processFile(f)}
+function onFile(e){if(e.target.files&&e.target.files[0])processFile(e.target.files[0])}
+
+let impImagem=null,impMimeType=null;
+
+async function processFile(file){
+  const msg=$('pdf-msg');
+  msg.style.display='block';msg.style.background='var(--brand-light)';msg.style.color='var(--brand)';
+  msg.textContent='Lendo arquivo...';
+  impImagem=null;impMimeType=null;$('imp-text').value='';
+  const type=file.type;
+  if(type==='application/pdf'||file.name.endsWith('.pdf')) await exPDF(file);
+  else if(type.includes('wordprocessingml')||file.name.endsWith('.docx')||file.name.endsWith('.doc')) await exDOCX(file);
+  else if(type.startsWith('image/')) await exImagem(file);
+  else{msg.style.background='var(--red-light)';msg.style.color='var(--red)';msg.textContent='Use PDF, Word ou imagem.'}
+}
+
 async function exPDF(file){
-  const msg=$('pdf-msg');msg.style.display='block';msg.style.background='var(--brand-light)';msg.style.color='var(--brand)';msg.textContent='Extraindo texto...';
+  const msg=$('pdf-msg');
   try{
     const ab=await file.arrayBuffer();
-    const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+    const pdf=await pdfjsLib.getDocument({data:new Uint8Array(ab),useWorkerFetch:false,isEvalSupported:false,useSystemFonts:true}).promise;
     let text='';
     for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const ct=await pg.getTextContent();text+=ct.items.map(it=>it.str).join(' ')+'\n'}
+    if(!text.trim())throw new Error('PDF sem texto');
     $('imp-text').value=text.trim();
     msg.style.background='var(--green-light)';msg.style.color='var(--green)';
     msg.textContent='✓ PDF lido ('+pdf.numPages+' pág.)! Clique em Analisar.';
-  }catch(e){msg.style.background='var(--red-light)';msg.style.color='var(--red)';msg.textContent='Erro ao ler PDF. Cole o texto manualmente.'}
+  }catch(e){msg.style.background='var(--red-light)';msg.style.color='var(--red)';msg.textContent='Não foi possível ler o PDF. Cole o texto manualmente.'}
+}
+
+async function exDOCX(file){
+  const msg=$('pdf-msg');
+  try{
+    const ab=await file.arrayBuffer();
+    const result=await mammoth.extractRawText({arrayBuffer:ab});
+    if(!result.value.trim())throw new Error('Documento vazio');
+    $('imp-text').value=result.value.trim();
+    msg.style.background='var(--green-light)';msg.style.color='var(--green)';
+    msg.textContent='✓ Word lido! Clique em Analisar.';
+  }catch(e){msg.style.background='var(--red-light)';msg.style.color='var(--red)';msg.textContent='Erro ao ler Word: '+e.message}
+}
+
+async function exImagem(file){
+  const msg=$('pdf-msg');
+  try{
+    const base64=await new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=()=>res(r.result.split(',')[1]);
+      r.onerror=()=>rej(new Error('Erro ao ler'));
+      r.readAsDataURL(file);
+    });
+    impImagem=base64;impMimeType=file.type||'image/jpeg';
+    msg.style.background='var(--green-light)';msg.style.color='var(--green)';
+    msg.textContent='✓ Imagem carregada! Clique em Analisar.';
+  }catch(e){msg.style.background='var(--red-light)';msg.style.color='var(--red)';msg.textContent='Erro ao ler imagem.'}
 }
 async function analisar(){
   const text=$('imp-text').value.trim();
-  if(!text){alert('Cole o texto ou suba um PDF!');return}
+  if(!text&&!impImagem){alert('Selecione um arquivo ou cole o texto!');return}
   const btn=$('btn-analisar');
   btn.textContent='Analisando...';btn.disabled=true;
   try{
     const today=new Date().toISOString().split('T')[0];
     const dnames=discs.map(d=>d.nome).join(', ');
-    const prompt='Analise este cronograma. Hoje: '+today+'. Disciplinas disponíveis: '+dnames+'\n\n'+text
-      +'\n\nResponda SOMENTE com JSON válido (sem markdown, sem explicação): '
-      +'[{"nome":"...","data":"YYYY-MM-DD","tipo":"prova|trabalho|apresentacao|outro","disciplina":"nome exato ou vazio","hora":"HH:MM ou vazio"}]. '
-      +'Ano padrão: '+new Date().getFullYear()+'. Ignore eventos já passados.';
-
-    // Chamar Edge Function swift-worker
-    const{data,error}=await SB.functions.invoke('swift-worker',{
-      body:{prompt, type:'cronograma'}
-    });
-
+    const body={hoje:today,disciplinas:dnames};
+    if(impImagem){body.imagem=impImagem;body.mimeType=impMimeType;}
+    else{body.texto=text;}
+    const{data,error}=await SB.functions.invoke('swift-worker',{body});
     if(error)throw new Error(error.message);
-
-    let resultado=data?.result||data?.content||data;
-    if(typeof resultado==='string'){
-      resultado=resultado.replace(/```json|```/g,'').trim();
-      resultado=JSON.parse(resultado);
-    }
-
-    impEvts=Array.isArray(resultado)?resultado:[];
+    impEvts=data?.eventos||[];
     if(!impEvts.length){
-      alert('Nenhum evento encontrado no texto.');
-      btn.textContent='Analisar com IA ✨';btn.disabled=false;
+      alert('Nenhum evento encontrado. Tente com outro arquivo.');
+      btn.textContent='✨ Analisar com IA';btn.disabled=false;
       return;
     }
-
     fillDiscs('imp-disc-def');
     $('imp-list').innerHTML=impEvts.map((e,i)=>
       '<div class="imp-item"><input type="checkbox" id="ic'+i+'" checked>'
@@ -1752,7 +1782,7 @@ async function analisar(){
     alert('Erro ao analisar: '+e.message);
     console.error('swift-worker error:',e);
   }
-  btn.textContent='Analisar com IA ✨';btn.disabled=false;
+  btn.textContent='✨ Analisar com IA';btn.disabled=false;
 }
 async function confirmar(){
   if(!U){alert('Sessão expirada!');return}
