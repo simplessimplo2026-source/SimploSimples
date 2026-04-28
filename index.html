@@ -10,718 +10,425 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="logo.svg">
 <link rel="apple-touch-icon" href="icon-512.png">
-<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Simplo">
 <meta name="theme-color" content="#0EA5E9">
-<meta name="msapplication-TileColor" content="#0C4A6E">
-<meta name="description" content="Sua agenda acadêmica inteligente — organize provas, trabalhos e apresentações">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Simplo">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════════════════════════
-   SIMPLO — GLASSMORPHISM REDESIGN
-   Índigo · Light + Dark · iOS-inspired
-══════════════════════════════════════ */
 :root {
-  /* ── Accent ── */
   --brand: #0284C7;
   --brand-mid: #0EA5E9;
-  --brand-light: rgba(14,165,233,0.08);
+  --brand-light: #EFF8FF;
   --brand-dark: #0369A1;
-  --brand-glow: rgba(14,165,233,0.28);
-
-  /* ── Semantic ── */
+  --brand-glow: rgba(14,165,233,0.2);
   --red: #EF4444;
-  --red-light: rgba(239,68,68,0.1);
+  --red-light: #FEF2F2;
   --green: #10B981;
-  --green-light: rgba(16,185,129,0.1);
+  --green-light: #ECFDF5;
   --amber: #F59E0B;
-  --amber-light: rgba(245,158,11,0.1);
+  --amber-light: #FFFBEB;
   --purple: #8B5CF6;
-  --purple-light: rgba(139,92,246,0.1);
-
-  /* ── Surface (Light) ── */
-  --bg: #EFF8FF;
-  --bg-grad: linear-gradient(145deg, #E0F2FE 0%, #F0F9FF 40%, #EFF6FF 100%);
-  --surface: rgba(255,255,255,0.72);
-  --surface-solid: #FFFFFF;
-  --surface-2: rgba(255,255,255,0.45);
-  --glass: rgba(255,255,255,0.6);
-  --glass-border: rgba(255,255,255,0.85);
-  --border: rgba(14,165,233,0.14);
-  --border-solid: #BAE6FD;
-
-  /* ── Text ── */
+  --purple-light: #F5F3FF;
+  --bg: #F0F9FF;
+  --surface: #FFFFFF;
+  --surface-2: #F8FAFF;
+  --border: #DBEAFE;
   --text: #082F49;
   --text-2: #0C4A6E;
   --text-3: #7DB9D4;
-
-  /* ── Shape ── */
-  --radius: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 26px;
-
-  /* ── Shadow ── */
-  --shadow: 0 2px 12px rgba(91,33,182,0.08), 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-md: 0 8px 24px rgba(91,33,182,0.12), 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-lg: 0 20px 48px rgba(91,33,182,0.16), 0 4px 16px rgba(0,0,0,0.08);
-  --shadow-glow: 0 0 0 3px var(--brand-glow);
-
-  /* ── Blur ── */
-  --blur: blur(12px) saturate(1.4);
-  --blur-sm: blur(6px);
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(14,165,233,0.1), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 25px rgba(14,165,233,0.12);
 }
-
-/* ══ REDUCED MOTION ══ */
-@media(prefers-reduced-motion:reduce){
-  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
-}
-
-/* ══ MODO SÓLIDO (sem glass) ══ */
-[data-glass="off"] {
-  --surface: #FFFFFF;
-  --surface-2: #F8FAFF;
-  --glass: #FFFFFF;
-  --glass-border: #DBEAFE;
-  --blur: none;
-  --blur-sm: none;
-}
-[data-glass="off"] .sidebar,
-[data-glass="off"] .topbar,
-[data-glass="off"] .bottom-nav,
-[data-glass="off"] .drawer,
-[data-glass="off"] .modal,
-[data-glass="off"] .pomo-modal,
-[data-glass="off"] .event-card,
-[data-glass="off"] .stat,
-[data-glass="off"] .disc-card,
-[data-glass="off"] .grupo-card,
-[data-glass="off"] .cal-cell,
-[data-glass="off"] .prog-ring-card,
-[data-glass="off"] .arquivo-item,
-[data-glass="off"] .tarefa-item,
-[data-glass="off"] .evento-grupo-card {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-[data-glass="off"][data-theme="dark"] {
-  --surface: #0F1E33;
-  --surface-2: #0A1628;
-  --glass: #0F1E33;
-  --glass-border: #1E3A5F;
-}
-
-/* ── DARK MODE ── */
 [data-theme="dark"] {
   --brand: #0EA5E9;
   --brand-mid: #38BDF8;
-  --brand-light: rgba(14,165,233,0.15);
-  --brand-dark: #0284C7;
-  --brand-glow: rgba(56,189,248,0.32);
-
+  --brand-light: rgba(14,165,233,0.12);
   --bg: #040D17;
-  --bg-grad: linear-gradient(145deg, #040D17 0%, #071E33 50%, #061525 100%);
-  --surface: rgba(6,30,54,0.75);
-  --surface-solid: #071E33;
-  --surface-2: rgba(6,30,54,0.45);
-  --glass: rgba(6,30,54,0.65);
-  --glass-border: rgba(56,189,248,0.15);
-  --border: rgba(14,165,233,0.18);
-  --border-solid: #0C4A6E;
-
+  --surface: #071E33;
+  --surface-2: #0A1628;
+  --border: #1E3A5F;
   --text: #E0F2FE;
   --text-2: #7DD3FC;
   --text-3: #3B7FA0;
-
-  --shadow: 0 2px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
-  --shadow-lg: 0 20px 48px rgba(0,0,0,0.7), 0 4px 16px rgba(0,0,0,0.5);
-
-  --red-light: rgba(239,68,68,0.15);
+  --red-light: rgba(239,68,68,0.12);
   --green-light: rgba(16,185,129,0.12);
   --amber-light: rgba(245,158,11,0.12);
-  --purple-light: rgba(139,92,246,0.15);
 }
-
-/* ══ BASE ══ */
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;line-height:1.5}
-body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 
-/* ══ GLASS MIXIN ══ */
-.glass{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--glass-border)}
 
-/* ── Elementos sem blur (performance) ── */
-.event-card{background:var(--surface-solid);border-radius:var(--radius-lg);border:1px solid var(--glass-border);padding:15px 18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:box-shadow .2s;box-shadow:var(--shadow);border-left:3px solid transparent}
-.stat{background:var(--surface-solid);border-radius:var(--radius-lg);padding:18px;border:1px solid var(--glass-border);box-shadow:var(--shadow)}
-.disc-card{background:var(--surface-solid);border-radius:var(--radius-lg);border:1px solid var(--glass-border);padding:20px;box-shadow:var(--shadow);border-left:4px solid var(--brand)}
-.grupo-card{background:var(--surface-solid);border-radius:var(--radius-lg);border:1px solid var(--glass-border);padding:20px;box-shadow:var(--shadow);cursor:pointer}
-.prog-ring-card{flex:1;background:var(--surface-solid);border-radius:var(--radius);border:1px solid var(--glass-border);padding:14px 12px;display:flex;flex-direction:column;align-items:center;box-shadow:var(--shadow)}
-.arquivo-item{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--surface-solid);border-radius:12px;border:1px solid var(--border);margin-bottom:6px}
-.tarefa-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--surface-solid);border-radius:12px;border:1px solid var(--border);margin-bottom:6px}
-.evento-grupo-card{background:var(--surface-solid);border-radius:10px;border:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:12px;margin-bottom:6px}
-.aviso-card{background:var(--surface-solid);border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--brand-mid)}
-.imp-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--border);margin-bottom:6px}
 
-/* ══ GRUPOS ══ */
-.arquivo-item{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:6px}
+.arquivo-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;border:1px solid var(--border);margin-bottom:6px}
 .arquivo-icon{font-size:22px;flex-shrink:0}
 .arquivo-body{flex:1;min-width:0}
 .arquivo-nome{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .arquivo-meta{font-size:11px;color:var(--text-3);margin-top:1px}
-.storage-bar{height:6px;background:var(--border);border-radius:4px;overflow:hidden;margin:8px 0}
-.storage-fill{height:100%;border-radius:4px;background:var(--brand-mid);transition:width .3s}
+.storage-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin:8px 0}
+.storage-fill{height:100%;border-radius:4px;background:var(--brand);transition:width .3s}
 .storage-fill.warn{background:var(--amber)}
 .storage-fill.full{background:var(--red)}
 
-.grupo-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--glass-border);padding:20px;box-shadow:var(--shadow);cursor:pointer}
+/* ── GRUPOS ── */
+.grupo-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);transition:box-shadow .15s;cursor:pointer}
+.grupo-card:hover{box-shadow:var(--shadow-md)}
 .grupo-nome{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
-.grupo-code{font-size:12px;color:var(--brand-mid);font-family:monospace;background:var(--brand-light);padding:2px 10px;border-radius:6px;display:inline-block;margin-bottom:8px;letter-spacing:1.5px}
-.grupo-stats{display:flex;gap:12px;font-size:12px;color:var(--text-3)}
-.aviso-card{background:var(--surface-2);border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--brand-mid)}
+.grupo-code{font-size:12px;color:var(--text-3);font-family:monospace;background:var(--bg);padding:2px 8px;border-radius:6px;display:inline-block;margin-bottom:8px;letter-spacing:1px}
+.grupo-stats{display:flex;gap:12px;font-size:12px;color:var(--text-2)}
+.aviso-card{background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--brand)}
 .aviso-text{font-size:13px;color:var(--text);margin-bottom:4px}
 .aviso-meta{font-size:11px;color:var(--text-3)}
-.tarefa-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:6px}
+.tarefa-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;border:1px solid var(--border);margin-bottom:6px}
 .tarefa-item.done{opacity:.5}
-.tarefa-check{width:18px;height:18px;accent-color:var(--brand-mid);cursor:pointer;flex-shrink:0;margin-top:1px}
+.tarefa-check{width:18px;height:18px;accent-color:var(--brand);cursor:pointer;flex-shrink:0;margin-top:1px}
 .tarefa-body{flex:1}
 .tarefa-titulo{font-size:13px;font-weight:600;color:var(--text)}
-.tarefa-atrib{font-size:11px;color:var(--brand-mid);margin-top:2px}
+.tarefa-atrib{font-size:11px;color:var(--brand);margin-top:2px}
 .tarefa-desc{font-size:11px;color:var(--text-3);margin-top:1px}
 .evento-grupo-card{background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:12px;margin-bottom:6px}
-.tabs{display:flex;background:var(--surface-2);border-radius:12px;padding:4px;margin-bottom:16px;border:1px solid var(--border)}
-.tab{flex:1;text-align:center;padding:7px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-3);transition:all .2s;border:none;background:none;font-family:inherit}
-.tab.on{background:var(--surface-solid);color:var(--brand-mid);box-shadow:var(--shadow)}
-.membro-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-.membro-avatar{width:34px;height:34px;border-radius:50%;background:var(--brand-light);border:1.5px solid var(--brand-glow);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--brand-mid);flex-shrink:0}
+.tabs{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:16px}
+.tab{flex:1;text-align:center;padding:7px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-3);transition:all .15s;border:none;background:none;font-family:inherit}
+.tab.on{background:var(--surface);color:var(--brand);box-shadow:var(--shadow)}
+.membro-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.membro-avatar{width:32px;height:32px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--brand);flex-shrink:0}
 .membro-info{flex:1}
 .membro-nome{font-size:13px;font-weight:600;color:var(--text)}
 .membro-role{font-size:11px;color:var(--text-3)}
-.code-box{background:var(--brand-light);border:1.5px dashed var(--brand-mid);border-radius:14px;padding:18px;text-align:center;margin-bottom:16px}
-.code-num{font-size:30px;font-weight:700;letter-spacing:8px;color:var(--brand-mid);font-family:monospace}
+.code-box{background:var(--brand-light);border:1.5px dashed var(--brand);border-radius:10px;padding:14px;text-align:center;margin-bottom:16px}
+.code-num{font-size:28px;font-weight:700;letter-spacing:6px;color:var(--brand);font-family:monospace}
 .code-label{font-size:11px;color:var(--text-3);margin-top:4px}
 
-/* ══ DARK OVERRIDES (Glass adapts, minimal overrides needed) ══ */
-[data-theme="dark"] .badge.b-prova{background:rgba(239,68,68,.18);color:#FCA5A5}
-[data-theme="dark"] .badge.b-trabalho{background:rgba(14,165,233,.18);color:#7DD3FC}
-[data-theme="dark"] .badge.b-apresentacao{background:rgba(16,185,129,.15);color:#6EE7B7}
-[data-theme="dark"] .badge.b-outro{background:rgba(245,158,11,.15);color:#FCD34D}
-[data-theme="dark"] .days-badge.d-hot{background:rgba(239,68,68,.18);color:#FCA5A5}
-[data-theme="dark"] .days-badge.d-warn{background:rgba(245,158,11,.18);color:#FCD34D}
-[data-theme="dark"] .days-badge.d-ok{background:rgba(16,185,129,.15);color:#6EE7B7}
-[data-theme="dark"] .days-badge.d-past{background:rgba(255,255,255,.06);color:#3B7FA0}
-[data-theme="dark"] .urgency{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3)}
-[data-theme="dark"] .urgency-head{color:#FCA5A5}
-[data-theme="dark"] .urgency-item{color:#FECACA}
-[data-theme="dark"] .nav-badge{background:rgba(239,68,68,.2);color:#FCA5A5}
-[data-theme="dark"] .cal-cell{background:rgba(6,30,54,.5);border-color:var(--border)}
-[data-theme="dark"] .cal-cell.today{border-color:var(--brand-mid)}
-[data-theme="dark"] .cal-cell:hover{background:var(--brand-light)}
-[data-theme="dark"] .filter.on{background:var(--brand-mid);color:#fff}
-[data-theme="dark"] .import-banner{background:var(--brand-light);border-color:var(--brand-mid)}
-[data-theme="dark"] .import-banner-text{color:#7DD3FC}
-[data-theme="dark"] .import-banner-sub{color:#38BDF8}
-[data-theme="dark"] .auth-card{background:rgba(4,20,40,.92);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--border)}
-[data-theme="dark"] #loading{background:linear-gradient(135deg,#041526,#0369A1)}
-[data-theme="dark"] .field input,[data-theme="dark"] .field textarea,[data-theme="dark"] select{background:rgba(255,255,255,.05)!important;color:var(--text)!important;border-color:var(--border)!important}
-[data-theme="dark"] .auth-tabs{background:rgba(255,255,255,.05)}
-[data-theme="dark"] .tab.on{background:rgba(255,255,255,.1)}
-[data-theme="dark"] .bnav-fab-btn{background:var(--brand-mid)}
-[data-theme="dark"] .drop-zone:hover{background:var(--brand-light)}
-[data-theme="dark"] .imp-item{background:rgba(255,255,255,.05)}
-[data-theme="dark"] .btn-secondary{background:rgba(255,255,255,.06);border-color:var(--border);color:var(--text-2)}
-[data-theme="dark"] .btn-secondary:hover{background:rgba(255,255,255,.1)}
-[data-theme="dark"] .pomo-modal{background:rgba(4,20,40,.92);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--border)}
-[data-theme="dark"] .prog-ring-card{background:rgba(255,255,255,.05);border-color:var(--border)}
-[data-theme="dark"] .nav-btn.active{background:var(--brand-light);color:var(--brand-mid)}
-[data-theme="dark"] .nav-btn:hover{background:rgba(255,255,255,.05)}
 
-/* ══ SKELETONS ══ */
-@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
-.skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--surface-2) 50%,var(--border) 75%);background-size:800px 100%;animation:shimmer 1.4s infinite linear;border-radius:var(--radius)}
-.sk-card{height:72px;margin-bottom:8px}
-.sk-stat{height:88px;border-radius:var(--radius-lg)}
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --brand: #3B82F6;
+  --brand-light: #1E3A5F;
+  --brand-dark: #60A5FA;
+  --bg: #0F172A;
+  --surface: #1E293B;
+  --border: #334155;
+  --text: #F1F5F9;
+  --text-2: #94A3B8;
+  --text-3: #64748B;
+  --red-light: #3B1A1A;
+  --green-light: #0F2A1F;
+  --amber-light: #2A1F0A;
+  --purple-light: #1E1A3B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
+}
 
-/* ══ ANIMATIONS ══ */
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideInLeft{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
-@keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes modalOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(10px) scale(.98)}}
+[data-theme="dark"] .badge.b-prova { background: #7F1D1D; color: #FCA5A5; }
+[data-theme="dark"] .badge.b-trabalho { background: #1E3A5F; color: #93C5FD; }
+[data-theme="dark"] .badge.b-apresentacao { background: #064E3B; color: #6EE7B7; }
+[data-theme="dark"] .badge.b-outro { background: #451A03; color: #FCD34D; }
+[data-theme="dark"] .days-badge.d-hot { background: #7F1D1D; color: #FCA5A5; }
+[data-theme="dark"] .days-badge.d-warn { background: #451A03; color: #FCD34D; }
+[data-theme="dark"] .days-badge.d-ok { background: #064E3B; color: #6EE7B7; }
+[data-theme="dark"] .days-badge.d-past { background: #1E293B; color: #64748B; }
+[data-theme="dark"] .urgency { background: #3B1A1A; border-color: #7F1D1D; }
+[data-theme="dark"] .urgency-head { color: #FCA5A5; }
+[data-theme="dark"] .urgency-item { color: #FECACA; }
+[data-theme="dark"] .nav-badge { background: #7F1D1D; color: #FCA5A5; }
+[data-theme="dark"] .stat-card { border-color: #334155; }
+[data-theme="dark"] .event-card { border-color: #334155; }
+[data-theme="dark"] .grupo-card { border-color: #334155; }
+[data-theme="dark"] .disc-card { border-color: #334155; }
+[data-theme="dark"] .filter.on { background: #3B82F6; color: #fff; }
+[data-theme="dark"] .import-banner { background: #1E3A5F; border-color: #3B82F6; }
+[data-theme="dark"] .import-banner-text { color: #93C5FD; }
+[data-theme="dark"] .import-banner-sub { color: #60A5FA; }
+[data-theme="dark"] .cal-cell { border-color: #334155; }
+[data-theme="dark"] .cal-cell.today { border-color: #3B82F6; }
+[data-theme="dark"] .cal-cell:hover { background: #1E3A5F; }
+[data-theme="dark"] .bottom-nav { background: #1E293B; border-color: #334155; }
+[data-theme="dark"] .drawer { background: #1E293B; }
+[data-theme="dark"] .drawer-item:hover { background: #0F172A; }
+[data-theme="dark"] .modal { background: #1E293B; }
+[data-theme="dark"] .sidebar { background: #1E293B; border-color: #334155; }
+[data-theme="dark"] .topbar { background: #1E293B; border-color: #334155; }
+[data-theme="dark"] .nav-btn.active { background: #1E3A5F; color: #93C5FD; }
+[data-theme="dark"] .nav-btn:hover { background: #0F172A; }
+[data-theme="dark"] .btn-secondary { background: #1E293B; border-color: #334155; color: #94A3B8; }
+[data-theme="dark"] .btn-secondary:hover { background: #0F172A; }
+
+[data-theme="dark"] .auth-card { background: #1E293B; }
+[data-theme="dark"] #loading { background: #1D4ED8; }
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field textarea,
+[data-theme="dark"] select { background: #0F172A !important; color: #F1F5F9 !important; border-color: #334155 !important; }
+[data-theme="dark"] .auth-tabs { background: #0F172A; }
+[data-theme="dark"] .tab.on { background: #1E293B; }
+[data-theme="dark"] .bnav-fab-btn { background: #3B82F6; }
+[data-theme="dark"] .drop-zone:hover { background: #1E3A5F; }
+[data-theme="dark"] .imp-item { background: #0F172A; }
+[data-theme="dark"] .aviso-card { background: #0F172A; }
+[data-theme="dark"] .tarefa-item { background: #1E293B; }
+[data-theme="dark"] .evento-grupo-card { background: #1E293B; }
+[data-theme="dark"] .arquivo-item { background: #1E293B; }
+[data-theme="dark"] .storage-bar { background: #334155; }
+[data-theme="dark"] .code-box { background: #1E3A5F; border-color: #3B82F6; }
+[data-theme="dark"] .membro-item { border-color: #334155; }
+[data-theme="dark"] .membro-avatar { background: #1E3A5F; }
+
+/* ─── LOADING ─── */
+#loading{position:fixed;inset:0;background:var(--brand);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999}
+.loading-logo{font-family:'Playfair Display',serif;font-size:36px;color:#fff;letter-spacing:-1px}
+.loading-sub{font-size:13px;color:rgba(255,255,255,0.7);font-weight:300}
+.loading-bar{width:120px;height:2px;background:rgba(255,255,255,0.2);border-radius:2px;overflow:hidden;margin-top:8px}
+.loading-bar-fill{height:100%;background:#fff;border-radius:2px;animation:loadbar 1.2s ease-in-out infinite}
 @keyframes loadbar{0%{width:0;margin-left:0}50%{width:80%;margin-left:0}100%{width:0;margin-left:120px}}
 
-.content > *{animation:fadeUp .24s cubic-bezier(.4,0,.2,1) both}
-.event-card{animation:fadeUp .2s cubic-bezier(.4,0,.2,1) both}
-.event-card:nth-child(1){animation-delay:.03s}.event-card:nth-child(2){animation-delay:.06s}
-.event-card:nth-child(3){animation-delay:.09s}.event-card:nth-child(4){animation-delay:.12s}
-.event-card:nth-child(5){animation-delay:.15s}.event-card:nth-child(6){animation-delay:.18s}
-.stat{animation:fadeUp .22s cubic-bezier(.4,0,.2,1) both}
-.stat:nth-child(1){animation-delay:.04s}.stat:nth-child(2){animation-delay:.08s}
-.stat:nth-child(3){animation-delay:.12s}.stat:nth-child(4){animation-delay:.16s}
-.disc-card{animation:fadeUp .22s cubic-bezier(.4,0,.2,1) both;transition:box-shadow .22s,transform .22s}
-.disc-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
-.grupo-card{transition:box-shadow .22s,transform .22s}
-.grupo-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
-.btn{transition:all .18s cubic-bezier(.4,0,.2,1)}
-.btn:not(:disabled):hover{transform:translateY(-1px)}
-.btn:active{transform:translateY(0) scale(.96)!important}
-.btn-primary{box-shadow:0 4px 16px var(--brand-glow)}
-.btn-primary:hover{box-shadow:0 6px 22px var(--brand-glow)!important}
-.nav-btn{transition:all .18s cubic-bezier(.4,0,.2,1)}
-.bnav-fab-btn{transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s}
-.bnav-fab-btn:hover{transform:scale(1.1);box-shadow:0 8px 24px var(--brand-glow)}
-.bnav-item{transition:color .15s}
-.filter{transition:all .18s cubic-bezier(.4,0,.2,1)}
-.filter.on{transform:scale(1.03)}
-
-/* ══ LOADING ══ */
-#loading{position:fixed;inset:0;background:linear-gradient(145deg,#0C4A6E,#0284C7 50%,#0EA5E9);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999}
-#loading::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(255,255,255,.1) 0%,transparent 60%)}
-.loading-logo{font-family:'Playfair Display',serif;font-size:38px;color:#fff;letter-spacing:-1.5px;position:relative}
-.loading-sub{font-size:13px;color:rgba(255,255,255,0.6);font-weight:300;letter-spacing:.5px}
-.loading-bar{width:100px;height:2px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;margin-top:8px}
-.loading-bar-fill{height:100%;background:rgba(255,255,255,0.9);border-radius:2px;animation:loadbar 1.4s cubic-bezier(.4,0,.2,1) infinite}
-
-/* ══ AUTH ══ */
-#auth{display:none;min-height:100vh;background:linear-gradient(145deg,#082F49 0%,#0369A1 50%,#0EA5E9 100%);align-items:center;justify-content:center;padding:20px}
-#auth::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(125,211,252,.12),transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(2,132,199,.18),transparent 55%);pointer-events:none}
-.auth-card{background:rgba(255,255,255,.92);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.9);border-radius:28px;padding:40px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,.25),0 0 0 1px rgba(255,255,255,.5);position:relative}
-.auth-brand{font-family:'Playfair Display',serif;font-size:30px;color:var(--brand);margin-bottom:4px;letter-spacing:-1px}
+/* ─── AUTH ─── */
+#auth{display:none;min-height:100vh;background:linear-gradient(135deg,#1e3a8a 0%,#2563EB 50%,#3B82F6 100%);align-items:center;justify-content:center;padding:20px}
+.auth-card{background:#fff;border-radius:24px;padding:40px;width:100%;max-width:400px;box-shadow:0 25px 50px rgba(0,0,0,0.15)}
+.auth-brand{font-family:'Playfair Display',serif;font-size:28px;color:var(--brand);margin-bottom:4px}
 .auth-sub{font-size:13px;color:var(--text-3);margin-bottom:28px;font-weight:300}
-.auth-tabs{display:flex;background:var(--border);border-radius:12px;padding:4px;margin-bottom:24px}
-.auth-tab{flex:1;text-align:center;padding:9px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text-3);transition:all .2s}
+.auth-tabs{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:24px}
+.auth-tab{flex:1;text-align:center;padding:8px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text-3);transition:all .15s}
 .auth-tab.active{background:#fff;color:var(--brand);box-shadow:var(--shadow)}
-.auth-msg{font-size:12px;padding:10px 14px;border-radius:10px;margin-bottom:14px;display:none}
-.auth-msg.error{background:rgba(239,68,68,.1);color:#B91C1C;border:1px solid rgba(239,68,68,.2);display:block}
-.auth-msg.success{background:rgba(16,185,129,.1);color:#065F46;border:1px solid rgba(16,185,129,.2);display:block}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border-solid);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s;background:rgba(255,255,255,.8);color:var(--text)}
-.field input:focus{border-color:var(--brand-mid);box-shadow:var(--shadow-glow)}
-.btn-auth{width:100%;padding:13px;background:linear-gradient(135deg,var(--brand),var(--brand-mid));color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 4px 20px var(--brand-glow);letter-spacing:.2px}
-.btn-auth:hover{box-shadow:0 6px 28px var(--brand-glow);transform:translateY(-1px)}
-.auth-link{text-align:center;margin-top:16px;font-size:12px;color:var(--text-3)}
-.auth-link span{color:var(--brand-mid);cursor:pointer;font-weight:600}
+.auth-msg{font-size:12px;padding:10px 14px;border-radius:8px;margin-bottom:14px;display:none}
+.auth-msg.error{background:#FEF2F2;color:#B91C1C;display:block}
+.auth-msg.success{background:#ECFDF5;color:#065F46;display:block}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.field input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s;background:#fff;color:var(--text)}
+.field input:focus{border-color:var(--brand)}
+.btn-auth{width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-auth:hover{background:var(--brand-dark)}
+.auth-link{text-align:center;margin-top:14px;font-size:12px;color:var(--text-3)}
+.auth-link span{color:var(--brand);cursor:pointer;font-weight:500}
 
-/* ══ APP LAYOUT ══ */
+/* ─── APP LAYOUT ─── */
 #app{display:none;height:100vh;overflow:hidden}
 .layout{display:flex;height:100%}
 
-/* ══ SIDEBAR ══ */
-.sidebar{width:236px;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
-.sidebar-top{padding:24px 20px 18px;border-bottom:1px solid var(--border)}
-.sidebar-brand{font-family:'Playfair Display',serif;font-size:20px;color:var(--brand);letter-spacing:-.8px}
-.sidebar-semester{font-size:11px;color:var(--text-3);margin-top:3px;font-weight:400;letter-spacing:.2px}
-.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-.nav-group{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1.2px;padding:12px 10px 5px}
-.nav-btn{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);width:100%;border:none;background:none;font-family:inherit;text-align:left}
-.nav-btn:hover{background:var(--brand-light);color:var(--text)}
-.nav-btn.active{background:var(--brand-light);color:var(--brand-mid);font-weight:600}
+/* ─── SIDEBAR ─── */
+.sidebar{width:230px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sidebar-top{padding:22px 18px 18px;border-bottom:1px solid var(--border)}
+.sidebar-brand{font-family:'Playfair Display',serif;font-size:22px;color:var(--brand);letter-spacing:-.5px}
+.sidebar-semester{font-size:11px;color:var(--text-3);margin-top:2px;font-weight:400}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-group{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;padding:10px 10px 4px}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:all .12s;width:100%;border:none;background:none;font-family:inherit;text-align:left}
+.nav-btn:hover{background:var(--bg);color:var(--text)}
+.nav-btn.active{background:var(--brand-light);color:var(--brand)}
 .nav-btn .icon{width:20px;text-align:center;font-size:15px;flex-shrink:0}
-.nav-badge{margin-left:auto;background:var(--red-light);color:var(--red);font-size:10px;font-weight:700;padding:1px 8px;border-radius:20px;min-width:20px;text-align:center;border:1px solid rgba(239,68,68,.2)}
-.sidebar-bottom{padding:16px 20px;border-top:1px solid var(--border)}
-.sidebar-email{font-size:11px;color:var(--text-3);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.nav-badge{margin-left:auto;background:var(--red-light);color:var(--red);font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;min-width:20px;text-align:center}
+.sidebar-bottom{padding:14px 18px;border-top:1px solid var(--border)}
+.sidebar-email{font-size:11px;color:var(--text-3);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* ══ MAIN ══ */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:transparent}
-.topbar{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--glass-border);padding:15px 26px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+/* ─── MAIN ─── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);padding-bottom:0}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .topbar-left{display:flex;align-items:center;gap:10px}
-.topbar-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.5px}
+.topbar-title{font-size:16px;font-weight:700;color:var(--text)}
 .topbar-actions{display:flex;gap:8px}
-.content{flex:1;overflow-y:auto;padding:24px 26px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.content{flex:1;overflow-y:auto;padding:22px 24px}
 
-/* ══ BUTTONS ══ */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;text-decoration:none;letter-spacing:.1px}
-.btn:active{transform:scale(.96)!important}
-.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-mid));color:#fff}
-.btn-secondary{background:var(--surface-solid);color:var(--text-2);border:1px solid var(--border)}
-.btn-secondary:hover{background:var(--glass);border-color:var(--brand-mid)}
-.btn-danger{background:var(--red-light);color:#B91C1C;border:1px solid rgba(239,68,68,.2)}
-.btn-danger:hover{background:rgba(239,68,68,.18)}
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .12s;text-decoration:none}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-primary:hover{background:var(--brand-dark)}
+.btn-secondary{background:var(--surface);color:var(--text-2);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:var(--bg);border-color:#CBD5E1}
+.btn-danger{background:var(--red-light);color:#B91C1C}
+.btn-danger:hover{background:#FEE2E2}
 .btn-ghost{background:transparent;color:var(--text-3);padding:6px 8px}
-.btn-ghost:hover{background:var(--brand-light);color:var(--brand-mid)}
-.btn-sm{padding:5px 12px;font-size:12px}
+.btn-ghost:hover{background:var(--bg);color:var(--text-2)}
+.btn-sm{padding:5px 10px;font-size:12px}
 .btn-block{width:100%;justify-content:center}
-.btn-icon{width:36px;height:36px;padding:0;justify-content:center;font-size:16px}
+.btn-icon{width:34px;height:34px;padding:0;justify-content:center;font-size:16px}
 
-/* ══ STATS ══ */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-.stat{background:var(--surface);border-radius:var(--radius-lg);padding:18px 18px;border:1px solid var(--glass-border);box-shadow:var(--shadow)}
-.stat-label{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1px}
-.stat-num{font-size:34px;font-weight:300;font-family:'Playfair Display',serif;margin:6px 0 3px;line-height:1;letter-spacing:-1.5px}
-.stat-desc{font-size:11px;color:var(--text-3);font-weight:500}
+/* ─── STATS ─── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{background:var(--surface);border-radius:var(--radius-lg);padding:16px 18px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.stat-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
+.stat-num{font-size:30px;font-weight:300;font-family:'Playfair Display',serif;margin:4px 0 2px;line-height:1}
+.stat-desc{font-size:11px;color:var(--text-3)}
 
-/* ══ URGENCY ══ */
-.urgency{background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(239,68,68,.04));border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:22px}
-.urgency-head{font-size:10px;font-weight:700;color:#B91C1C;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
-.urgency-item{font-size:13px;color:#991B1B;padding:3px 0;display:flex;align-items:center;gap:8px}
-.urgency-dot{width:6px;height:6px;background:var(--red);border-radius:50%;flex-shrink:0}
+/* ─── URGENCY ─── */
+.urgency{background:linear-gradient(135deg,#FEF2F2,#FEE2E2);border:1px solid #FECACA;border-radius:var(--radius);padding:14px 16px;margin-bottom:20px}
+.urgency-head{font-size:11px;font-weight:700;color:#991B1B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.urgency-item{font-size:13px;color:#7F1D1D;padding:2px 0;display:flex;align-items:center;gap:8px}
+.urgency-dot{width:6px;height:6px;background:#EF4444;border-radius:50%;flex-shrink:0}
 
-/* ══ IMPORT BANNER ══ */
-.import-banner{background:var(--brand-light);border:1.5px dashed var(--brand-mid);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:22px;transition:border-color .2s,background .2s}
-.import-banner:hover{border-color:var(--brand);background:rgba(109,40,217,.12)}
-.import-banner-text{font-size:13px;font-weight:700;color:var(--brand-mid)}
-.import-banner-sub{font-size:11px;color:var(--brand);margin-top:1px;opacity:.8}
+/* ─── IMPORT BANNER ─── */
+.import-banner{background:linear-gradient(135deg,var(--brand-light),#DBEAFE);border:1.5px dashed #93C5FD;border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:20px;transition:border-color .15s}
+.import-banner:hover{border-color:var(--brand)}
+.import-banner-text{font-size:13px;font-weight:600;color:var(--brand)}
+.import-banner-sub{font-size:11px;color:#60A5FA;margin-top:1px}
 
-/* ══ SECTION ══ */
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.section-title{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1px}
+/* ─── SECTION ─── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
 
-/* ══ EVENT CARDS ══ */
+/* ─── EVENT CARDS ─── */
 .event-list{display:flex;flex-direction:column;gap:8px}
-.event-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--glass-border);padding:15px 18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);border-left:3px solid transparent}
-.event-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
-.event-card.done{opacity:.4}
+.event-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:13px 16px;display:flex;align-items:flex-start;gap:13px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow);border-left:3px solid var(--border)}
+.event-card:hover{box-shadow:var(--shadow-md);border-color:#CBD5E1;transform:translateY(-1px)}
+.event-card.done{opacity:.45}
 .event-card.t-prova{border-left-color:var(--red)}
-.event-card.t-trabalho{border-left-color:var(--brand-mid)}
+.event-card.t-trabalho{border-left-color:var(--brand)}
 .event-card.t-apresentacao{border-left-color:var(--green)}
 .event-card.t-outro{border-left-color:var(--amber)}
-.event-date{text-align:center;min-width:38px;flex-shrink:0}
-.event-day{font-size:26px;font-weight:700;font-family:'Playfair Display',serif;line-height:1;color:var(--text);letter-spacing:-1px}
-.event-mon{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-top:1px}
+.event-date{text-align:center;min-width:36px;flex-shrink:0}
+.event-day{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;line-height:1;color:var(--text)}
+.event-mon{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
 .event-body{flex:1;min-width:0}
-.event-name{font-size:13.5px;font-weight:600;color:var(--text);line-height:1.35}
-.event-meta{display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap}
-.badge{font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+.event-name{font-size:13px;font-weight:600;color:var(--text)}
+.event-meta{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
+.badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px;flex-shrink:0}
 .b-prova{background:var(--red-light);color:#B91C1C}
-.b-trabalho{background:var(--brand-light);color:var(--brand)}
+.b-trabalho{background:var(--brand-light);color:var(--brand-dark)}
 .b-apresentacao{background:var(--green-light);color:#065F46}
 .b-outro{background:var(--amber-light);color:#92400E}
 .event-disc{font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
-.event-note{font-size:11px;color:var(--text-3);font-style:italic;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.days-badge{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;flex-shrink:0}
+.event-note{font-size:11px;color:var(--text-3);font-style:italic;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.days-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
 .d-hot{background:var(--red-light);color:#B91C1C}
 .d-warn{background:var(--amber-light);color:#92400E}
 .d-ok{background:var(--green-light);color:#065F46}
-.d-past{background:var(--border);color:var(--text-3)}
-.event-actions{opacity:0;transition:opacity .15s;flex-shrink:0}
+.d-past{background:var(--bg);color:var(--text-3)}
+.event-actions{opacity:0;transition:opacity .12s;flex-shrink:0}
 .event-card:hover .event-actions{opacity:1}
 
-/* ══ FILTERS ══ */
-.filters{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
-.filter{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text-3);font-family:inherit}
-.filter.on{background:var(--brand-mid);color:#fff;border-color:var(--brand-mid);box-shadow:0 4px 12px var(--brand-glow)}
+/* ─── FILTERS ─── */
+.filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.filter{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text-3);transition:all .12s;font-family:inherit}
+.filter.on{background:var(--brand);color:#fff;border-color:var(--brand)}
 
-/* ══ CALENDAR ══ */
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.cal-month-title{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;color:var(--text);letter-spacing:-.5px;text-transform:capitalize}
-.cal-nav-arrows{display:flex;gap:6px}
-.cal-nav-btn{width:34px;height:34px;border-radius:50%;background:var(--surface-solid);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text-2);transition:all .15s}
-.cal-nav-btn:hover{background:var(--brand-light);border-color:var(--brand-mid);color:var(--brand-mid)}
-.cal-today-btn{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;background:var(--surface-solid);border:1px solid var(--border);cursor:pointer;color:var(--text-3);font-family:inherit;transition:all .15s}
-.cal-today-btn:hover{background:var(--brand-light);color:var(--brand-mid);border-color:var(--brand-mid)}
+/* ─── CALENDAR ─── */
+.cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.cal-month-title{font-size:18px;font-weight:700;font-family:'Playfair Display',serif;color:var(--text)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.cal-head{text-align:center;font-size:10px;font-weight:700;color:var(--text-3);padding:8px 0 10px;text-transform:uppercase;letter-spacing:.8px}
-.cal-cell{min-height:76px;background:var(--surface-solid);border-radius:12px;padding:8px 7px 6px;border:1px solid var(--border);cursor:pointer;transition:all .18s;position:relative}
-.cal-cell:hover{background:var(--brand-light);border-color:var(--brand-mid);transform:translateY(-1px)}
-.cal-cell.other{opacity:.25;pointer-events:none}
-.cal-cell.today{border-color:var(--brand-mid);border-width:2px;background:var(--brand-light)}
-.cal-cell.has-events{border-color:var(--border-solid)}
-.cal-num{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1}
-.cal-cell.today .cal-num{color:var(--brand-mid);background:var(--brand-mid);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;margin-bottom:5px}
-.cal-dot{font-size:9px;padding:1px 5px;border-radius:4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;line-height:1.4}
-.cal-dot.t-prova{background:var(--red-light);color:#B91C1C}
-.cal-dot.t-trabalho{background:var(--brand-light);color:var(--brand)}
-.cal-dot.t-apresentacao{background:var(--green-light);color:#065F46}
-.cal-dot.t-outro{background:var(--amber-light);color:#92400E}
-.cal-more{font-size:9px;color:var(--text-3);font-weight:600;margin-top:2px}
+.cal-head{text-align:center;font-size:10px;font-weight:700;color:var(--text-3);padding:6px 0;text-transform:uppercase;letter-spacing:.5px}
+.cal-cell{min-height:70px;background:var(--surface);border-radius:8px;padding:6px;border:1px solid var(--border);cursor:pointer;transition:background .1s}
+.cal-cell:hover{background:var(--brand-light)}
+.cal-cell.other{opacity:.25}
+.cal-cell.today{border-color:var(--brand);border-width:2px}
+.cal-num{font-size:12px;font-weight:700;margin-bottom:3px;color:var(--text)}
+.cal-cell.today .cal-num{color:var(--brand)}
+.cal-dot{font-size:9px;padding:1px 5px;border-radius:3px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Preview do dia selecionado */
-.cal-preview{background:var(--surface-solid);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;margin-top:16px;animation:fadeUp .2s ease}
-.cal-preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.cal-preview-title{font-size:14px;font-weight:700;color:var(--text);text-transform:capitalize}
-.cal-preview-empty{text-align:center;padding:20px;color:var(--text-3);font-size:13px}
-
-/* ══ DISCIPLINES ══ */
-.disc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.disc-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--glass-border);padding:20px;box-shadow:var(--shadow);border-left:4px solid var(--brand)}
+/* ─── DISCIPLINES ─── */
+.disc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.disc-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow);border-left:4px solid var(--brand);transition:box-shadow .15s}
+.disc-card:hover{box-shadow:var(--shadow-md)}
 .disc-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
-.disc-prof{font-size:12px;color:var(--text-3);margin-bottom:14px}
+.disc-prof{font-size:12px;color:var(--text-3);margin-bottom:12px}
 .disc-stats{display:flex;gap:10px}
 .disc-stat{font-size:12px;color:var(--text-2)}
 
-/* ══ EMPTY ══ */
-.empty{text-align:center;padding:60px 24px;color:var(--text-3)}
-.empty-icon{font-size:48px;margin-bottom:14px;filter:grayscale(0.2)}
+/* ─── EMPTY ─── */
+.empty{text-align:center;padding:56px 24px;color:var(--text-3)}
+.empty-icon{font-size:44px;margin-bottom:12px;filter:grayscale(0.3)}
 .empty-title{font-size:15px;font-weight:600;color:var(--text-2);margin-bottom:6px}
 .empty-sub{font-size:13px}
 
-/* ══ OVERLAY / MODAL ══ */
-.overlay{display:none;position:fixed;inset:0;background:rgba(10,5,30,.5);z-index:9000;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+/* ─── OVERLAY / MODAL ─── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:9000;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 .overlay.open{display:flex}
-.modal{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:24px 26px;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalIn .22s cubic-bezier(.4,0,.2,1)}
-.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-.modal-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.4px}
-.modal-close{background:var(--border);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text-3);transition:all .15s}
-.modal-close:hover{background:var(--red-light);color:var(--red)}
+.modal{background:var(--surface);border-radius:20px;padding:22px 24px;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700;color:var(--text)}
+.modal-close{background:var(--bg);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--text-3);transition:background .12s}
+.modal-close:hover{background:var(--border)}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:18px;border-top:1px solid var(--border);margin-top:18px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--border);margin-top:16px}
 
-/* ══ IMPORT MODAL ══ */
-.drop-zone{border:2px dashed var(--border-solid);border-radius:var(--radius);padding:28px;text-align:center;cursor:pointer;margin-bottom:14px;transition:all .2s;background:var(--surface-2)}
-.drop-zone:hover{border-color:var(--brand-mid);background:var(--brand-light)}
-.imp-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--border);margin-bottom:6px}
-.imp-item input{accent-color:var(--brand-mid);width:15px;height:15px;flex-shrink:0;margin-top:2px;cursor:pointer}
+/* ─── IMPORT MODAL ─── */
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;margin-bottom:14px;transition:all .15s}
+.drop-zone:hover{border-color:var(--brand);background:var(--brand-light)}
+.imp-item{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-bottom:6px}
+.imp-item input{accent-color:var(--brand);width:15px;height:15px;flex-shrink:0;margin-top:2px;cursor:pointer}
 
-/* ══ BOTTOM NAV ══ */
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-top:1px solid var(--glass-border);z-index:200;pointer-events:none;padding:8px 0 env(safe-area-inset-bottom,12px);justify-content:space-around;align-items:center;box-shadow:0 -8px 32px rgba(91,33,182,.1)}
-.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 14px;color:var(--text-3);font-size:10px;font-weight:600;min-width:56px;transition:color .15s;border-radius:10px;-webkit-tap-highlight-color:transparent}
-.bnav-item.on{color:var(--brand-mid)}
-.bnav-item.on .bnav-icon{transform:scale(1.15)}
-.bnav-icon{font-size:22px;line-height:1;transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
-.bnav-fab{display:flex;flex-direction:column;align-items:center;cursor:pointer;margin-top:-22px;-webkit-tap-highlight-color:transparent}
-.bnav-fab-btn{width:56px;height:56px;background:linear-gradient(135deg,var(--brand),var(--brand-mid));border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;box-shadow:0 6px 24px var(--brand-glow)}
-.bnav-fab-btn:active{transform:scale(.9)}
+/* ─── BOTTOM NAV (mobile) ─── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;pointer-events:none;padding:6px 0 env(safe-area-inset-bottom,10px);justify-content:space-around;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,.06)}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 12px;color:var(--text-3);font-size:10px;font-weight:600;min-width:52px;transition:color .12s}
+.bnav-item.on{color:var(--brand)}
+.bnav-icon{font-size:21px;line-height:1}
+.bnav-fab{display:flex;flex-direction:column;align-items:center;cursor:pointer;margin-top:-18px}
+.bnav-fab-btn{width:50px;height:50px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;box-shadow:0 4px 16px rgba(37,99,235,.4);transition:transform .12s}
+.bnav-fab-btn:active{transform:scale(.92)}
 
-/* ══ DRAWER ══ */
-.drawer-bg{display:none;position:fixed;inset:0;background:rgba(10,5,30,.5);z-index:300;pointer-events:none;opacity:0;transition:opacity .25s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.drawer-bg.open{opacity:1}
-.drawer{display:none;position:fixed;top:0;left:0;bottom:0;width:280px;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-right:1px solid var(--glass-border);z-index:301;flex-direction:column;box-shadow:8px 0 40px rgba(0,0,0,.2);transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
-.drawer.open{transform:translateX(0)}
-.drawer-item{display:flex;align-items:center;gap:10px;padding:12px 20px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent}
-.drawer-item:hover{background:var(--brand-light);color:var(--brand-mid)}
+/* ─── DRAWER (mobile) ─── */
+.drawer-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;pointer-events:none}
+.drawer{display:none;position:fixed;top:0;left:0;bottom:0;width:275px;background:var(--surface);z-index:301;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,.12);transform:translateX(-100%);transition:transform .25s ease}
+.drawer-item{display:flex;align-items:center;gap:10px;padding:11px 18px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:background .1s}
+.drawer-item:hover{background:var(--bg);color:var(--text)}
 .drawer-item .icon{font-size:16px;width:20px;text-align:center}
 
-/* ══ POMODORO ══ */
-.pomo-overlay{display:none;position:fixed;inset:0;background:rgba(10,5,30,.6);z-index:9100;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.pomo-overlay.open{display:flex}
-.pomo-modal{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:28px 28px 24px;width:340px;max-width:92vw;box-shadow:var(--shadow-lg);animation:modalIn .22s cubic-bezier(.4,0,.2,1);text-align:center}
-.pomo-ring{position:relative;width:160px;height:160px;margin:0 auto 20px}
-.pomo-ring svg{transform:rotate(-90deg)}
-.pomo-ring-bg{fill:none;stroke:var(--border);stroke-width:10}
-.pomo-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s linear,stroke .4s}
-.pomo-time{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.pomo-time-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--text);letter-spacing:-2px;line-height:1}
-.pomo-time-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-top:3px}
-.pomo-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
-.pomo-subtitle{font-size:12px;color:var(--text-3);margin-bottom:20px}
-.pomo-btns{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
-.pomo-sessions{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
-.pomo-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all .3s}
-.pomo-dot.done{background:var(--brand-mid)}
-.pomo-dot.active{background:var(--red);transform:scale(1.25)}
-.pomo-modes{display:flex;background:var(--surface-2);border-radius:12px;padding:3px;gap:2px;border:1px solid var(--border)}
-.pomo-mode{flex:1;padding:6px;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--text-3);transition:all .18s}
-.pomo-mode.on{background:var(--surface-solid);color:var(--brand-mid);box-shadow:var(--shadow)}
-
-/* ══ PROGRESS CHART ══ */
-.disc-progress{margin-bottom:24px}
-.disc-prog-item{margin-bottom:13px}
-.disc-prog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-.disc-prog-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
-.disc-prog-count{font-size:11px;color:var(--text-3);font-weight:500;flex-shrink:0}
-.disc-prog-bar{height:6px;background:var(--border);border-radius:4px;overflow:hidden}
-.disc-prog-fill{height:100%;border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1)}
-.prog-ring-wrap{display:flex;gap:12px;margin-bottom:22px}
-.prog-ring-card{flex:1;background:var(--surface);border-radius:var(--radius);border:1px solid var(--glass-border);padding:14px 12px;display:flex;flex-direction:column;align-items:center;box-shadow:var(--shadow)}
-.prog-ring-card svg{margin-bottom:6px}
-.prog-ring-label{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;text-align:center}
-.prog-ring-num{font-size:19px;font-weight:700;font-family:'Playfair Display',serif;color:var(--text);margin-bottom:2px;letter-spacing:-.5px}
-
-
-/* ══ WIDGET HOJE ══ */
-.widget-hoje{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);border-radius:var(--radius-xl);padding:22px 22px 18px;margin-bottom:22px;color:#fff;box-shadow:0 8px 28px var(--brand-glow);position:relative;overflow:hidden}
-.widget-hoje::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
-.widget-hoje::after{content:'';position:absolute;bottom:-40px;right:40px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.05);pointer-events:none}
-.widget-hoje-data{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-bottom:4px}
-.widget-hoje-titulo{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;letter-spacing:-.5px;margin-bottom:16px;line-height:1.2}
-.widget-hoje-items{display:flex;flex-direction:column;gap:8px;position:relative;z-index:1}
-.widget-hoje-item{background:rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.2);cursor:pointer;transition:background .15s}
-.widget-hoje-item:hover{background:rgba(255,255,255,.22)}
-.widget-hoje-item-hora{font-size:11px;font-weight:700;opacity:.8;min-width:38px;flex-shrink:0}
-.widget-hoje-item-nome{font-size:13px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.widget-hoje-item-disc{font-size:11px;opacity:.7;flex-shrink:0;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.widget-hoje-vazio{text-align:center;padding:12px 0;opacity:.75;font-size:13px;font-weight:500}
-.widget-hoje-footer{display:flex;align-items:center;justify-content:space-around;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
-.widget-hoje-stat{text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.widget-hoje-stat-num{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;line-height:1}
-.widget-hoje-stat-label{font-size:10px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
-.widget-hoje-divider{width:1px;height:32px;background:rgba(255,255,255,.2)}
-
-/* ══ PAGE TRANSITIONS ══ */
-@keyframes pageIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
-@keyframes pageInLeft{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
-@keyframes pageOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-18px)}}
-@keyframes pageOutRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(18px)}}
-#content.page-enter{animation:pageIn .22s cubic-bezier(.4,0,.2,1) both}
-#content.page-enter-back{animation:pageInLeft .22s cubic-bezier(.4,0,.2,1) both}
-#content.page-exit{animation:pageOut .14s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
-#content.page-exit-back{animation:pageOutRight .14s cubic-bezier(.4,0,.2,1) both;pointer-events:none}
-.topbar-title{transition:opacity .15s,transform .15s}
-.topbar-title.fade{opacity:0;transform:translateY(-4px)}
-
-/* ══ FAB MENU ══ */
-.fab-backdrop{position:fixed;inset:0;z-index:198;background:rgba(10,5,30,.4);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .22s}
-.fab-backdrop.open{opacity:1;pointer-events:auto}
-.fab-menu{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:199;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;opacity:0;transition:opacity .2s}
-.fab-menu.open{opacity:1;pointer-events:auto}
-@media(min-width:769px){
-  .fab-menu{bottom:auto;top:70px;right:24px;left:auto;transform:none;align-items:flex-end}
-}
-.fab-item{display:flex;align-items:center;gap:12px;background:var(--surface-solid);border:1px solid var(--glass-border);border-radius:14px;padding:11px 16px 11px 12px;box-shadow:var(--shadow-md);cursor:pointer;width:220px;transition:all .18s;transform:translateY(10px);opacity:0;-webkit-tap-highlight-color:transparent}
-.fab-menu.open .fab-item{transform:translateY(0);opacity:1}
-.fab-item:nth-child(1){transition-delay:.04s}
-.fab-item:nth-child(2){transition-delay:.07s}
-.fab-item:nth-child(3){transition-delay:.10s}
-.fab-item:nth-child(4){transition-delay:.13s}
-.fab-item:nth-child(5){transition-delay:.16s}
-.fab-item:hover{transform:translateY(-2px)!important;box-shadow:var(--shadow-lg)}
-.fab-item:active{transform:scale(.96)!important}
-.fab-item-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.fab-item-label{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
-.fab-item-sub{font-size:11px;color:var(--text-3);margin-top:1px}
-.bnav-fab-btn.open{transform:rotate(45deg) scale(1.05)}
-
-/* ══ PREMIUM ══ */
-.premium-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
-.premium-lock{display:inline-flex;align-items:center;gap:4px;background:var(--amber-light);color:#92400E;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;border:1px solid rgba(245,158,11,.3)}
-.premium-card{background:linear-gradient(135deg,#1E3A5F 0%,#0C4A6E 50%,#0284C7 100%);border-radius:var(--radius-xl);padding:28px 24px;color:#fff;position:relative;overflow:hidden;margin-bottom:20px}
-.premium-card::before{content:'⭐';position:absolute;right:-10px;top:-10px;font-size:100px;opacity:.08;line-height:1}
-.premium-card-title{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;letter-spacing:-.5px;margin-bottom:6px}
-.premium-card-sub{font-size:13px;opacity:.8;margin-bottom:20px;line-height:1.5}
-.premium-feature{display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:10px;opacity:.9}
-.premium-feature-icon{font-size:18px;flex-shrink:0}
-.premium-pix{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:16px;margin-top:18px;text-align:center}
-.premium-pix-key{font-size:15px;font-weight:700;letter-spacing:.5px;margin:6px 0;font-family:monospace}
-.premium-pix-label{font-size:11px;opacity:.7}
-.premium-status{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:13px;font-weight:600}
-.premium-status.active{background:var(--green-light);color:#065F46;border:1px solid rgba(16,185,129,.2)}
-.premium-status.inactive{background:var(--amber-light);color:#92400E;border:1px solid rgba(245,158,11,.2)}
-
-/* ══ MOBILE ══ */
-/* ══ ONBOARDING ══ */
-.onboarding{position:fixed;inset:0;z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px}
-.onboarding-bg{position:absolute;inset:0;background:linear-gradient(145deg,#082F49,#0284C7 60%,#0EA5E9);transition:opacity .4s}
-.onboarding-card{background:rgba(255,255,255,0.96);border-radius:28px;padding:40px 32px 32px;width:100%;max-width:400px;position:relative;z-index:1;box-shadow:0 32px 80px rgba(0,0,0,.25);text-align:center}
-.onboarding-icon{font-size:64px;margin-bottom:16px;line-height:1;display:block}
-.onboarding-title{font-size:24px;font-weight:700;font-family:'Playfair Display',serif;color:#082F49;letter-spacing:-.5px;margin-bottom:10px}
-.onboarding-desc{font-size:14px;color:#475569;line-height:1.65;margin-bottom:28px}
-.onboarding-dots{display:flex;gap:7px;justify-content:center;margin-bottom:24px}
-.onboarding-dot{width:8px;height:8px;border-radius:50%;background:#BAE6FD;transition:all .25s}
-.onboarding-dot.on{width:24px;border-radius:4px;background:#0EA5E9}
-.onboarding-actions{display:flex;gap:10px}
-.onboarding-skip{flex:1;padding:13px;background:transparent;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;color:#94A3B8;font-family:inherit;transition:all .15s}
-.onboarding-skip:hover{border-color:#0EA5E9;color:#0EA5E9}
-.onboarding-next{flex:2;padding:13px;background:linear-gradient(135deg,#0284C7,#0EA5E9);border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;font-family:inherit;box-shadow:0 4px 16px rgba(14,165,233,.35);transition:all .15s}
-.onboarding-next:hover{box-shadow:0 6px 22px rgba(14,165,233,.45);transform:translateY(-1px)}
-@media(max-width:480px){
-  .onboarding-card{padding:32px 24px 28px;border-radius:24px}
-  .onboarding-icon{font-size:52px}
-  .onboarding-title{font-size:20px}
-  .onboarding-desc{font-size:13px}
-}
-
-/* ══ IPAD / TABLET (768px - 1200px) ══ */
-@media(min-width:768px) and (max-width:1200px){
-  .sidebar{width:220px}
-  .sidebar-top{padding:20px 18px 14px}
-  .sidebar-brand{font-size:17px}
-  .sidebar-semester{font-size:11px}
-  .sidebar-nav{padding:10px 8px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-  .nav-group{font-size:9px;padding:10px 10px 4px;letter-spacing:.8px}
-  .nav-btn{padding:10px 12px;font-size:13px;gap:9px}
-  .nav-btn .icon{font-size:15px}
-  .sidebar-bottom{padding:14px 18px}
-  .topbar{padding:13px 20px}
-  .topbar-title{font-size:16px}
-  .content{padding:18px 20px}
-  .stats{grid-template-columns:repeat(2,1fr);gap:10px}
-  .stat{padding:14px 15px}
-  .stat-num{font-size:30px}
-  .disc-grid{grid-template-columns:1fr}
-  .cal-cell{min-height:64px;padding:6px 5px}
-  .cal-dot{font-size:8px;padding:1px 4px}
-  .cal-month-title{font-size:19px}
-  .widget-hoje{padding:20px 18px 16px}
-  .widget-hoje-titulo{font-size:20px}
-}
-
+/* ─── MOBILE ─── */
 @media(max-width:768px){
-  /* Desativar animações pesadas no mobile */
-  .content > *{animation:none}
-  .event-card{animation:none}
-  .stat{animation:none}
-  .disc-card{animation:none}
-  /* Manter só page transition */
-  #content.page-enter{animation:pageIn .2s ease both}
-  #content.page-enter-back{animation:pageInLeft .2s ease both}
-  #content.page-exit{animation:pageOut .12s ease both}
-  #content.page-exit-back{animation:pageOutRight .12s ease both}
   .sidebar{display:none}
-  .main{padding-bottom:76px}
-  .topbar{padding:10px 16px}
+  .main{padding-bottom:72px}
+  .topbar{padding:11px 16px}
   .topbar .btn-secondary,.topbar .btn-primary{display:none}
-  .topbar-title{font-size:15px;font-weight:700;letter-spacing:-.3px}
-  .content{padding:12px 14px}
-  .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
-  .stat{padding:12px 13px;border-radius:12px}
-  .stat-num{font-size:26px;margin:4px 0 2px}
-  .stat-label{font-size:8px}
-  .stat-desc{font-size:10px}
+  .topbar-title{font-size:15px}
+  .content{padding:14px 16px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .stat{padding:13px 14px;border-radius:var(--radius)}
+  .stat-num{font-size:26px}
   .disc-grid{grid-template-columns:1fr}
   .field-row{grid-template-columns:1fr}
-  .filters{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:3px;gap:6px;margin-bottom:12px}
+  .filters{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
   .filters::-webkit-scrollbar{display:none}
-  .filter{white-space:nowrap;flex-shrink:0;padding:6px 14px;font-size:12px}
+  .filter{white-space:nowrap;flex-shrink:0}
   .overlay{align-items:flex-end}
-  .modal{border-radius:24px 24px 0 0;width:100%;max-width:100%;margin:0;padding:6px 18px 28px;max-height:90vh}
-  .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:8px auto 14px}
-  .modal-title{font-size:16px}
+  .modal{border-radius:22px 22px 0 0;width:100%;max-width:100%;margin:0;padding:6px 20px 28px;max-height:88vh}
+  .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:8px auto 16px}
   .bottom-nav.visible{display:flex!important;pointer-events:auto!important}
   #btn-hamburger{display:flex!important}
   .event-card:hover{transform:none}
-  .event-card{padding:11px 13px;border-radius:12px;gap:10px}
-  .event-day{font-size:20px}
-  .event-name{font-size:13px}
-  .btn{-webkit-tap-highlight-color:transparent}
-  .urgency{border-radius:12px;padding:11px 13px;margin-bottom:14px}
-  .section-head{margin-bottom:10px}
-  .section-title{font-size:9px}
-  .widget-hoje{padding:16px 16px 14px;border-radius:18px;margin-bottom:14px}
-  .widget-hoje-data{font-size:10px}
-  .widget-hoje-titulo{font-size:18px;margin-bottom:12px}
-  .widget-hoje-item{padding:8px 11px;border-radius:10px}
-  .widget-hoje-item-nome{font-size:12px}
-  .widget-hoje-stat-num{font-size:18px}
-  .widget-hoje-stat-label{font-size:9px}
-  .cal-cell{min-height:56px;padding:5px 4px}
-  .cal-num{font-size:11px}
-  .cal-dot{font-size:8px;padding:1px 3px}
-  .cal-month-title{font-size:17px}
-  .prog-ring-wrap{gap:8px;margin-bottom:14px}
-  .prog-ring-card{padding:10px 8px}
-  .prog-ring-num{font-size:16px}
-  .prog-ring-label{font-size:8px}
-  .disc-progress{margin-bottom:16px}
 }
+/* ── DARK MODE ── */
+[data-theme="dark"] body{background:var(--bg);color:var(--text)}
+[data-theme="dark"] .sidebar,[data-theme="dark"] .topbar,[data-theme="dark"] .modal,[data-theme="dark"] .bottom-nav,[data-theme="dark"] .auth-card,[data-theme="dark"] .event-card,[data-theme="dark"] .stat,[data-theme="dark"] .disc-card,[data-theme="dark"] .grupo-card,[data-theme="dark"] .cal-cell{background:var(--surface);border-color:var(--border);color:var(--text)}
+[data-theme="dark"] .field input,[data-theme="dark"] .field textarea,[data-theme="dark"] select{background:var(--surface-2)!important;color:var(--text)!important;border-color:var(--border)!important}
+[data-theme="dark"] .overlay{background:rgba(0,0,0,.6)}
+[data-theme="dark"] .nav-btn:hover{background:var(--brand-light)}
+[data-theme="dark"] .btn-secondary{background:var(--surface-2);border-color:var(--border);color:var(--text-2)}
+[data-theme="dark"] #loading{background:linear-gradient(135deg,#041526,#0369A1)!important}
+[data-theme="dark"] #auth{background:linear-gradient(145deg,#082F49,#0369A1,#0EA5E9)}
+[data-theme="dark"] .auth-card{background:var(--surface)}
+[data-theme="dark"] .cal-cell.today{border-color:var(--brand-mid)}
+[data-theme="dark"] .filter.on{background:var(--brand-mid);color:#fff}
+[data-theme="dark"] .urgency{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2)}
+[data-theme="dark"] .import-banner{background:var(--brand-light);border-color:var(--brand-mid)}
+[data-theme="dark"] .tabs{background:var(--surface-2)}
+[data-theme="dark"] .tab.on{background:var(--surface)}
+[data-theme="dark"] .nav-badge{background:rgba(239,68,68,.2);color:#FCA5A5}
+[data-theme="dark"] .bnav-fab-btn{background:var(--brand)}
+
+/* ── MELHORIAS ── */
+.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-mid));box-shadow:0 4px 12px rgba(14,165,233,.25)}
+.sidebar-brand{color:var(--brand)!important}
+.nav-btn.active{background:var(--brand-light);color:var(--brand);font-weight:600}
+.auth-card{background:#fff;border-radius:24px;padding:36px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.auth-brand{font-family:'Playfair Display',serif;font-size:28px;color:var(--brand);margin-bottom:4px}
+.btn-auth{background:linear-gradient(135deg,var(--brand),var(--brand-mid));box-shadow:0 4px 16px rgba(14,165,233,.3)}
+.filter.on{background:var(--brand);color:#fff;border-color:var(--brand)}
 </style>
 </head>
 <body>
 
 <!-- LOADING -->
-<div id="loading">
-  <div class="loading-logo">Simplo</div>
-  <div class="loading-sub">sua agenda acadêmica</div>
+<div id="loading" style="background:linear-gradient(145deg,#0C4A6E,#0284C7 50%,#0EA5E9)">
+  <div class="loading-logo">Simplo Estudante</div>
+  <div class="loading-sub">Simplo Estudante</div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
-</div>
-
-<!-- ONBOARDING -->
-<div id="onboarding" class="onboarding" style="display:none">
-  <div class="onboarding-bg"></div>
-  <div class="onboarding-card">
-    <span class="onboarding-icon" id="ob-icon">🎓</span>
-    <div class="onboarding-title" id="ob-title">Bem-vindo ao Simplo!</div>
-    <div class="onboarding-desc" id="ob-desc">Sua agenda acadêmica inteligente. Organize provas, trabalhos e apresentações em um só lugar.</div>
-    <div class="onboarding-dots" id="ob-dots"></div>
-    <div class="onboarding-actions">
-      <button class="onboarding-skip" onclick="finishOnboarding()">Pular</button>
-      <button class="onboarding-next" id="ob-next" onclick="nextOnboarding()">Próximo →</button>
-    </div>
-  </div>
 </div>
 
 <!-- AUTH -->
@@ -729,58 +436,26 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
   <div class="auth-card">
     <div class="auth-brand">Simplo Estudante</div>
     <div class="auth-sub">Sua agenda acadêmica inteligente</div>
-
-    <!-- Tela normal de login/cadastro -->
-    <div id="auth-normal">
-      <div class="auth-tabs">
-        <div class="auth-tab active" onclick="setTab('login')">Entrar</div>
-        <div class="auth-tab" onclick="setTab('register')">Criar conta</div>
-      </div>
-      <div id="auth-msg" class="auth-msg"></div>
-      <div class="field" id="field-nome" style="display:none">
-        <label>Nome completo</label>
-        <input type="text" id="a-nome" placeholder="Seu nome completo">
-      </div>
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="a-email" placeholder="seu@email.com">
-      </div>
-      <div class="field">
-        <label>Senha</label>
-        <div style="position:relative">
-          <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()" style="width:100%;padding:11px 42px 11px 14px;border:1.5px solid var(--border-solid);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s;background:rgba(255,255,255,.8);color:var(--text)">
-          <button type="button" onclick="toggleSenha('a-pass','olho-pass')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3);padding:0;line-height:1" id="olho-pass">👁</button>
-        </div>
-      </div>
-      <button class="btn-auth" id="auth-btn" onclick="doAuth()">Entrar</button>
-      <div class="auth-link" id="forgot-wrap">
-        <span onclick="doForgot()">Esqueci minha senha</span>
-      </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="setTab('login')">Entrar</div>
+      <div class="auth-tab" onclick="setTab('register')">Criar conta</div>
     </div>
-
-    <!-- Tela de redefinir senha -->
-    <div id="auth-reset" style="display:none">
-      <div style="text-align:center;margin-bottom:20px">
-        <div style="font-size:36px;margin-bottom:8px">🔐</div>
-        <div style="font-size:15px;font-weight:700;color:var(--text)">Nova senha</div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:4px">Digite sua nova senha abaixo</div>
-      </div>
-      <div id="reset-msg" class="auth-msg"></div>
-      <div class="field">
-        <label>Nova senha</label>
-        <div style="position:relative">
-          <input type="password" id="reset-pass" placeholder="Mínimo 6 caracteres" style="width:100%;padding:11px 42px 11px 14px;border:1.5px solid var(--border-solid);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:rgba(255,255,255,.8);color:var(--text)">
-          <button type="button" onclick="toggleSenha('reset-pass','olho-r1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3);padding:0;line-height:1" id="olho-r1">👁</button>
-        </div>
-      </div>
-      <div class="field">
-        <label>Confirmar senha</label>
-        <div style="position:relative">
-          <input type="password" id="reset-pass2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')doReset()" style="width:100%;padding:11px 42px 11px 14px;border:1.5px solid var(--border-solid);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:rgba(255,255,255,.8);color:var(--text)">
-          <button type="button" onclick="toggleSenha('reset-pass2','olho-r2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3);padding:0;line-height:1" id="olho-r2">👁</button>
-        </div>
-      </div>
-      <button class="btn-auth" id="reset-btn" onclick="doReset()">Salvar nova senha</button>
+    <div id="auth-msg" class="auth-msg"></div>
+    <div class="field" id="field-nome" style="display:none">
+      <label>Nome completo</label>
+      <input type="text" id="a-nome" placeholder="Seu nome completo">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="a-email" placeholder="seu@email.com">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()">
+    </div>
+    <button class="btn-auth" id="auth-btn" onclick="doAuth()">Entrar</button>
+    <div class="auth-link" id="forgot-wrap">
+      <span onclick="doForgot()">Esqueci minha senha</span>
     </div>
   </div>
 </div>
@@ -805,11 +480,8 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
         <button class="nav-btn" onclick="openModal('cfg')"><span class="icon">⚙️</span>Configurações</button>
       </nav>
       <div class="sidebar-bottom">
-        <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;min-width:0">
-          <div id="s-nome" style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1"></div>
-          <span id="s-premium-badge" style="display:none;font-size:12px;flex-shrink:0" title="Conta Premium">⭐</span>
-        </div>
-        <div id="s-email" style="font-size:11px;color:var(--text-3);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%"></div>
+        <div id="s-nome" style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px"></div>
+        <div class="sidebar-email" id="s-email"></div>
         <button class="btn btn-secondary btn-sm btn-block" onclick="doLogout()">Sair</button>
       </div>
     </aside>
@@ -821,9 +493,8 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
           <span class="topbar-title" id="page-title">Resumo</span>
         </div>
         <div class="topbar-actions">
-          <button class="btn btn-primary" onclick="toggleFabMenu()" style="gap:6px" id="topbar-fab-btn">
-            <span id="topbar-fab-icon" style="font-size:18px;line-height:1;transition:transform .2s">+</span> Criar
-          </button>
+          <button class="btn btn-secondary" onclick="openModal('import')">📎 Importar</button>
+          <button class="btn btn-primary" onclick="openModal('evento')">+ Novo evento</button>
         </div>
       </header>
       <main class="content" id="content"></main>
@@ -835,35 +506,10 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 <nav class="bottom-nav" id="bottom-nav">
   <div class="bnav-item on" id="bn-resumo" onclick="go('resumo');bnav('resumo')"><span class="bnav-icon">📋</span>Resumo</div>
   <div class="bnav-item" id="bn-calendario" onclick="go('calendario');bnav('calendario')"><span class="bnav-icon">📅</span>Agenda</div>
-  <div class="bnav-fab" onclick="toggleFabMenu()"><div class="bnav-fab-btn" id="fab-btn">+</div></div>
+  <div class="bnav-fab" onclick="openModal('evento')"><div class="bnav-fab-btn">+</div></div>
   <div class="bnav-item" id="bn-eventos" onclick="go('eventos','todos');bnav('eventos')"><span class="bnav-icon">📚</span>Eventos</div>
   <div class="bnav-item" id="bn-mais" onclick="openDrawer()"><span class="bnav-icon">☰</span>Mais</div>
 </nav>
-
-<!-- FAB MENU -->
-<div class="fab-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
-<div class="fab-menu" id="fab-menu">
-  <div class="fab-item" onclick="closeFabMenu();openModal('evento')">
-    <div class="fab-item-icon" style="background:#EFF6FF"><span>📝</span></div>
-    <div><div class="fab-item-label">Novo evento</div><div class="fab-item-sub">Prova, trabalho, apresentação</div></div>
-  </div>
-  <div class="fab-item" onclick="closeFabMenu();openModal('disc')">
-    <div class="fab-item-icon" style="background:#F0FDF4"><span>📚</span></div>
-    <div><div class="fab-item-label">Nova disciplina</div><div class="fab-item-sub">Adicionar matéria</div></div>
-  </div>
-  <div class="fab-item" onclick="closeFabMenu();abrirImportComGate()">
-    <div class="fab-item-icon" style="background:#FFF7ED"><span>🤖</span></div>
-    <div><div class="fab-item-label">Importar com IA</div><div class="fab-item-sub" id="fab-import-sub">Requer Premium</div></div>
-  </div>
-  <div class="fab-item" onclick="closeFabMenu();openGrupoEntry('criar')">
-    <div class="fab-item-icon" style="background:#F5F3FF"><span>👥</span></div>
-    <div><div class="fab-item-label">Criar grupo</div><div class="fab-item-sub">Novo grupo de estudo</div></div>
-  </div>
-  <div class="fab-item" onclick="closeFabMenu();openPomo()">
-    <div class="fab-item-icon" style="background:#FFF1F2"><span>🍅</span></div>
-    <div><div class="fab-item-label">Pomodoro</div><div class="fab-item-sub">Iniciar sessão de foco</div></div>
-  </div>
-</div>
 
 <!-- DRAWER -->
 <div class="drawer-bg" id="dbg" onclick="closeDrawer()"></div>
@@ -883,7 +529,7 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
     <div class="drawer-item" onclick="go('grupos');closeDrawer()"><span class="icon">👥</span>Grupos</div>
     <div class="drawer-item" onclick="openModal('perfil');closeDrawer()"><span class="icon">👤</span>Meu Perfil</div>
     <div class="drawer-item" onclick="openModal('cfg');closeDrawer()"><span class="icon">⚙️</span>Configurações</div>
-    <div class="drawer-item" onclick="abrirImportComGate();closeDrawer()"><span class="icon">📎</span>Importar cronograma</div>
+    <div class="drawer-item" onclick="openModal('import');closeDrawer()"><span class="icon">📎</span>Importar cronograma</div>
   </nav>
   <div style="padding:14px 18px;border-top:1px solid var(--border)">
     <button class="btn btn-secondary btn-block" onclick="doLogout()">Sair da conta</button>
@@ -963,12 +609,12 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
     <div style="background:var(--brand-light);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--brand);font-weight:500">
       💡 Suba um PDF ou cole o texto — o GPT extrai os eventos automaticamente.
     </div>
-    <div class="drop-zone" onclick="triggerFileInput()">
+    <div class="drop-zone" onclick="document.getElementById('imp-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--brand)'" ondragleave="this.style.borderColor=''" ondrop="onDrop(event)">
       <div style="font-size:28px;margin-bottom:6px">📄</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text-2)">Toque para selecionar o PDF</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-2)">Clique ou arraste o PDF</div>
       <div style="font-size:11px;color:var(--text-3);margin-top:2px">Ou cole o texto abaixo</div>
     </div>
-    <input type="file" id="imp-file" accept=".pdf,application/pdf" style="display:none;position:absolute;opacity:0" onchange="onFile(event)">
+    <input type="file" id="imp-file" accept=".pdf" style="display:none" onchange="onFile(event)">
     <div id="pdf-msg" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:10px"></div>
     <div class="field"><label>Ou cole o texto do cronograma</label>
       <textarea id="imp-text" placeholder="Prova AV1 - Psicopatologia - 15/05&#10;Entrega trabalho - 20/05" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;min-height:100px;resize:vertical"></textarea>
@@ -1005,22 +651,24 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
     <div class="modal-title">⚙️ Configurações</div>
     <button class="modal-close" onclick="closeModal('cfg')">✕</button>
   </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:4px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px">
     <span style="font-size:13px;font-weight:600;color:var(--text)">🌙 Modo escuro</span>
     <div id="dark-toggle" onclick="toggleDark()" style="width:44px;height:24px;border-radius:12px;background:var(--border);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0">
       <div id="dark-knob" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px">
-    <div>
-      <span style="font-size:13px;font-weight:600;color:var(--text)">🪟 Efeito vidro (Glass)</span>
-      <div style="font-size:11px;color:var(--text-3);margin-top:2px">Superfícies translúcidas com blur</div>
+  <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:12px;font-weight:600;color:var(--text)">🤖 OpenAI API Key</span>
+      <span id="cfg-status" style="font-size:11px"></span>
     </div>
-    <div id="glass-toggle" onclick="toggleGlass()" style="width:44px;height:24px;border-radius:12px;background:var(--brand-mid);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0">
-      <div id="glass-knob" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:22px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>
+    <div style="display:flex;gap:6px">
+      <input type="password" id="cfg-key" placeholder="sk-proj-..." style="flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;outline:none;background:var(--bg);color:var(--text)">
+      <button class="btn btn-primary btn-sm" onclick="salvarCfg()">Salvar</button>
+      <button class="btn btn-danger btn-sm" onclick="removeKey()">✕</button>
     </div>
+    <div style="font-size:10px;color:var(--text-3);margin-top:5px">🔒 Salva só no seu navegador · platform.openai.com</div>
   </div>
-  <div id="cfg-api-section" style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px"></div>
   <div class="modal-actions" style="padding-top:0;border-top:none;margin-top:0">
     <button class="btn btn-secondary btn-block" onclick="closeModal('cfg')">Fechar</button>
   </div>
@@ -1162,20 +810,13 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
     <div class="modal-title">👤 Meu Perfil</div>
     <button class="modal-close" onclick="closeModal('perfil')">✕</button>
   </div>
-  <div style="display:flex;align-items:center;gap:14px;background:var(--brand-light);border-radius:12px;padding:14px;margin-bottom:14px">
+  <div style="display:flex;align-items:center;gap:14px;background:var(--brand-light);border-radius:12px;padding:14px;margin-bottom:18px">
     <div id="perfil-avatar" style="width:52px;height:52px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0">?</div>
-    <div style="flex:1;min-width:0">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <div id="perfil-nome-display" style="font-size:15px;font-weight:700;color:var(--text)">Sem nome</div>
-        <span id="perfil-premium-badge"></span>
-      </div>
+    <div>
+      <div id="perfil-nome-display" style="font-size:15px;font-weight:700;color:var(--text)">Sem nome</div>
       <div id="perfil-curso-display" style="font-size:12px;color:var(--text-3);margin-top:1px"></div>
     </div>
   </div>
-
-  <!-- Status Premium -->
-  <div id="perfil-premium-card" style="margin-bottom:16px"></div>
-
   <div class="field"><label>Nome completo</label><input type="text" id="p-nome" placeholder="Ex: Emanuel Silva"></div>
   <div class="field-row">
     <div class="field"><label>Curso</label><input type="text" id="p-curso" placeholder="Ex: Psicologia"></div>
@@ -1238,89 +879,17 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 </div>
 </div>
 
-<!-- MODAL: PREMIUM -->
-<div class="overlay" id="m-premium">
-<div class="modal" style="max-width:420px">
-  <div class="modal-head">
-    <div class="modal-title">✨ Simplo Premium</div>
-    <button class="modal-close" onclick="closeModal('premium')">✕</button>
-  </div>
-
-  <div id="premium-status-bar"></div>
-
-  <div class="premium-card">
-    <div class="premium-card-title">Desbloqueie a IA</div>
-    <div class="premium-card-sub">Importe cronogramas automaticamente, deixe a IA organizar seus eventos em segundos.</div>
-    <div class="premium-feature"><span class="premium-feature-icon">🤖</span><span>Importação de cronograma por IA</span></div>
-    <div class="premium-feature"><span class="premium-feature-icon">📅</span><span>Leitura automática de PDF/foto</span></div>
-    <div class="premium-feature"><span class="premium-feature-icon">⚡</span><span>Criação de múltiplos eventos de uma vez</span></div>
-    <div class="premium-feature"><span class="premium-feature-icon">🔄</span><span>Atualizações futuras incluídas</span></div>
-    <div class="premium-pix">
-      <div class="premium-pix-label">Acesso vitalício por apenas</div>
-      <div class="premium-pix-key">R$ 9,90</div>
-      <div class="premium-pix-label" style="margin-top:8px">Pague via PIX e envie o comprovante</div>
-      <div class="premium-pix-key" id="pix-key" style="margin-top:6px;cursor:pointer" onclick="copyPix()">emanu0707@gmail.com</div>
-      <div id="pix-copied" style="font-size:11px;opacity:0;transition:opacity .3s;margin-top:4px">✓ Copiado!</div>
-    </div>
-  </div>
-
-  <div style="font-size:12px;color:var(--text-3);text-align:center;line-height:1.6">
-    Após o pagamento, envie o comprovante para<br>
-    <strong style="color:var(--brand-mid)">emanu0707@gmail.com</strong><br>
-    e seu acesso será liberado em até 24h. 🚀
-  </div>
-</div>
-</div>
-
-<!-- MODAL: POMODORO -->
-<div class="pomo-overlay" id="pomo-overlay">
-<div class="pomo-modal">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-    <div class="pomo-modes" style="flex:1">
-      <button class="pomo-mode on" id="pomo-m-foco" onclick="setPomoMode('foco')">🎯 Foco</button>
-      <button class="pomo-mode" id="pomo-m-curto" onclick="setPomoMode('curto')">☕ Pausa curta</button>
-      <button class="pomo-mode" id="pomo-m-longo" onclick="setPomoMode('longo')">🛋 Pausa longa</button>
-    </div>
-    <button onclick="closePomo()" style="margin-left:10px;background:var(--bg);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;color:var(--text-3);display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
-  </div>
-  <div class="pomo-ring">
-    <svg width="160" height="160" viewBox="0 0 160 160">
-      <circle class="pomo-ring-bg" cx="80" cy="80" r="70"/>
-      <circle class="pomo-ring-fill" id="pomo-ring-fill" cx="80" cy="80" r="70"
-        stroke-dasharray="439.82" stroke-dashoffset="0"/>
-    </svg>
-    <div class="pomo-time">
-      <div class="pomo-time-num" id="pomo-display">25:00</div>
-      <div class="pomo-time-label" id="pomo-phase-label">Foco</div>
-    </div>
-  </div>
-  <div class="pomo-title" id="pomo-ev-title">Sessão de estudo</div>
-  <div class="pomo-subtitle" id="pomo-ev-disc"></div>
-  <div class="pomo-sessions" id="pomo-dots"></div>
-  <div class="pomo-btns">
-    <button class="btn btn-secondary btn-sm" onclick="resetPomo()">↺ Reset</button>
-    <button class="btn btn-primary" id="pomo-btn" onclick="togglePomo()" style="min-width:90px">▶ Iniciar</button>
-    <button class="btn btn-secondary btn-sm" onclick="skipPomo()">⏭ Pular</button>
-  </div>
-  <div style="font-size:11px;color:var(--text-3);text-align:center">Sessões hoje: <span id="pomo-count" style="font-weight:700;color:var(--brand)">0</span></div>
-</div>
-</div>
-
 <script>
-// ── DARK MODE + GLASS INIT ──
+// ── DARK MODE INIT ──
 (function(){
   const saved = localStorage.getItem('dark_mode');
   if (saved === '1') document.documentElement.setAttribute('data-theme','dark');
+})();
 
-  // iOS: ativar modo sólido por padrão (glass é pesado no Safari)
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const glassSaved = localStorage.getItem('glass_mode');
-  // Se nunca configurou e é iOS, desliga glass por padrão
-  if (glassSaved === null && isIOS) {
-    document.documentElement.setAttribute('data-glass','off');
-  } else if (glassSaved === '0') {
-    document.documentElement.setAttribute('data-glass','off');
-  }
+// ── DARK MODE INIT ──
+(function(){
+  if(localStorage.getItem('dark_mode')==='1')
+    document.documentElement.setAttribute('data-theme','dark');
 })();
 
 // ── SUPABASE ──
@@ -1329,8 +898,6 @@ const SB = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmcXhoaXdmaGR5bHd0dXNuYnNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjY2MjQsImV4cCI6MjA5MjU0MjYyNH0.UoQRoDw4qBCdOLA7jbFeSeycUM84mN-b5pwwnv1UBWg'
 );
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-// Fallback para Safari que bloqueia workers externos
-if(typeof Worker === 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='';
 
 // ── STATE ──
 let U=null, discs=[], evts=[], pg='resumo', flt='todos', evId=null, discId=null, calDt=new Date(), impEvts=[];
@@ -1353,18 +920,6 @@ function ftipo(t){return{prova:'Prova',trabalho:'Trabalho',apresentacao:'Apresen
 function gDisc(id){return discs.find(d=>d.id===id)}
 
 // ── AUTH ──
-function toggleSenha(inputId, btnId){
-  const inp=$(inputId), btn=$(btnId);
-  if(!inp) return;
-  if(inp.type==='password'){
-    inp.type='text';
-    if(btn) btn.textContent='🙈';
-  } else {
-    inp.type='password';
-    if(btn) btn.textContent='👁';
-  }
-}
-
 let aMode='login';
 function setTab(m){
   aMode=m;
@@ -1378,33 +933,13 @@ function aMsg(msg,type){const e=$('auth-msg');e.textContent=msg;e.className='aut
 async function doAuth(){
   const email=$('a-email').value.trim(),pass=$('a-pass').value;
   if(!email||!pass){aMsg('Preencha email e senha!','error');return}
-  if(aMode==='register'){
-    const nome=$('a-nome')?.value.trim()||'';
-    if(!nome){aMsg('Preencha seu nome!','error');return}
-  }
   $('auth-btn').textContent='...';$('auth-btn').disabled=true;
   try{
-    if(aMode==='login'){
-      const r=await SB.auth.signInWithPassword({email,password:pass});
-      if(r.error)throw r.error;
-    } else {
-      const nome=$('a-nome')?.value.trim()||'';
-      // 1. Criar usuário
-      const r=await SB.auth.signUp({email,password:pass,options:{data:{nome}}});
-      if(r.error)throw r.error;
-      // 2. Salvar nome no perfil (com retry pois o trigger pode demorar)
-      if(r.data?.user){
-        const uid = r.data.user.id;
-        setTimeout(async()=>{
-          try{
-            await SB.from('perfis').upsert({id:uid,nome,instituicao:'UNIVALI'},{onConflict:'id'});
-          }catch(e){ console.log('perfil upsert:', e.message) }
-        }, 1000);
-      }
-      aMsg('Conta criada! Verifique seu email para confirmar.','success');
-      $('auth-btn').textContent='Criar conta';$('auth-btn').disabled=false;
-      return;
-    }
+    let r=aMode==='login'
+      ?await SB.auth.signInWithPassword({email,password:pass})
+      :await SB.auth.signUp({email,password:pass});
+    if(r.error)throw r.error;
+    if(aMode==='register'){aMsg('Conta criada! Verifique seu email.','success');$('auth-btn').textContent='Criar conta';$('auth-btn').disabled=false;return}
   }catch(e){
     const m={'Invalid login credentials':'Email ou senha incorretos.','Email not confirmed':'Confirme seu email antes de entrar.','User already registered':'Email já cadastrado.'};
     aMsg(m[e.message]||e.message,'error');
@@ -1413,88 +948,25 @@ async function doAuth(){
 }
 async function doForgot(){
   const email=$('a-email').value.trim();
-  if(!email){aMsg('Digite seu email primeiro!','error');return}
-  $('auth-btn').textContent='Enviando...';$('auth-btn').disabled=true;
-  const{error}=await SB.auth.resetPasswordForEmail(email,{
-    redirectTo: window.location.origin+window.location.pathname+'?reset=1'
-  });
-  $('auth-btn').textContent='Entrar';$('auth-btn').disabled=false;
-  if(error) aMsg(error.message,'error');
-  else aMsg('✓ Email enviado! Verifique sua caixa de entrada.','success');
+  if(!email){aMsg('Digite seu email!','error');return}
+  const{error}=await SB.auth.resetPasswordForEmail(email);
+  if(error)aMsg(error.message,'error');else aMsg('Email enviado!','success');
 }
-async function doReset(){
-  const pass=$('reset-pass').value;
-  const pass2=$('reset-pass2').value;
-  const msg=$('reset-msg');
-  if(!pass||pass.length<6){msg.textContent='Senha deve ter pelo menos 6 caracteres.';msg.className='auth-msg error';return}
-  if(pass!==pass2){msg.textContent='As senhas não coincidem.';msg.className='auth-msg error';return}
-  $('reset-btn').textContent='Salvando...';$('reset-btn').disabled=true;
-  const{error}=await SB.auth.updateUser({password:pass});
-  if(error){
-    const erros={
-      'New password should be different from the old password.':'A nova senha deve ser diferente da senha atual.',
-      'Password should be at least 6 characters.':'A senha deve ter pelo menos 6 caracteres.',
-      'Auth session missing!':'Sessão expirada. Solicite um novo link de recuperação.'
-    };
-    msg.textContent=erros[error.message]||error.message;
-    msg.className='auth-msg error';
-    $('reset-btn').textContent='Salvar nova senha';$('reset-btn').disabled=false;
-  } else {
-    msg.textContent='✓ Senha alterada! Redirecionando...';msg.className='auth-msg success';
-    setTimeout(()=>window.location.href=window.location.pathname,1500);
-  }
-}
-
-function checkResetFlow(){
-  const hash=window.location.hash;
-  const params=new URLSearchParams(window.location.search);
-
-  // Link expirado ou inválido
-  if(hash.includes('error=access_denied')||hash.includes('otp_expired')){
-    hide('loading');
-    $('auth').style.display='flex';
-    $('auth-normal').style.display='block';
-    $('auth-reset').style.display='none';
-    // Mostrar mensagem de erro amigável
-    const msg=$('auth-msg');
-    msg.textContent='⚠️ Link expirado. Solicite uma nova recuperação de senha.';
-    msg.className='auth-msg error';
-    // Limpar hash da URL
-    history.replaceState(null,'',window.location.pathname);
-    return true;
-  }
-
-  // Link válido de recovery
-  if(hash.includes('type=recovery')||params.get('reset')==='1'){
-    hide('loading');
-    $('auth').style.display='flex';
-    $('auth-normal').style.display='none';
-    $('auth-reset').style.display='block';
-    return true;
-  }
-
-  return false;
-}
-
-// Ouvir evento de recovery do Supabase
-SB.auth.onAuthStateChange((event,session)=>{
-  if(event==='PASSWORD_RECOVERY'){
-    $('app').style.display='none';
-    $('auth').style.display='flex';
-    $('auth-normal').style.display='none';
-    $('auth-reset').style.display='block';
-    hide('loading');
-  }
-});
-
 async function doLogout(){
   try { await SB.auth.signOut(); } catch(e) {}
-  window.location.reload();
+  discs=[];evts=[];U=null;perfil=null;grupos=[];
+  try { closeDrawer(); } catch(e) {}
+  try { closeModal('grupo'); } catch(e) {}
+  $('app').style.display='none';
+  $('auth').style.display='flex';
+  try { $('bottom-nav').classList.remove('visible'); } catch(e) {}
+  try { $('a-email').value=''; $('a-pass').value=''; $('a-nome').value=''; } catch(e) {}
+  try { $('auth-msg').className='auth-msg'; $('auth-msg').textContent=''; } catch(e) {}
+  try { setTab('login'); } catch(e) {}
 }
 
 // ── INIT ──
 async function init(){
-  if(checkResetFlow()) return;
   const{data:{session}}=await SB.auth.getSession();
   hide('loading');
   const real=s=>s&&s.user&&s.user.email&&!s.user.is_anonymous;
@@ -1517,9 +989,7 @@ async function boot(u){
   await loadAll();
   await loadGrupos();
   await loadPerfil();
-  prevPg = '';
-  badges(); render();
-  checkOnboarding();
+  badges();render();
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
 
@@ -1547,32 +1017,22 @@ async function rDiscs(){const{data}=await SB.from('disciplinas').select('*').ord
 async function rEvts(){const{data}=await SB.from('eventos').select('*').order('data');evts=data||[]}
 
 // ── NAV ──
-// ── NAV ──
-const PAGE_ORDER = ['resumo','calendario','eventos','disciplinas','grupos'];
-let prevPg = 'resumo';
-
 function go(p,f){
-  closeFabMenu();
-  prevPg = pg;
-  pg=p; if(f) flt=f;
+  pg=p;if(f)flt=f;
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
   const map={resumo:0,calendario:1,todos:2,prova:3,trabalho:4,apresentacao:5,disciplinas:6,cfg:7};
   const btns=document.querySelectorAll('.nav-btn');
-  const k=f||p; if(map[k]!==undefined&&btns[map[k]]) btns[map[k]].classList.add('active');
-  const titles={resumo:'Resumo',calendario:'Calendário',todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros',disciplinas:'Disciplinas',grupos:'Grupos'};
-  const titleEl = $('page-title');
-  titleEl.classList.add('fade');
-  setTimeout(()=>{ titleEl.textContent=titles[f||p]||''; titleEl.classList.remove('fade'); }, 150);
+  const k=f||p;if(map[k]!==undefined&&btns[map[k]])btns[map[k]].classList.add('active');
+  const titles={resumo:'Resumo',calendario:'Calendário',todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros',disciplinas:'Disciplinas'};
+  $('page-title').textContent=titles[f||p]||'';
   render();
 }
-
 function bnav(k){
   document.querySelectorAll('.bnav-item').forEach(e=>e.classList.remove('on'));
-  const e=$('bn-'+k); if(e) e.classList.add('on');
+  const e=$('bn-'+k);if(e)e.classList.add('on');
 }
-
 function badges(){
-  const t=new Date(); t.setHours(0,0,0,0);
+  const t=new Date();t.setHours(0,0,0,0);
   const p=evts.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=t);
   const ball=$('b-all'); if(ball) ball.textContent=p.length;
   const bprova=$('b-prova'); if(bprova) bprova.textContent=p.filter(e=>e.tipo==='prova').length;
@@ -1581,41 +1041,11 @@ function badges(){
 // ── RENDER ──
 function render(){
   const el=$('content');
-
-  let html = '';
-  if(pg==='resumo') html=rResumo();
-  else if(pg==='eventos') html=rEventos();
-  else if(pg==='calendario') html=rCal();
-  else if(pg==='disciplinas') html=rDiscsPage();
-  else if(pg==='grupos') html=rGruposPage();
-
-  // Sem página anterior definida = sem animação (boot ou reload)
-  if(!prevPg){
-    el.innerHTML = html;
-    return;
-  }
-
-  const prevIdx = PAGE_ORDER.indexOf(prevPg);
-  const nextIdx = PAGE_ORDER.indexOf(pg);
-  const goingForward = nextIdx >= prevIdx;
-
-  // Mesma página = só atualiza
-  if(prevPg === pg){
-    el.innerHTML = html;
-    return;
-  }
-
-  // Animação de transição
-  el.classList.remove('page-enter','page-enter-back','page-exit','page-exit-back');
-  el.classList.add(goingForward ? 'page-exit' : 'page-exit-back');
-
-  setTimeout(()=>{
-    el.innerHTML = html;
-    el.classList.remove('page-exit','page-exit-back');
-    el.classList.add(goingForward ? 'page-enter' : 'page-enter-back');
-    el.scrollTo({top:0, behavior:'smooth'});
-    setTimeout(()=> el.classList.remove('page-enter','page-enter-back'), 250);
-  }, 140);
+  if(pg==='resumo')el.innerHTML=rResumo();
+  else if(pg==='eventos')el.innerHTML=rEventos();
+  else if(pg==='calendario')el.innerHTML=rCal();
+  else if(pg==='disciplinas')el.innerHTML=rDiscsPage();
+  else if(pg==='grupos')el.innerHTML=rGruposPage();
 }
 
 function cardHTML(ev){
@@ -1638,6 +1068,39 @@ function cardHTML(ev){
   +'</div>';
 }
 
+function rResumo(){
+  const t=new Date();t.setHours(0,0,0,0);
+  const sorted=[...evts].sort((a,b)=>new Date(a.data)-new Date(b.data));
+  const pend=sorted.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=t);
+  const urg=pend.filter(e=>dLeft(e.data)<=1);
+  const conc=evts.filter(e=>e.concluido).length;
+  const provas=pend.filter(e=>e.tipo==='prova').length;
+  const trab=pend.filter(e=>e.tipo==='trabalho').length;
+  const h=new Date().getHours();
+  const sau=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+
+  let urgHtml='';
+  if(urg.length){
+    urgHtml='<div class="urgency"><div class="urgency-head">⚠ Atenção urgente</div>'
+      +urg.map(e=>'<div class="urgency-item"><span class="urgency-dot"></span>'+e.nome+' — '+(dLeft(e.data)===0?'HOJE':'amanhã')+(e.hora?' às '+e.hora:'')+'</div>').join('')
+    +'</div>';
+  }
+
+  return'<div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">'
+    +'<div><div style="font-size:12px;color:var(--text-3);font-weight:500">'+sau+' 👋</div>'
+    +'<div style="font-size:22px;font-weight:700;font-family:\'Playfair Display\',serif;margin-top:2px;color:var(--text)">'+(pend.length===0?'Tudo em dia! 🎉':pend.length+' evento'+(pend.length>1?'s':'')+' pendente'+(pend.length>1?'s':''))+'</div></div>'
+    +'<button onclick="openModal(\'import\')" style="background:var(--brand-light);border:1.5px solid var(--brand);color:var(--brand);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📎 Importar</button>'
+  +'</div>'
+  +'<div class="stats">'
+    +'<div class="stat"><div class="stat-label">Provas</div><div class="stat-num" style="color:var(--red)">'+provas+'</div><div class="stat-desc">pendentes</div></div>'
+    +'<div class="stat"><div class="stat-label">Trabalhos</div><div class="stat-num" style="color:var(--brand)">'+trab+'</div><div class="stat-desc">a entregar</div></div>'
+    +'<div class="stat"><div class="stat-label">Total</div><div class="stat-num">'+pend.length+'</div><div class="stat-desc">pendentes</div></div>'
+    +'<div class="stat"><div class="stat-label">Feitos</div><div class="stat-num" style="color:var(--green)">'+conc+'</div><div class="stat-desc">concluídos</div></div>'
+  +'</div>'
+  +urgHtml
+  +'<div class="section-head"><span class="section-title">Próximos eventos</span><button class="btn btn-ghost btn-sm" onclick="go(\'eventos\',\'todos\')">Ver todos →</button></div>'
+  +'<div class="event-list">'+(pend.length?pend.slice(0,6).map(cardHTML).join(''):'<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nada pendente!</div><div class="empty-sub">Adicione eventos ou importe um cronograma.</div></div>')+'</div>';
+}
 
 function rEventos(){
   let evs=[...evts].sort((a,b)=>new Date(a.data)-new Date(b.data));
@@ -1649,90 +1112,30 @@ function rEventos(){
 }
 function setFlt(f){flt=f;const t={todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros'};$('page-title').textContent=t[f];render()}
 
-let calSelectedDay = null;
-
 function rCal(){
   const y=calDt.getFullYear(),m=calDt.getMonth();
   const mn=calDt.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),dip=new Date(y,m,0).getDate();
   const today=new Date();
-  const todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-
-  const heads=['D','S','T','Q','Q','S','S'].map(d=>'<div class="cal-head">'+d+'</div>').join('');
+  const heads=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>'<div class="cal-head">'+d+'</div>').join('');
   let days='';
-
-  // Dias do mês anterior
-  for(let i=fd-1;i>=0;i--)
-    days+='<div class="cal-cell other"><div class="cal-num">'+(dip-i)+'</div></div>';
-
-  // Dias do mês atual
+  for(let i=fd-1;i>=0;i--)days+='<div class="cal-cell other"><div class="cal-num">'+(dip-i)+'</div></div>';
   for(let d=1;d<=dim;d++){
     const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const isT=ds===todayStr;
-    const isSel=ds===calSelectedDay;
+    const isT=today.getDate()===d&&today.getMonth()===m&&today.getFullYear()===y;
     const es=evts.filter(e=>e.data===ds);
-    const dots=es.slice(0,2).map(e=>'<div class="cal-dot t-'+e.tipo+'">'+e.nome+'</div>').join('');
-    const more=es.length>2?'<div class="cal-more">+'+( es.length-2)+' mais</div>':'';
-    const numHtml=isT
-      ?'<div class="cal-num"><div style="width:22px;height:22px;border-radius:50%;background:var(--brand-mid);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+d+'</div></div>'
-      :'<div class="cal-num" style="color:'+(isSel?'var(--brand-mid)':'var(--text)')+'">'+d+'</div>';
-    const selStyle=isSel?'border-color:var(--brand-mid);border-width:2px;background:var(--brand-light);':'';
-    const hasEvStyle=es.length>0&&!isSel?'border-color:var(--border-solid);':'';
-    days+='<div class="cal-cell'+(isT?' today':'')+'" style="'+selStyle+hasEvStyle+'" onclick="selectCalDay(\''+ds+'\')">'+numHtml+dots+more+'</div>';
+    const cols={prova:'#FEF2F2',trabalho:'#EFF6FF',apresentacao:'#ECFDF5',outro:'#FFFBEB'};
+    const tcols={prova:'#B91C1C',trabalho:'#1D4ED8',apresentacao:'#065F46',outro:'#92400E'};
+    const dots=es.slice(0,2).map(e=>'<div class="cal-dot" style="background:'+cols[e.tipo]+';color:'+tcols[e.tipo]+'">'+e.nome+'</div>').join('');
+    const more=es.length>2?'<div style="font-size:9px;color:var(--text-3)">+'+( es.length-2)+' mais</div>':'';
+    days+='<div class="cal-cell'+(isT?' today':'')+'" onclick="openEvento(null,\''+ds+'\')"><div class="cal-num">'+d+'</div>'+dots+more+'</div>';
   }
-
-  // Dias do próximo mês
   const rem=(fd+dim)%7===0?0:7-(fd+dim)%7;
-  for(let d=1;d<=rem;d++)
-    days+='<div class="cal-cell other"><div class="cal-num">'+d+'</div></div>';
-
-  // Preview do dia selecionado
-  let preview='';
-  if(calSelectedDay){
-    const selEvts=evts.filter(e=>e.data===calSelectedDay).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99'));
-    const selDate=new Date(calSelectedDay+'T00:00:00');
-    const selLabel=selDate.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
-    const evHtml=selEvts.length
-      ?selEvts.map(ev=>{
-          const disc=gDisc(ev.disciplina_id);
-          return'<div class="event-card t-'+ev.tipo+(ev.concluido?' done':'')+'" onclick="openEvento(\''+ev.id+'\')" style="margin-bottom:8px">'
-            +'<div class="event-date"><div class="event-day">'+selDate.getDate()+'</div><div class="event-mon">'+selDate.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'</div></div>'
-            +'<div class="event-body"><div class="event-name">'+ev.nome+'</div>'
-            +'<div class="event-meta"><span class="badge b-'+ev.tipo+'">'+ftipo(ev.tipo)+'</span>'
-            +(disc?'<span class="event-disc">'+disc.nome+'</span>':'')
-            +(ev.hora?'<span class="event-disc">🕐 '+ev.hora+'</span>':'')
-            +'</div></div></div>';
-        }).join('')
-      :'<div class="cal-preview-empty">Nenhum evento neste dia<br><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openEvento(null,\''+calSelectedDay+'\')">+ Adicionar evento</button></div>';
-
-    preview='<div class="cal-preview">'
-      +'<div class="cal-preview-head">'
-      +'<div class="cal-preview-title">'+selLabel+'</div>'
-      +(selEvts.length?'<button class="btn btn-primary btn-sm" onclick="openEvento(null,\''+calSelectedDay+'\')">+ Evento</button>':'')
-      +'</div>'
-      +evHtml+'</div>';
-  }
-
-  return '<div class="cal-nav">'
-    +'<div style="display:flex;align-items:center;gap:10px">'
-    +'<div class="cal-nav-arrows">'
-    +'<button class="cal-nav-btn" onclick="moveCal(-1)">‹</button>'
-    +'<button class="cal-nav-btn" onclick="moveCal(1)">›</button>'
-    +'</div>'
-    +'<span class="cal-month-title">'+mn+'</span>'
-    +'</div>'
-    +'<button class="cal-today-btn" onclick="calDt=new Date();calSelectedDay=null;render()">Hoje</button>'
-    +'</div>'
-    +'<div class="cal-grid">'+heads+days+'</div>'
-    +preview;
+  for(let d=1;d<=rem;d++)days+='<div class="cal-cell other"><div class="cal-num">'+d+'</div></div>';
+  return'<div class="cal-nav"><button class="btn btn-secondary btn-sm" onclick="moveCal(-1)">← Anterior</button><span class="cal-month-title">'+mn+'</span><button class="btn btn-secondary btn-sm" onclick="moveCal(1)">Próximo →</button></div>'
+    +'<div class="cal-grid">'+heads+days+'</div>';
 }
-
-function selectCalDay(ds){
-  calSelectedDay = calSelectedDay === ds ? null : ds;
-  render();
-}
-
-function moveCal(d){calDt.setMonth(calDt.getMonth()+d);calSelectedDay=null;render()}
+function moveCal(d){calDt.setMonth(calDt.getMonth()+d);render()}
 
 function rDiscsPage(){
   const cards=discs.map(d=>{
@@ -1760,13 +1163,7 @@ function openModal(id){
   else if(id==='import')openImport();
   else if(id==='cfg')openCfg();
 }
-function closeModal(id){
-  const el=$('m-'+id);
-  if(!el)return;
-  const modal=el.querySelector('.modal');
-  if(modal){modal.style.animation='modalOut .18s ease forwards'}
-  setTimeout(()=>{el.classList.remove('open');if(modal)modal.style.animation=''},180);
-}
+function closeModal(id){$('m-'+id).classList.remove('open')}
 // Modais só fecham pelo X ou Cancelar
 
 // ── EVENTO ──
@@ -1846,28 +1243,10 @@ async function delDisc(){
 
 // ── CONFIG ──
 function openCfg(){
-  const glassOn = document.documentElement.getAttribute('data-glass') !== 'off';
-  applyGlass(glassOn);
-
-  const apiSection = $('cfg-api-section');
-  if (isPremium()) {
-    apiSection.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:22px">⭐</span>
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text)">IA Premium ativa</div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:2px">Você tem acesso completo à importação de cronogramas com IA.</div>
-        </div>
-      </div>`;
-  } else {
-    apiSection.innerHTML = `
-      <div style="text-align:center;padding:4px 0">
-        <div style="font-size:22px;margin-bottom:8px">🤖</div>
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Recurso Premium</div>
-        <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;line-height:1.5">A importação com IA está disponível apenas para contas Premium.</div>
-        <button class="btn btn-primary btn-sm" onclick="closeModal('cfg');openModal('premium')" style="width:100%">✨ Ver plano Premium</button>
-      </div>`;
-  }
+  const k=oai();
+  $('cfg-key').value=k?'••••••••••••••••':'';
+  $('cfg-status').textContent=k?'✓ Key configurada':'✗ Nenhuma key';
+  $('cfg-status').style.color=k?'var(--green)':'var(--red)';
   $('m-cfg').classList.add('open');
 }
 function salvarCfg(){
@@ -1879,79 +1258,47 @@ function salvarCfg(){
 function removeKey(){if(!confirm('Remover?'))return;localStorage.removeItem('oai_key');closeModal('cfg')}
 
 // ── IMPORT ──
-function _abrirImportModal(){
+function openImport(){
   $('imp1').style.display='block';$('imp2').style.display='none';$('imp3').style.display='none';
   $('imp-text').value='';$('pdf-msg').style.display='none';
   $('m-import').classList.add('open');
 }
-function openImport(){
-  if(!isPremium()){ openModal('premium'); return; }
-  _abrirImportModal();
-}
 function imp1(){$('imp1').style.display='block';$('imp2').style.display='none'}
-function onDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f)exPDF(f)}
-function onFile(e){if(e.target.files&&e.target.files[0])exPDF(e.target.files[0])}
-
-function triggerFileInput(){
-  const inp = $('imp-file');
-  if(!inp) return;
-  // iOS Safari requer que o click seja direto — criar novo input temporário se necessário
-  inp.click();
-}
-
+function onDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')exPDF(f)}
+function onFile(e){if(e.target.files[0])exPDF(e.target.files[0])}
 async function exPDF(file){
-  const msg=$('pdf-msg');
-  msg.style.display='block';msg.style.background='var(--brand-light)';msg.style.color='var(--brand)';
-  msg.textContent='Extraindo texto do PDF...';
+  const msg=$('pdf-msg');msg.style.display='block';msg.style.background='var(--brand-light)';msg.style.color='var(--brand)';msg.textContent='Extraindo texto...';
   try{
     const ab=await file.arrayBuffer();
-    // Usar workerSrc inline para compatibilidade com Safari/iOS
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(ab),
-      useWorkerFetch: false,
-      isEvalSupported: false,
-      useSystemFonts: true
-    });
-    const pdf=await loadingTask.promise;
+    const pdf=await pdfjsLib.getDocument({data:ab}).promise;
     let text='';
-    for(let i=1;i<=pdf.numPages;i++){
-      const pg=await pdf.getPage(i);
-      const ct=await pg.getTextContent();
-      text+=ct.items.map(it=>it.str).join(' ')+'\n';
-    }
-    const trimmed=text.trim();
-    if(!trimmed){throw new Error('PDF sem texto extraível')}
-    $('imp-text').value=trimmed;
+    for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const ct=await pg.getTextContent();text+=ct.items.map(it=>it.str).join(' ')+'\n'}
+    $('imp-text').value=text.trim();
     msg.style.background='var(--green-light)';msg.style.color='var(--green)';
-    msg.textContent='✓ PDF lido ('+pdf.numPages+' página'+(pdf.numPages>1?'s':'')+')! Clique em Analisar.';
-  }catch(e){
-    msg.style.background='var(--red-light)';msg.style.color='var(--red)';
-    msg.textContent='Não foi possível ler o PDF. Cole o texto manualmente.';
-    console.error('exPDF error:', e);
-  }
+    msg.textContent='✓ PDF lido ('+pdf.numPages+' pág.)! Clique em Analisar.';
+  }catch(e){msg.style.background='var(--red-light)';msg.style.color='var(--red)';msg.textContent='Erro ao ler PDF. Cole o texto manualmente.'}
 }
 async function analisar(){
   const text=$('imp-text').value.trim();if(!text){alert('Cole o texto ou suba um PDF!');return}
+  const key=oai();if(!key){alert('Configure sua OpenAI API Key nas Configurações ⚙️!');return}
   const btn=$('btn-analisar');btn.textContent='Analisando...';btn.disabled=true;
   try{
     const today=new Date().toISOString().split('T')[0];
     const dnames=discs.map(d=>d.nome).join(', ');
-    const { data: { session } } = await SB.auth.getSession();
-    const token = session?.access_token;
-    const res = await fetch(`${SB.supabaseUrl}/functions/v1/swift-worker`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ texto: text, disciplinas: dnames, hoje: today })
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:1500,messages:[{role:'user',
+        content:'Analise este cronograma. Hoje: '+today+'. Disciplinas: '+dnames+'\n\n'+text+'\n\nResponda SOMENTE JSON (sem markdown): [{"nome":"...","data":"YYYY-MM-DD","tipo":"prova|trabalho|apresentacao|outro","disciplina":"nome exato ou vazio","hora":"HH:MM ou vazio"}]. Ano padrão: '+new Date().getFullYear()}]})
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Erro na análise');
-    impEvts = data.eventos;
-    if(!impEvts.length){alert('Nenhum evento encontrado.');btn.textContent='Analisar com IA ✨';btn.disabled=false;return}
+    const data=await r.json();if(data.error)throw new Error(data.error.message);
+    impEvts=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
+    if(!impEvts.length){alert('Nenhum evento encontrado.');btn.textContent='Analisar com GPT ✨';btn.disabled=false;return}
     fillDiscs('imp-disc-def');
     $('imp-list').innerHTML=impEvts.map((e,i)=>'<div class="imp-item"><input type="checkbox" id="ic'+i+'" checked><div style="flex:1;font-size:12px"><div style="font-weight:600;color:var(--text)">'+e.nome+'</div><div style="color:var(--text-3)">'+ftipo(e.tipo)+' · '+e.data+(e.hora?' às '+e.hora:'')+(e.disciplina?' · '+e.disciplina:'')+'</div></div></div>').join('');
     $('imp1').style.display='none';$('imp2').style.display='block';
   }catch(e){alert('Erro: '+e.message)}
-  btn.textContent='Analisar com IA ✨';btn.disabled=false;
+  btn.textContent='Analisar com GPT ✨';btn.disabled=false;
 }
 async function confirmar(){
   if(!U){alert('Sessão expirada!');return}
@@ -1976,13 +1323,12 @@ function openDrawer(){
   const d=$('drawer'),o=$('dbg');
   d.style.display='flex';o.style.display='block';o.style.pointerEvents='auto';
   $('d-email').textContent=U?.email||'';
-  requestAnimationFrame(()=>{d.classList.add('open');o.classList.add('open')});
+  setTimeout(()=>{d.style.transform='translateX(0)'},10);
 }
 function closeDrawer(){
   const d=$('drawer'),o=$('dbg');
-  d.classList.remove('open');o.classList.remove('open');
-  o.style.pointerEvents='none';
-  setTimeout(()=>{d.style.display='none';o.style.display='none'},280);
+  d.style.transform='translateX(-100%)';o.style.pointerEvents='none';
+  setTimeout(()=>{d.style.display='none';o.style.display='none'},250);
 }
 
 // Listeners dos botões críticos
@@ -2104,7 +1450,7 @@ function applyDark(on) {
   document.documentElement.setAttribute('data-theme', on ? 'dark' : '');
   const toggle = document.getElementById('dark-toggle');
   const knob = document.getElementById('dark-knob');
-  if (toggle) toggle.style.background = on ? 'var(--brand-mid)' : '';
+  if (toggle) toggle.style.background = on ? '#3B82F6' : '';
   if (knob) knob.style.left = on ? '22px' : '2px';
 }
 
@@ -2112,25 +1458,6 @@ function toggleDark() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   applyDark(!isDark);
   localStorage.setItem('dark_mode', isDark ? '0' : '1');
-}
-
-// ── GLASS MODE ──
-function applyGlass(on) {
-  if (on) {
-    document.documentElement.removeAttribute('data-glass');
-  } else {
-    document.documentElement.setAttribute('data-glass', 'off');
-  }
-  const toggle = document.getElementById('glass-toggle');
-  const knob = document.getElementById('glass-knob');
-  if (toggle) toggle.style.background = on ? 'var(--brand-mid)' : 'var(--border)';
-  if (knob) knob.style.left = on ? '22px' : '2px';
-}
-
-function toggleGlass() {
-  const isOn = document.documentElement.getAttribute('data-glass') !== 'off';
-  applyGlass(!isOn);
-  localStorage.setItem('glass_mode', isOn ? '0' : '1');
 }
 
 // ── PERFIL ──
@@ -2141,11 +1468,11 @@ async function loadPerfil() {
   if (data) {
     perfil = data;
   } else {
+    // Criar perfil se não existir
     await SB.from('perfis').insert({ id: U.id });
     perfil = { nome: '', curso: '', semestre: '', instituicao: 'UNIVALI', bio: '' };
   }
   atualizarUIperfil();
-  atualizarUIPremium();
 }
 
 function atualizarUIperfil() {
@@ -2168,7 +1495,6 @@ function openPerfil() {
   $('perfil-avatar').textContent = inicial;
   $('perfil-nome-display').textContent = nome || 'Sem nome';
   $('perfil-curso-display').textContent = [perfil.curso, perfil.semestre ? perfil.semestre+'° Semestre' : '', perfil.instituicao].filter(Boolean).join(' · ');
-  atualizarUIPremium();
   $('p-nome').value = perfil.nome || '';
   $('p-curso').value = perfil.curso || '';
   $('p-semestre').value = perfil.semestre || '';
@@ -2679,7 +2005,7 @@ function toggleQR() {
   btn.textContent = '📱 Ocultar QR Code';
 }
 
-// ── NOTIFICAÇÕES NATIVAS ──
+// ── NOTIFICAÇÕES ──
 async function pedirPermissaoNotificacao() {
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') {
@@ -2693,7 +2019,9 @@ async function pedirPermissaoNotificacao() {
 }
 
 function agendarNotificacoes() {
+  // Verificar eventos urgentes agora
   verificarEventosUrgentes();
+  // Verificar todo dia às 8h
   const agora = new Date();
   const amanha8h = new Date(agora);
   amanha8h.setDate(amanha8h.getDate() + (agora.getHours() >= 8 ? 1 : 0));
@@ -2707,52 +2035,31 @@ function agendarNotificacoes() {
 
 function verificarEventosUrgentes() {
   if (!evts.length || Notification.permission !== 'granted') return;
-
-  const hoje_str = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('notif_' + hoje_str)) return;
-
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
   const urgentes = evts.filter(e => {
     if (e.concluido) return false;
     const dl = dLeft(e.data);
-    return dl >= 0 && dl <= 1;
+    return dl >= 0 && dl <= 3;
   });
-
-  if (!urgentes.length) return;
-
   urgentes.forEach(ev => {
     const dl = dLeft(ev.data);
-    const quando = dl === 0 ? 'HOJE' : 'amanhã';
+    const quando = dl === 0 ? 'HOJE' : dl === 1 ? 'amanhã' : `em ${dl} dias`;
     const disc = gDisc(ev.disciplina_id);
-    const icone = ev.tipo === 'prova' ? '📝' : ev.tipo === 'trabalho' ? '📂' : '🎤';
-
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: 'NOTIFY',
-        title: `${icone} ${ev.nome}`,
-        body: `${ftipo(ev.tipo)} ${quando}${disc ? ' · ' + disc.nome : ''}${ev.hora ? ' às ' + ev.hora : ''}`,
-        tag: ev.id
-      });
-    }
+    new Notification(`${ev.tipo === 'prova' ? '📝' : ev.tipo === 'trabalho' ? '📂' : '🎤'} ${ev.nome}`, {
+      body: `${ftipo(ev.tipo)} ${quando}${disc ? ' · ' + disc.nome : ''}`,
+      icon: '/SimploSimples/icon-192.png',
+      badge: '/SimploSimples/icon-192.png',
+      tag: ev.id
+    });
   });
-
-  localStorage.setItem('notif_' + hoje_str, '1');
 }
 
 // Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/SimploSimples/sw.js')
-    .then(reg => {
-      console.log('SW registrado');
-      // Verificar atualizações a cada 30min
-      setInterval(() => reg.update(), 30 * 60 * 1000);
-    })
+    .then(() => console.log('SW registrado'))
     .catch(e => console.log('SW erro:', e));
 }
-
-// Handler de shortcuts do PWA
-const _acao = new URLSearchParams(window.location.search).get('acao');
-if (_acao === 'novo-evento') setTimeout(() => openModal('evento'), 1500);
-if (_acao === 'calendario') setTimeout(() => go('calendario'), 1500);
 
 
   // Auto-preencher código se veio por link/QR
@@ -2766,513 +2073,18 @@ if (_acao === 'calendario') setTimeout(() => go('calendario'), 1500);
     }, 1000);
   }
 
-
-// ── ONBOARDING ──
-const OB_STEPS = [
-  {
-    icon: '🎓',
-    title: 'Bem-vindo ao Simplo!',
-    desc: 'Sua agenda acadêmica inteligente. Organize provas, trabalhos e apresentações em um só lugar.'
-  },
-  {
-    icon: '📅',
-    title: 'Gerencie seus eventos',
-    desc: 'Adicione provas, trabalhos e apresentações com data, horário e disciplina. Receba alertas antes dos prazos.'
-  },
-  {
-    icon: '🤖',
-    title: 'IA que te ajuda',
-    desc: 'Com o plano Premium, importe cronogramas enviados pelo professor — a IA extrai todos os eventos automaticamente.'
-  },
-  {
-    icon: '👥',
-    title: 'Estude em grupo',
-    desc: 'Crie grupos com seus colegas, compartilhe eventos, avisos e tarefas em tempo real.'
-  },
-  {
-    icon: '🚀',
-    title: 'Tudo pronto!',
-    desc: 'Comece adicionando suas disciplinas e o primeiro evento. Bons estudos! 📚'
-  }
-];
-let obStep = 0;
-
-function showOnboarding(){
-  obStep = 0;
-  renderObStep();
-  $('onboarding').style.display = 'flex';
+function applyDark(on){
+  document.documentElement.setAttribute('data-theme',on?'dark':'');
+  const t=$('dark-toggle'),k=$('dark-knob');
+  if(t)t.style.background=on?'var(--brand)':'';
+  if(k)k.style.left=on?'22px':'2px';
+}
+function toggleDark(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  applyDark(!isDark);
+  localStorage.setItem('dark_mode',isDark?'0':'1');
 }
 
-function renderObStep(){
-  const s = OB_STEPS[obStep];
-  const total = OB_STEPS.length;
-
-  // Animação suave
-  const card = document.querySelector('.onboarding-card');
-  card.style.opacity = '0';card.style.transform = 'translateY(8px)';
-  setTimeout(()=>{
-    $('ob-icon').textContent = s.icon;
-    $('ob-title').textContent = s.title;
-    $('ob-desc').textContent = s.desc;
-    $('ob-next').textContent = obStep === total-1 ? '✓ Começar' : 'Próximo →';
-    $('ob-dots').innerHTML = Array.from({length:total},(_,i)=>
-      `<div class="onboarding-dot${i===obStep?' on':''}"></div>`
-    ).join('');
-    card.style.opacity = '1';card.style.transform = 'translateY(0)';
-    card.style.transition = 'opacity .22s ease, transform .22s ease';
-  }, 80);
-}
-
-function nextOnboarding(){
-  if(obStep < OB_STEPS.length - 1){
-    obStep++;
-    renderObStep();
-  } else {
-    finishOnboarding();
-  }
-}
-
-function finishOnboarding(){
-  $('onboarding').style.display = 'none';
-  localStorage.setItem('ob_done_'+U.id, '1');
-}
-
-function checkOnboarding(){
-  if(!localStorage.getItem('ob_done_'+U.id)){
-    setTimeout(showOnboarding, 600);
-  }
-}
-
-// ── FAB MENU ──
-let fabOpen = false;
-
-function toggleFabMenu() {
-  if (fabOpen) closeFabMenu(); else openFabMenu();
-}
-
-function openFabMenu() {
-  fabOpen = true;
-  $('fab-backdrop').classList.add('open');
-  $('fab-menu').classList.add('open');
-  $('fab-btn').classList.add('open');
-  // Animar botão da topbar no desktop
-  const ti = $('topbar-fab-icon');
-  if(ti) ti.style.transform = 'rotate(45deg)';
-  const sub = $('fab-import-sub');
-  if (sub) sub.textContent = isPremium() ? 'Importar cronograma' : '🔒 Requer Premium';
-}
-
-function closeFabMenu() {
-  fabOpen = false;
-  $('fab-backdrop').classList.remove('open');
-  $('fab-menu').classList.remove('open');
-  $('fab-btn').classList.remove('open');
-  const ti = $('topbar-fab-icon');
-  if(ti) ti.style.transform = 'rotate(0deg)';
-}
-
-// ── EDGE FUNCTION (IA via Supabase) ──
-async function importarComIA(texto) {
-  // Verifica premium antes de chamar
-  if (!isPremium()) {
-    openModal('premium');
-    return null;
-  }
-
-  try {
-    const { data: { session } } = await SB.auth.getSession();
-    const token = session?.access_token;
-
-    const res = await fetch(`${SB.supabaseUrl}/functions/v1/swift-worker`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ texto })
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Erro na Edge Function');
-    }
-
-    return await res.json();
-  } catch (e) {
-    console.error('Edge Function error:', e);
-    alert('Erro ao processar com IA: ' + e.message);
-    return null;
-  }
-}
-
-// ── PREMIUM ──
-function isPremium() {
-  // Admin sempre tem acesso
-  const adminEmails = ['emanu0707@gmail.com'];
-  if (U && adminEmails.includes(U.email)) return true;
-  // Usuário premium pelo banco
-  return perfil && perfil.premium === true;
-}
-
-function abrirImportComGate() {
-  if (isPremium()) {
-    openModal('import');
-  } else {
-    openModal('premium');
-  }
-}
-
-function copyPix() {
-  navigator.clipboard.writeText('emanu0707@gmail.com').then(() => {
-    const el = $('pix-copied');
-    if (el) { el.style.opacity = '1'; setTimeout(() => el.style.opacity = '0', 2000); }
-  });
-}
-
-function atualizarUIPremium() {
-  const premium = isPremium();
-
-  // Sidebar — só estrelinha discreta
-  const badge = $('s-premium-badge');
-  if (badge) {
-    badge.style.display = premium ? 'inline' : 'none';
-  }
-
-  // Modal premium status bar
-  const statusBar = $('premium-status-bar');
-  if (statusBar) {
-    statusBar.innerHTML = premium
-      ? `<div class="premium-status active">✅ Sua conta tem acesso Premium ativo!</div>`
-      : `<div class="premium-status inactive">🔒 Você ainda não tem acesso Premium</div>`;
-  }
-
-  // Perfil modal — badge discreto ao lado do nome
-  const perfilBadge = $('perfil-premium-badge');
-  if (perfilBadge) {
-    perfilBadge.innerHTML = premium ? '⭐' : '';
-    perfilBadge.title = premium ? 'Conta Premium' : '';
-    perfilBadge.style.fontSize = '14px';
-  }
-
-  // Perfil modal — card de status
-  const perfilCard = $('perfil-premium-card');
-  if (perfilCard) {
-    if (premium) {
-      perfilCard.innerHTML = `
-        <div style="background:var(--green-light);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px">
-          <span>⭐</span>
-          <div style="font-size:12px;font-weight:600;color:#065F46">Conta Premium ativa — IA disponível</div>
-        </div>`;
-    } else {
-      perfilCard.innerHTML = `
-        <div style="background:var(--amber-light);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <div style="font-size:12px;color:#92400E">Conta gratuita</div>
-          <button class="btn btn-sm" onclick="closeModal('perfil');openModal('premium')" style="background:var(--brand-mid);color:#fff;border:none;white-space:nowrap;flex-shrink:0;font-size:11px">Ver Premium</button>
-        </div>`;
-    }
-  }
-}
-
-const POMO_DURATIONS = { foco: 25*60, curto: 5*60, longo: 15*60 };
-let pomoState = {
-  mode: 'foco', running: false, timer: null,
-  remaining: 25*60, total: 25*60,
-  sessions: 0, sessionsDone: 0,
-  evNome: '', evDisc: ''
-};
-const CIRCUM = 2 * Math.PI * 70; // 439.82
-
-function openPomo(evNome, evDisc) {
-  pomoState.evNome = evNome || 'Sessão de estudo';
-  pomoState.evDisc = evDisc || '';
-  $('pomo-ev-title').textContent = pomoState.evNome;
-  $('pomo-ev-disc').textContent = pomoState.evDisc;
-  pomoState.sessions = parseInt(localStorage.getItem('pomo_sessions_today') || '0');
-  renderPomoDots();
-  updatePomoDisplay();
-  $('pomo-overlay').classList.add('open');
-}
-function closePomo() {
-  if (pomoState.running) pausePomo();
-  $('pomo-overlay').classList.remove('open');
-}
-function setPomoMode(m) {
-  if (pomoState.running) pausePomo();
-  pomoState.mode = m;
-  pomoState.remaining = POMO_DURATIONS[m];
-  pomoState.total = POMO_DURATIONS[m];
-  document.querySelectorAll('.pomo-mode').forEach(b => b.classList.remove('on'));
-  $('pomo-m-'+m).classList.add('on');
-  const labels = { foco: 'Foco', curto: 'Pausa curta', longo: 'Pausa longa' };
-  $('pomo-phase-label').textContent = labels[m];
-  updatePomoDisplay();
-}
-function togglePomo() {
-  if (pomoState.running) pausePomo(); else startPomo();
-}
-function startPomo() {
-  pomoState.running = true;
-  $('pomo-btn').textContent = '⏸ Pausar';
-  pomoState.timer = setInterval(() => {
-    pomoState.remaining--;
-    updatePomoDisplay();
-    if (pomoState.remaining <= 0) {
-      clearInterval(pomoState.timer);
-      pomoState.running = false;
-      if (pomoState.mode === 'foco') {
-        pomoState.sessionsDone++;
-        pomoState.sessions++;
-        localStorage.setItem('pomo_sessions_today', pomoState.sessions);
-        $('pomo-count').textContent = pomoState.sessions;
-        renderPomoDots();
-        if (Notification.permission === 'granted') {
-          new Notification('🎉 Pomodoro concluído!', { body: 'Hora de uma pausa merecida.' });
-        }
-      }
-      $('pomo-btn').textContent = '▶ Iniciar';
-      // Auto avança para pausa
-      const next = pomoState.sessionsDone % 4 === 0 ? 'longo' : 'curto';
-      if (pomoState.mode === 'foco') setTimeout(() => setPomoMode(next), 800);
-      else setTimeout(() => setPomoMode('foco'), 800);
-    }
-  }, 1000);
-}
-function pausePomo() {
-  clearInterval(pomoState.timer);
-  pomoState.running = false;
-  $('pomo-btn').textContent = '▶ Iniciar';
-}
-function resetPomo() {
-  pausePomo();
-  pomoState.remaining = POMO_DURATIONS[pomoState.mode];
-  updatePomoDisplay();
-}
-function skipPomo() {
-  pausePomo();
-  pomoState.remaining = 0;
-  updatePomoDisplay();
-}
-function updatePomoDisplay() {
-  const m = Math.floor(pomoState.remaining / 60).toString().padStart(2,'0');
-  const s = (pomoState.remaining % 60).toString().padStart(2,'0');
-  $('pomo-display').textContent = m + ':' + s;
-  const pct = pomoState.remaining / pomoState.total;
-  const offset = CIRCUM * (1 - pct);
-  const fill = $('pomo-ring-fill');
-  fill.style.strokeDashoffset = offset;
-  const colors = { foco: '#EF4444', curto: '#10B981', longo: '#8B5CF6' };
-  fill.style.stroke = colors[pomoState.mode];
-  $('pomo-count').textContent = pomoState.sessions;
-}
-function renderPomoDots() {
-  const n = Math.min(pomoState.sessionsDone % 4 === 0 && pomoState.sessionsDone > 0 ? 4 : pomoState.sessionsDone % 4, 4);
-  $('pomo-dots').innerHTML = Array.from({length:4}, (_,i) =>
-    `<div class="pomo-dot ${i < n ? 'done' : i === n ? 'active' : ''}"></div>`
-  ).join('');
-}
-
-// ── WIDGET HOJE ──
-function rWidgetHoje() {
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const amanha = new Date(hoje); amanha.setDate(amanha.getDate() + 1);
-
-  const toStr = d => d.toISOString().split('T')[0];
-  const hojeStr = toStr(hoje);
-  const amanhaStr = toStr(amanha);
-
-  const evHoje = evts.filter(e => e.data === hojeStr && !e.concluido)
-    .sort((a,b) => (a.hora||'99:99').localeCompare(b.hora||'99:99'));
-  const evAmanha = evts.filter(e => e.data === amanhaStr && !e.concluido);
-  const semana = evts.filter(e => {
-    const d = new Date(e.data+'T00:00:00');
-    return !e.concluido && d >= hoje && d <= new Date(hoje.getTime() + 7*86400000);
-  }).length;
-
-  const diasSemana = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
-  const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  const dataLabel = `${diasSemana[hoje.getDay()]}, ${hoje.getDate()} de ${meses[hoje.getMonth()]}`;
-
-  let titulo = '';
-  if (evHoje.length === 0 && evAmanha.length === 0) titulo = 'Dia livre! 🎉';
-  else if (evHoje.length === 0) titulo = `${evAmanha.length} evento${evAmanha.length>1?'s':''} amanhã`;
-  else titulo = `${evHoje.length} evento${evHoje.length>1?'s':''} hoje`;
-
-  const itemsHtml = evHoje.length > 0
-    ? evHoje.slice(0,3).map(ev => {
-        const disc = gDisc(ev.disciplina_id);
-        const icones = {prova:'📝',trabalho:'📂',apresentacao:'🎤',outro:'📌'};
-        return `<div class="widget-hoje-item" onclick="openEvento('${ev.id}')">
-          <span style="font-size:16px">${icones[ev.tipo]||'📌'}</span>
-          <span class="widget-hoje-item-hora">${ev.hora||'—'}</span>
-          <span class="widget-hoje-item-nome">${ev.nome}</span>
-          ${disc?`<span class="widget-hoje-item-disc">${disc.nome}</span>`:''}
-        </div>`;
-      }).join('')
-    : evAmanha.length > 0
-      ? evAmanha.slice(0,2).map(ev => {
-          const disc = gDisc(ev.disciplina_id);
-          const icones = {prova:'📝',trabalho:'📂',apresentacao:'🎤',outro:'📌'};
-          return `<div class="widget-hoje-item" onclick="openEvento('${ev.id}')">
-            <span style="font-size:16px">${icones[ev.tipo]||'📌'}</span>
-            <span class="widget-hoje-item-hora" style="opacity:.6">amanhã</span>
-            <span class="widget-hoje-item-nome">${ev.nome}</span>
-            ${disc?`<span class="widget-hoje-item-disc">${disc.nome}</span>`:''}
-          </div>`;
-        }).join('')
-      : '<div class="widget-hoje-vazio">✨ Nenhum evento nos próximos dias</div>';
-
-  const conc = evts.filter(e=>e.concluido).length;
-  const total = evts.length;
-  const pct = total > 0 ? Math.round((conc/total)*100) : 0;
-
-  return `<div class="widget-hoje">
-    <div class="widget-hoje-data">${dataLabel}</div>
-    <div class="widget-hoje-titulo">${titulo}</div>
-    <div class="widget-hoje-items">${itemsHtml}</div>
-    <div class="widget-hoje-footer">
-      <div class="widget-hoje-stat">
-        <div class="widget-hoje-stat-num">${evHoje.length}</div>
-        <div class="widget-hoje-stat-label">Hoje</div>
-      </div>
-      <div class="widget-hoje-divider"></div>
-      <div class="widget-hoje-stat">
-        <div class="widget-hoje-stat-num">${evAmanha.length}</div>
-        <div class="widget-hoje-stat-label">Amanhã</div>
-      </div>
-      <div class="widget-hoje-divider"></div>
-      <div class="widget-hoje-stat">
-        <div class="widget-hoje-stat-num">${semana}</div>
-        <div class="widget-hoje-stat-label">Na semana</div>
-      </div>
-      <div class="widget-hoje-divider"></div>
-      <div class="widget-hoje-stat">
-        <div class="widget-hoje-stat-num">${pct}%</div>
-        <div class="widget-hoje-stat-label">Feitos</div>
-      </div>
-    </div>
-  </div>`;
-}
-
-// ── PROGRESS CHART (resumo) ──
-function rProgressChart() {
-  if (!discs.length) return '';
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-
-  const discData = discs.map(d => {
-    const es = evts.filter(e => e.disciplina_id === d.id);
-    const total = es.length;
-    const conc = es.filter(e => e.concluido).length;
-    const pend = es.filter(e => !e.concluido && new Date(e.data+'T00:00:00') >= hoje).length;
-    const pct = total > 0 ? Math.round((conc / total) * 100) : 0;
-    return { ...d, total, conc, pend, pct };
-  }).filter(d => d.total > 0).sort((a,b) => b.pct - a.pct);
-
-  if (!discData.length) return '';
-
-  // Mini anéis de resumo geral
-  const totalEvts = evts.length;
-  const totalConc = evts.filter(e => e.concluido).length;
-  const globalPct = totalEvts > 0 ? Math.round((totalConc/totalEvts)*100) : 0;
-  const C = 2*Math.PI*22; // circunferência do mini anel
-
-  function miniRing(pct, color, label, num) {
-    const off = C * (1 - pct/100);
-    return `<div class="prog-ring-card">
-      <svg width="56" height="56" viewBox="0 0 56 56" style="transform:rotate(-90deg)">
-        <circle cx="28" cy="28" r="22" fill="none" stroke="var(--border)" stroke-width="6"/>
-        <circle cx="28" cy="28" r="22" fill="none" stroke="${color}" stroke-width="6"
-          stroke-linecap="round" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"/>
-      </svg>
-      <div class="prog-ring-num">${num}</div>
-      <div class="prog-ring-label">${label}</div>
-    </div>`;
-  }
-
-  const pendFuturos = evts.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=hoje).length;
-  const urgentes = evts.filter(e=>!e.concluido&&dLeft(e.data)<=3&&dLeft(e.data)>=0).length;
-
-  const ringsHtml = `<div class="prog-ring-wrap">
-    ${miniRing(globalPct,'var(--brand)',`${globalPct}% concluído`,totalConc+'/'+totalEvts)}
-    ${miniRing(pendFuturos>0?Math.min(100,Math.round((pendFuturos/Math.max(totalEvts,1))*100)):0,'var(--amber)','Pendentes',pendFuturos)}
-    ${miniRing(urgentes>0?100:0,urgentes>0?'var(--red)':'var(--green)','Urgentes',urgentes)}
-  </div>`;
-
-  const barsHtml = discData.map(d => `
-    <div class="disc-prog-item">
-      <div class="disc-prog-header">
-        <span class="disc-prog-name">${d.nome}</span>
-        <span class="disc-prog-count">${d.conc}/${d.total} · ${d.pct}%</span>
-      </div>
-      <div class="disc-prog-bar">
-        <div class="disc-prog-fill" style="width:${d.pct}%;background:${d.cor}"></div>
-      </div>
-    </div>
-  `).join('');
-
-  return `<div class="section-head" style="margin-bottom:12px">
-    <span class="section-title">📊 Progresso por disciplina</span>
-    <button class="btn btn-ghost btn-sm" onclick="openPomo()" style="font-size:11px">🍅 Pomodoro</button>
-  </div>
-  ${ringsHtml}
-  <div class="disc-progress">${barsHtml}</div>`;
-}
-
-// ── rResumo ATUALIZADO ──
-function rResumo(){
-  const t=new Date();t.setHours(0,0,0,0);
-  const sorted=[...evts].sort((a,b)=>new Date(a.data)-new Date(b.data));
-  const pend=sorted.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=t);
-  const urg=pend.filter(e=>dLeft(e.data)<=1);
-  const conc=evts.filter(e=>e.concluido).length;
-  const provas=pend.filter(e=>e.tipo==='prova').length;
-  const trab=pend.filter(e=>e.tipo==='trabalho').length;
-  const h=new Date().getHours();
-  const sau=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
-  const nome = perfil?.nome ? perfil.nome.split(' ')[0] : '';
-
-  let urgHtml='';
-  if(urg.length){
-    urgHtml='<div class="urgency"><div class="urgency-head">⚠ Atenção urgente</div>'
-      +urg.map(e=>'<div class="urgency-item"><span class="urgency-dot"></span>'+e.nome+' — '+(dLeft(e.data)===0?'HOJE':'amanhã')+(e.hora?' às '+e.hora:'')+'</div>').join('')
-    +'</div>';
-  }
-
-  return rWidgetHoje()
-  +'<div class="stats">'
-    +'<div class="stat"><div class="stat-label">Provas</div><div class="stat-num" style="color:var(--red)">'+provas+'</div><div class="stat-desc">pendentes</div></div>'
-    +'<div class="stat"><div class="stat-label">Trabalhos</div><div class="stat-num" style="color:var(--brand)">'+trab+'</div><div class="stat-desc">a entregar</div></div>'
-    +'<div class="stat"><div class="stat-label">Total</div><div class="stat-num">'+pend.length+'</div><div class="stat-desc">pendentes</div></div>'
-    +'<div class="stat"><div class="stat-label">Feitos</div><div class="stat-num" style="color:var(--green)">'+conc+'</div><div class="stat-desc">concluídos</div></div>'
-  +'</div>'
-  +urgHtml
-  +rProgressChart()
-  +'<div class="section-head"><span class="section-title">Próximos eventos</span><button class="btn btn-ghost btn-sm" onclick="go(\'eventos\',\'todos\')">Ver todos →</button></div>'
-  +'<div class="event-list">'+(pend.length?pend.slice(0,5).map(ev=>{
-    // Adiciona botão Pomodoro em cada card
-    const disc=gDisc(ev.disciplina_id);
-    const d=new Date(ev.data+'T00:00:00');
-    const dl=dLeft(ev.data);
-    return '<div class="event-card t-'+ev.tipo+(ev.concluido?' done':'')+'" onclick="openEvento(\''+ev.id+'\')">'
-      +'<div class="event-date"><div class="event-day">'+d.getDate()+'</div><div class="event-mon">'+d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'</div></div>'
-      +'<div class="event-body">'
-        +'<div class="event-name">'+(ev.concluido?'✓ ':'')+ev.nome+'</div>'
-        +'<div class="event-meta">'
-          +'<span class="badge b-'+ev.tipo+'">'+ftipo(ev.tipo)+'</span>'
-          +(disc?'<span class="event-disc">'+disc.nome+'</span>':'')
-          +(ev.hora?'<span class="event-disc">🕐 '+ev.hora+'</span>':'')
-          +(!ev.concluido?dBadge(dl):'')
-        +'</div>'
-        +(ev.notas?'<div class="event-note">'+ev.notas+'</div>':'')
-      +'</div>'
-      +'<div class="event-actions" style="display:flex;flex-direction:column;gap:4px;opacity:1">'
-        +'<button class="btn btn-ghost btn-sm" title="Pomodoro" onclick="event.stopPropagation();openPomo(\''+ev.nome.replace(/'/g,"\\'")+'\',' +(disc?'\''+disc.nome.replace(/'/g,"\\'")+'\'':'\'\'')+')" style="font-size:13px;padding:4px 6px">🍅</button>'
-        +'<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleDone(\''+ev.id+'\','+ev.concluido+')">'+(ev.concluido?'↩':'✓')+'</button>'
-      +'</div>'
-    +'</div>';
-  }).join(''):'<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nada pendente!</div><div class="empty-sub">Adicione eventos ou importe um cronograma.</div></div>')+'</div>';
-}
-
-// Reinicializar swipe nos cards sempre que o conteúdo renderizar
 init();
 </script>
 </body>
