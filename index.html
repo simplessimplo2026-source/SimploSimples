@@ -584,19 +584,17 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .premium-status.inactive{background:var(--amber-light);color:#92400E;border:1px solid rgba(245,158,11,.2)}
 
 /* ══ MOBILE ══ */
-/* ══ IPAD / TABLET (768px - 1024px) ══ */
-@media(min-width:768px) and (max-width:1024px){
-  .sidebar{width:210px}
-  .sidebar-top{padding:18px 16px 14px}
-  .sidebar-brand{font-size:16px}
+/* ══ IPAD / TABLET (768px - 1200px) ══ */
+@media(min-width:768px) and (max-width:1200px){
+  .sidebar{width:220px}
+  .sidebar-top{padding:20px 18px 14px}
+  .sidebar-brand{font-size:17px}
   .sidebar-semester{font-size:11px}
   .sidebar-nav{padding:10px 8px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-  .nav-group{font-size:9px;padding:10px 8px 4px;letter-spacing:.8px}
-  .nav-btn{padding:9px 10px;font-size:13px;gap:8px}
+  .nav-group{font-size:9px;padding:10px 10px 4px;letter-spacing:.8px}
+  .nav-btn{padding:10px 12px;font-size:13px;gap:9px}
   .nav-btn .icon{font-size:15px}
-  .sidebar-bottom{padding:14px 16px}
-  .sidebar-bottom #s-nome{font-size:13px;white-space:normal;overflow:visible;word-break:break-word}
-  .sidebar-email{font-size:11px;white-space:normal;overflow:visible;word-break:break-all}
+  .sidebar-bottom{padding:14px 18px}
   .topbar{padding:13px 20px}
   .topbar-title{font-size:16px}
   .content{padding:18px 20px}
@@ -685,26 +683,49 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
   <div class="auth-card">
     <div class="auth-brand">Simplo Estudante</div>
     <div class="auth-sub">Sua agenda acadêmica inteligente</div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="setTab('login')">Entrar</div>
-      <div class="auth-tab" onclick="setTab('register')">Criar conta</div>
+
+    <!-- Tela normal de login/cadastro -->
+    <div id="auth-normal">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="setTab('login')">Entrar</div>
+        <div class="auth-tab" onclick="setTab('register')">Criar conta</div>
+      </div>
+      <div id="auth-msg" class="auth-msg"></div>
+      <div class="field" id="field-nome" style="display:none">
+        <label>Nome completo</label>
+        <input type="text" id="a-nome" placeholder="Seu nome completo">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="a-email" placeholder="seu@email.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()">
+      </div>
+      <button class="btn-auth" id="auth-btn" onclick="doAuth()">Entrar</button>
+      <div class="auth-link" id="forgot-wrap">
+        <span onclick="doForgot()">Esqueci minha senha</span>
+      </div>
     </div>
-    <div id="auth-msg" class="auth-msg"></div>
-    <div class="field" id="field-nome" style="display:none">
-      <label>Nome completo</label>
-      <input type="text" id="a-nome" placeholder="Seu nome completo">
-    </div>
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="a-email" placeholder="seu@email.com">
-    </div>
-    <div class="field">
-      <label>Senha</label>
-      <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()">
-    </div>
-    <button class="btn-auth" id="auth-btn" onclick="doAuth()">Entrar</button>
-    <div class="auth-link" id="forgot-wrap">
-      <span onclick="doForgot()">Esqueci minha senha</span>
+
+    <!-- Tela de redefinir senha -->
+    <div id="auth-reset" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:36px;margin-bottom:8px">🔐</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">Nova senha</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:4px">Digite sua nova senha abaixo</div>
+      </div>
+      <div id="reset-msg" class="auth-msg"></div>
+      <div class="field">
+        <label>Nova senha</label>
+        <input type="password" id="reset-pass" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="field">
+        <label>Confirmar senha</label>
+        <input type="password" id="reset-pass2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')doReset()">
+      </div>
+      <button class="btn-auth" id="reset-btn" onclick="doReset()">Salvar nova senha</button>
     </div>
   </div>
 </div>
@@ -729,11 +750,11 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
         <button class="nav-btn" onclick="openModal('cfg')"><span class="icon">⚙️</span>Configurações</button>
       </nav>
       <div class="sidebar-bottom">
-        <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
-          <div id="s-nome" style="font-size:13px;font-weight:600;color:var(--text)"></div>
-          <span id="s-premium-badge" style="display:none;font-size:12px" title="Conta Premium">⭐</span>
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;min-width:0">
+          <div id="s-nome" style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1"></div>
+          <span id="s-premium-badge" style="display:none;font-size:12px;flex-shrink:0" title="Conta Premium">⭐</span>
         </div>
-        <div class="sidebar-email" id="s-email" style="margin-bottom:8px"></div>
+        <div id="s-email" style="font-size:11px;color:var(--text-3);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%"></div>
         <button class="btn btn-secondary btn-sm btn-block" onclick="doLogout()">Sair</button>
       </div>
     </aside>
@@ -1324,10 +1345,57 @@ async function doAuth(){
 }
 async function doForgot(){
   const email=$('a-email').value.trim();
-  if(!email){aMsg('Digite seu email!','error');return}
-  const{error}=await SB.auth.resetPasswordForEmail(email);
-  if(error)aMsg(error.message,'error');else aMsg('Email enviado!','success');
+  if(!email){aMsg('Digite seu email primeiro!','error');return}
+  $('auth-btn').textContent='Enviando...';$('auth-btn').disabled=true;
+  const{error}=await SB.auth.resetPasswordForEmail(email,{
+    redirectTo: window.location.origin+window.location.pathname+'?reset=1'
+  });
+  $('auth-btn').textContent='Entrar';$('auth-btn').disabled=false;
+  if(error) aMsg(error.message,'error');
+  else aMsg('✓ Email enviado! Verifique sua caixa de entrada.','success');
 }
+async function doReset(){
+  const pass=$('reset-pass').value;
+  const pass2=$('reset-pass2').value;
+  const msg=$('reset-msg');
+  if(!pass||pass.length<6){msg.textContent='Senha deve ter pelo menos 6 caracteres.';msg.className='auth-msg error';return}
+  if(pass!==pass2){msg.textContent='As senhas não coincidem.';msg.className='auth-msg error';return}
+  $('reset-btn').textContent='Salvando...';$('reset-btn').disabled=true;
+  const{error}=await SB.auth.updateUser({password:pass});
+  if(error){
+    msg.textContent=error.message;msg.className='auth-msg error';
+    $('reset-btn').textContent='Salvar nova senha';$('reset-btn').disabled=false;
+  } else {
+    msg.textContent='✓ Senha alterada! Redirecionando...';msg.className='auth-msg success';
+    setTimeout(()=>window.location.href=window.location.pathname,1500);
+  }
+}
+
+function checkResetFlow(){
+  // Detectar se voltou do email de reset (hash com access_token)
+  const hash=window.location.hash;
+  const params=new URLSearchParams(window.location.search);
+  if(hash.includes('type=recovery')||params.get('reset')==='1'){
+    $('auth').style.display='flex';
+    $('auth-normal').style.display='none';
+    $('auth-reset').style.display='block';
+    hide('loading');
+    return true;
+  }
+  return false;
+}
+
+// Ouvir evento de recovery do Supabase
+SB.auth.onAuthStateChange((event,session)=>{
+  if(event==='PASSWORD_RECOVERY'){
+    $('app').style.display='none';
+    $('auth').style.display='flex';
+    $('auth-normal').style.display='none';
+    $('auth-reset').style.display='block';
+    hide('loading');
+  }
+});
+
 async function doLogout(){
   try { await SB.auth.signOut(); } catch(e) {}
   window.location.reload();
@@ -1335,6 +1403,7 @@ async function doLogout(){
 
 // ── INIT ──
 async function init(){
+  if(checkResetFlow()) return;
   const{data:{session}}=await SB.auth.getSession();
   hide('loading');
   const real=s=>s&&s.user&&s.user.email&&!s.user.is_anonymous;
