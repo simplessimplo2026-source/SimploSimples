@@ -9,11 +9,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="logo.svg">
-<link rel="apple-touch-icon" href="logo.svg">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Simplo">
+<meta name="theme-color" content="#0EA5E9">
+<meta name="msapplication-TileColor" content="#0C4A6E">
+<meta name="description" content="Sua agenda acadêmica inteligente — organize provas, trabalhos e apresentações">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -2726,9 +2731,18 @@ function verificarEventosUrgentes() {
 // Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/SimploSimples/sw.js')
-    .then(() => console.log('SW registrado'))
+    .then(reg => {
+      console.log('SW registrado');
+      // Verificar atualizações a cada 30min
+      setInterval(() => reg.update(), 30 * 60 * 1000);
+    })
     .catch(e => console.log('SW erro:', e));
 }
+
+// Handler de shortcuts do PWA
+const _acao = new URLSearchParams(window.location.search).get('acao');
+if (_acao === 'novo-evento') setTimeout(() => openModal('evento'), 1500);
+if (_acao === 'calendario') setTimeout(() => go('calendario'), 1500);
 
 
   // Auto-preencher código se veio por link/QR
