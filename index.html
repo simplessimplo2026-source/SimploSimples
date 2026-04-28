@@ -467,6 +467,82 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 .onboarding-actions{display:flex;gap:10px}
 .onboarding-skip{flex:1;padding:12px;background:transparent;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;color:#94A3B8;font-family:inherit}
 .onboarding-next{flex:2;padding:12px;background:linear-gradient(135deg,#0284C7,#0EA5E9);border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;font-family:inherit}
+/* ── ANIMAÇÕES DE PÁGINA ── */
+@keyframes pageIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pageInLeft{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pageOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-16px)}}
+@keyframes pageOutRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(16px)}}
+#content.page-enter{animation:pageIn .22s ease both}
+#content.page-enter-back{animation:pageInLeft .22s ease both}
+#content.page-exit{animation:pageOut .14s ease both;pointer-events:none}
+#content.page-exit-back{animation:pageOutRight .14s ease both;pointer-events:none}
+.topbar-title{transition:opacity .15s,transform .15s}
+.topbar-title.fade{opacity:0;transform:translateY(-4px)}
+@media(max-width:768px){
+  #content.page-enter,#content.page-enter-back,#content.page-exit,#content.page-exit-back{animation:none}
+}
+
+/* ── WIDGET HOJE ── */
+.widget-hoje{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);border-radius:18px;padding:20px 20px 16px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden}
+.widget-hoje::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07)}
+.widget-hoje-data{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.75;margin-bottom:4px}
+.widget-hoje-titulo{font-size:20px;font-weight:700;font-family:'Playfair Display',serif;letter-spacing:-.5px;margin-bottom:14px;line-height:1.2}
+.widget-hoje-items{display:flex;flex-direction:column;gap:7px;position:relative;z-index:1}
+.widget-hoje-item{background:rgba(255,255,255,.15);border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:9px;cursor:pointer}
+.widget-hoje-item-hora{font-size:11px;font-weight:700;opacity:.8;min-width:36px;flex-shrink:0}
+.widget-hoje-item-nome{font-size:13px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.widget-hoje-item-disc{font-size:11px;opacity:.7;flex-shrink:0;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.widget-hoje-vazio{text-align:center;padding:10px 0;opacity:.75;font-size:13px}
+.widget-hoje-footer{display:flex;align-items:center;justify-content:space-around;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
+.widget-hoje-stat{text-align:center;flex:1;display:flex;flex-direction:column;align-items:center}
+.widget-hoje-stat-num{font-size:20px;font-weight:700;font-family:'Playfair Display',serif;line-height:1}
+.widget-hoje-stat-label{font-size:9px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.widget-hoje-divider{width:1px;height:28px;background:rgba(255,255,255,.2)}
+
+/* ── PROGRESSO ── */
+.disc-progress{margin-bottom:20px}
+.disc-prog-item{margin-bottom:12px}
+.disc-prog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.disc-prog-name{font-size:12px;font-weight:600;color:var(--text)}
+.disc-prog-count{font-size:11px;color:var(--text-3)}
+.disc-prog-bar{height:6px;background:var(--border);border-radius:4px;overflow:hidden}
+.disc-prog-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.prog-ring-wrap{display:flex;gap:10px;margin-bottom:18px}
+.prog-ring-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 10px;display:flex;flex-direction:column;align-items:center;box-shadow:var(--shadow)}
+.prog-ring-card svg{margin-bottom:5px}
+.prog-ring-label{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;text-align:center}
+.prog-ring-num{font-size:17px;font-weight:700;font-family:'Playfair Display',serif;color:var(--text);margin-bottom:2px}
+
+/* ── POMODORO ── */
+.pomo-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9100;align-items:center;justify-content:center}
+.pomo-overlay.open{display:flex}
+.pomo-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px 24px 20px;width:320px;max-width:92vw;box-shadow:var(--shadow-lg);text-align:center}
+.pomo-ring{position:relative;width:150px;height:150px;margin:0 auto 18px}
+.pomo-ring svg{transform:rotate(-90deg)}
+.pomo-ring-bg{fill:none;stroke:var(--border);stroke-width:10}
+.pomo-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s linear,stroke .4s}
+.pomo-time{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pomo-time-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--text);letter-spacing:-2px;line-height:1}
+.pomo-time-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+.pomo-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pomo-subtitle{font-size:11px;color:var(--text-3);margin-bottom:16px}
+.pomo-btns{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.pomo-sessions{display:flex;gap:5px;justify-content:center;margin-bottom:16px}
+.pomo-dot{width:9px;height:9px;border-radius:50%;background:var(--border);transition:all .3s}
+.pomo-dot.done{background:var(--brand-mid)}
+.pomo-dot.active{background:var(--red);transform:scale(1.2)}
+.pomo-modes{display:flex;background:var(--bg);border-radius:10px;padding:3px;gap:2px;border:1px solid var(--border);margin-bottom:16px}
+.pomo-mode{flex:1;padding:5px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--text-3);transition:all .15s}
+.pomo-mode.on{background:var(--surface);color:var(--brand);box-shadow:var(--shadow)}
+
+/* ── CALENDÁRIO MELHORADO ── */
+.cal-preview{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:16px;margin-top:14px}
+.cal-preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-preview-title{font-size:13px;font-weight:700;color:var(--text);text-transform:capitalize}
+.cal-preview-empty{text-align:center;padding:16px;color:var(--text-3);font-size:13px}
+
+/* ── RESET SENHA ── */
+#auth-reset{display:none}
 </style>
 </head>
 <body>
@@ -483,26 +559,56 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   <div class="auth-card">
     <div class="auth-brand">Simplo Estudante</div>
     <div class="auth-sub">Sua agenda acadêmica inteligente</div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="setTab('login')">Entrar</div>
-      <div class="auth-tab" onclick="setTab('register')">Criar conta</div>
+
+    <div id="auth-normal">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="setTab('login')">Entrar</div>
+        <div class="auth-tab" onclick="setTab('register')">Criar conta</div>
+      </div>
+      <div id="auth-msg" class="auth-msg"></div>
+      <div class="field" id="field-nome" style="display:none">
+        <label>Nome completo</label>
+        <input type="text" id="a-nome" placeholder="Seu nome completo">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="a-email" placeholder="seu@email.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <div style="position:relative">
+          <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()" style="width:100%;padding-right:40px">
+          <button type="button" onclick="toggleSenha('a-pass','olho-pass')" id="olho-pass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)">👁</button>
+        </div>
+      </div>
+      <button class="btn-auth" id="auth-btn" onclick="doAuth()">Entrar</button>
+      <div class="auth-link" id="forgot-wrap">
+        <span onclick="doForgot()">Esqueci minha senha</span>
+      </div>
     </div>
-    <div id="auth-msg" class="auth-msg"></div>
-    <div class="field" id="field-nome" style="display:none">
-      <label>Nome completo</label>
-      <input type="text" id="a-nome" placeholder="Seu nome completo">
-    </div>
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="a-email" placeholder="seu@email.com">
-    </div>
-    <div class="field">
-      <label>Senha</label>
-      <input type="password" id="a-pass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doAuth()">
-    </div>
-    <button class="btn-auth" id="auth-btn" onclick="doAuth()">Entrar</button>
-    <div class="auth-link" id="forgot-wrap">
-      <span onclick="doForgot()">Esqueci minha senha</span>
+
+    <div id="auth-reset" style="display:none">
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:36px;margin-bottom:8px">🔐</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">Nova senha</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:4px">Digite sua nova senha abaixo</div>
+      </div>
+      <div id="reset-msg" class="auth-msg"></div>
+      <div class="field">
+        <label>Nova senha</label>
+        <div style="position:relative">
+          <input type="password" id="reset-pass" placeholder="Mínimo 6 caracteres" style="width:100%;padding-right:40px">
+          <button type="button" onclick="toggleSenha('reset-pass','olho-r1')" id="olho-r1" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)">👁</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Confirmar senha</label>
+        <div style="position:relative">
+          <input type="password" id="reset-pass2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')doReset()" style="width:100%;padding-right:40px">
+          <button type="button" onclick="toggleSenha('reset-pass2','olho-r2')" id="olho-r2" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-3)">👁</button>
+        </div>
+      </div>
+      <button class="btn-auth" id="reset-btn" onclick="doReset()">Salvar nova senha</button>
     </div>
   </div>
 </div>
@@ -519,6 +625,39 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
       <button class="onboarding-next" id="ob-next" onclick="nextOnboarding()">Próximo →</button>
     </div>
   </div>
+</div>
+
+<!-- MODAL: POMODORO -->
+<div class="pomo-overlay" id="pomo-overlay">
+<div class="pomo-modal">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div class="pomo-modes" style="flex:1">
+      <button class="pomo-mode on" id="pomo-m-foco" onclick="setPomoMode('foco')">🎯 Foco</button>
+      <button class="pomo-mode" id="pomo-m-curto" onclick="setPomoMode('curto')">☕ Curta</button>
+      <button class="pomo-mode" id="pomo-m-longo" onclick="setPomoMode('longo')">🛋 Longa</button>
+    </div>
+    <button onclick="closePomo()" style="margin-left:10px;background:var(--bg);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--text-3);flex-shrink:0">✕</button>
+  </div>
+  <div class="pomo-ring">
+    <svg width="150" height="150" viewBox="0 0 150 150">
+      <circle class="pomo-ring-bg" cx="75" cy="75" r="65"/>
+      <circle class="pomo-ring-fill" id="pomo-ring-fill" cx="75" cy="75" r="65" stroke-dasharray="408.41" stroke-dashoffset="0"/>
+    </svg>
+    <div class="pomo-time">
+      <div class="pomo-time-num" id="pomo-display">25:00</div>
+      <div class="pomo-time-label" id="pomo-phase-label">Foco</div>
+    </div>
+  </div>
+  <div class="pomo-title" id="pomo-ev-title">Sessão de estudo</div>
+  <div class="pomo-subtitle" id="pomo-ev-disc"></div>
+  <div class="pomo-sessions" id="pomo-dots"></div>
+  <div class="pomo-btns">
+    <button class="btn btn-secondary btn-sm" onclick="resetPomo()">↺</button>
+    <button class="btn btn-primary" id="pomo-btn" onclick="togglePomo()" style="min-width:90px">▶ Iniciar</button>
+    <button class="btn btn-secondary btn-sm" onclick="skipPomo()">⏭</button>
+  </div>
+  <div style="font-size:11px;color:var(--text-3);text-align:center">Sessões hoje: <span id="pomo-count" style="font-weight:700;color:var(--brand)">0</span></div>
+</div>
 </div>
 
 <!-- APP -->
@@ -548,8 +687,6 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <div id="s-email" style="font-size:11px;color:var(--text-3);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
         <button class="btn btn-secondary btn-sm btn-block" onclick="doLogout()">Sair</button>
       </div>
-        <button class="btn btn-secondary btn-sm btn-block" onclick="doLogout()">Sair</button>
-      </div>
     </aside>
 
     <div class="main">
@@ -559,8 +696,9 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
           <span class="topbar-title" id="page-title">Resumo</span>
         </div>
         <div class="topbar-actions">
-          <button class="btn btn-secondary" onclick="openModal('import')">📎 Importar</button>
-          <button class="btn btn-primary" onclick="openModal('evento')">+ Novo evento</button>
+          <button class="btn btn-primary" onclick="toggleFabMenu()" style="gap:6px">
+            <span id="topbar-fab-icon" style="font-size:16px;transition:transform .2s">+</span> Criar
+          </button>
         </div>
       </header>
       <main class="content" id="content"></main>
@@ -1053,16 +1191,8 @@ async function doForgot(){
   if(error)aMsg(error.message,'error');else aMsg('Email enviado!','success');
 }
 async function doLogout(){
-  try { await SB.auth.signOut(); } catch(e) {}
-  discs=[];evts=[];U=null;perfil=null;grupos=[];
-  try { closeDrawer(); } catch(e) {}
-  try { closeModal('grupo'); } catch(e) {}
-  $('app').style.display='none';
-  $('auth').style.display='flex';
-  try { $('bottom-nav').classList.remove('visible'); } catch(e) {}
-  try { $('a-email').value=''; $('a-pass').value=''; $('a-nome').value=''; } catch(e) {}
-  try { $('auth-msg').className='auth-msg'; $('auth-msg').textContent=''; } catch(e) {}
-  try { setTab('login'); } catch(e) {}
+  try{await SB.auth.signOut()}catch(e){}
+  window.location.reload();
 }
 
 // ── INIT ──
@@ -1120,12 +1250,15 @@ async function rEvts(){const{data}=await SB.from('eventos').select('*').order('d
 
 // ── NAV ──
 function go(p,f){
+  prevPg=pg||'resumo';
   pg=p;if(f)flt=f;
+  closeFabMenu();
+  syncFabIcon(false);
   document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
   const map={resumo:0,calendario:1,todos:2,prova:3,trabalho:4,apresentacao:5,disciplinas:6,cfg:7};
   const btns=document.querySelectorAll('.nav-btn');
   const k=f||p;if(map[k]!==undefined&&btns[map[k]])btns[map[k]].classList.add('active');
-  const titles={resumo:'Resumo',calendario:'Calendário',todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros',disciplinas:'Disciplinas'};
+  const titles={resumo:'Resumo',calendario:'Calendário',todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros',disciplinas:'Disciplinas',grupos:'Grupos'};
   $('page-title').textContent=titles[f||p]||'';
   render();
 }
@@ -1143,11 +1276,25 @@ function badges(){
 // ── RENDER ──
 function render(){
   const el=$('content');
-  if(pg==='resumo')el.innerHTML=rResumo();
-  else if(pg==='eventos')el.innerHTML=rEventos();
-  else if(pg==='calendario')el.innerHTML=rCal();
-  else if(pg==='disciplinas')el.innerHTML=rDiscsPage();
-  else if(pg==='grupos')el.innerHTML=rGruposPage();
+  if(!el)return;
+  let html='';
+  if(pg==='resumo')html=rResumo();
+  else if(pg==='eventos')html=rEventos();
+  else if(pg==='calendario')html=rCal();
+  else if(pg==='disciplinas')html=rDiscsPage();
+  else if(pg==='grupos')html=rGruposPage();
+  if(!prevPg||prevPg===pg){el.innerHTML=html;return}
+  const pi=PAGE_ORDER.indexOf(prevPg),ni=PAGE_ORDER.indexOf(pg);
+  const fwd=ni>=pi;
+  el.classList.remove('page-enter','page-enter-back','page-exit','page-exit-back');
+  el.classList.add(fwd?'page-exit':'page-exit-back');
+  setTimeout(()=>{
+    el.innerHTML=html;
+    el.classList.remove('page-exit','page-exit-back');
+    el.classList.add(fwd?'page-enter':'page-enter-back');
+    el.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>el.classList.remove('page-enter','page-enter-back'),250);
+  },140);
 }
 
 function cardHTML(ev){
@@ -1178,21 +1325,13 @@ function rResumo(){
   const conc=evts.filter(e=>e.concluido).length;
   const provas=pend.filter(e=>e.tipo==='prova').length;
   const trab=pend.filter(e=>e.tipo==='trabalho').length;
-  const h=new Date().getHours();
-  const sau=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
-
   let urgHtml='';
   if(urg.length){
     urgHtml='<div class="urgency"><div class="urgency-head">⚠ Atenção urgente</div>'
       +urg.map(e=>'<div class="urgency-item"><span class="urgency-dot"></span>'+e.nome+' — '+(dLeft(e.data)===0?'HOJE':'amanhã')+(e.hora?' às '+e.hora:'')+'</div>').join('')
     +'</div>';
   }
-
-  return'<div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">'
-    +'<div><div style="font-size:12px;color:var(--text-3);font-weight:500">'+sau+' 👋</div>'
-    +'<div style="font-size:22px;font-weight:700;font-family:\'Playfair Display\',serif;margin-top:2px;color:var(--text)">'+(pend.length===0?'Tudo em dia! 🎉':pend.length+' evento'+(pend.length>1?'s':'')+' pendente'+(pend.length>1?'s':''))+'</div></div>'
-    +'<button onclick="openModal(\'import\')" style="background:var(--brand-light);border:1.5px solid var(--brand);color:var(--brand);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📎 Importar</button>'
-  +'</div>'
+  return rWidgetHoje()
   +'<div class="stats">'
     +'<div class="stat"><div class="stat-label">Provas</div><div class="stat-num" style="color:var(--red)">'+provas+'</div><div class="stat-desc">pendentes</div></div>'
     +'<div class="stat"><div class="stat-label">Trabalhos</div><div class="stat-num" style="color:var(--brand)">'+trab+'</div><div class="stat-desc">a entregar</div></div>'
@@ -1200,6 +1339,7 @@ function rResumo(){
     +'<div class="stat"><div class="stat-label">Feitos</div><div class="stat-num" style="color:var(--green)">'+conc+'</div><div class="stat-desc">concluídos</div></div>'
   +'</div>'
   +urgHtml
+  +rProgressChart()
   +'<div class="section-head"><span class="section-title">Próximos eventos</span><button class="btn btn-ghost btn-sm" onclick="go(\'eventos\',\'todos\')">Ver todos →</button></div>'
   +'<div class="event-list">'+(pend.length?pend.slice(0,6).map(cardHTML).join(''):'<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nada pendente!</div><div class="empty-sub">Adicione eventos ou importe um cronograma.</div></div>')+'</div>';
 }
@@ -1225,19 +1365,34 @@ function rCal(){
   for(let d=1;d<=dim;d++){
     const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const isT=today.getDate()===d&&today.getMonth()===m&&today.getFullYear()===y;
+    const isSel=ds===calSelectedDay;
     const es=evts.filter(e=>e.data===ds);
     const cols={prova:'#FEF2F2',trabalho:'#EFF6FF',apresentacao:'#ECFDF5',outro:'#FFFBEB'};
-    const tcols={prova:'#B91C1C',trabalho:'#1D4ED8',apresentacao:'#065F46',outro:'#92400E'};
+    const tcols={prova:'#B91C1C',trabalho:'#0284C7',apresentacao:'#065F46',outro:'#92400E'};
     const dots=es.slice(0,2).map(e=>'<div class="cal-dot" style="background:'+cols[e.tipo]+';color:'+tcols[e.tipo]+'">'+e.nome+'</div>').join('');
     const more=es.length>2?'<div style="font-size:9px;color:var(--text-3)">+'+( es.length-2)+' mais</div>':'';
-    days+='<div class="cal-cell'+(isT?' today':'')+'" onclick="openEvento(null,\''+ds+'\')"><div class="cal-num">'+d+'</div>'+dots+more+'</div>';
+    const selStyle=isSel?'border-color:var(--brand);border-width:2px;':'';
+    days+='<div class="cal-cell'+(isT?' today':'')+'" style="'+selStyle+'" onclick="selectCalDay(\''+ds+'\')"><div class="cal-num"'+(isT?' style="color:var(--brand);font-weight:700"':'')+'>'+d+'</div>'+dots+more+'</div>';
   }
   const rem=(fd+dim)%7===0?0:7-(fd+dim)%7;
   for(let d=1;d<=rem;d++)days+='<div class="cal-cell other"><div class="cal-num">'+d+'</div></div>';
+
+  // Preview do dia selecionado
+  let preview='';
+  if(calSelectedDay){
+    const selEvts=evts.filter(e=>e.data===calSelectedDay).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99'));
+    const selDate=new Date(calSelectedDay+'T00:00:00');
+    const selLabel=selDate.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+    const evHtml=selEvts.length
+      ?selEvts.map(ev=>{const disc=gDisc(ev.disciplina_id);return'<div class="event-card t-'+ev.tipo+'" onclick="openEvento(\''+ev.id+'\')" style="margin-bottom:8px">'+cardHTML(ev).replace(/^<div[^>]*>/,'').replace(/<\/div>$/,'')+'</div>'}).join('')
+      :'<div class="cal-preview-empty">Nenhum evento — <button class="btn btn-primary btn-sm" onclick="openEvento(null,\''+calSelectedDay+'\')">+ Adicionar</button></div>';
+    preview='<div class="cal-preview"><div class="cal-preview-head"><div class="cal-preview-title">'+selLabel+'</div>'+(selEvts.length?'<button class="btn btn-primary btn-sm" onclick="openEvento(null,\''+calSelectedDay+'\')">+ Evento</button>':'')+'</div>'+selEvts.map(ev=>cardHTML(ev)).join('')+'</div>';
+  }
+
   return'<div class="cal-nav"><button class="btn btn-secondary btn-sm" onclick="moveCal(-1)">← Anterior</button><span class="cal-month-title">'+mn+'</span><button class="btn btn-secondary btn-sm" onclick="moveCal(1)">Próximo →</button></div>'
-    +'<div class="cal-grid">'+heads+days+'</div>';
+    +'<div class="cal-grid">'+heads+days+'</div>'+preview;
 }
-function moveCal(d){calDt.setMonth(calDt.getMonth()+d);render()}
+function moveCal(d){calDt.setMonth(calDt.getMonth()+d);calSelectedDay=null;render()}
 
 function rDiscsPage(){
   const cards=discs.map(d=>{
@@ -2197,6 +2352,7 @@ function openFabMenu(){
   $('fab-backdrop').classList.add('open');
   $('fab-menu').classList.add('open');
   $('fab-btn').classList.add('open');
+  syncFabIcon(true);
   const sub=$('fab-import-sub');
   if(sub)sub.textContent=isPremium()?'Importar cronograma':'🔒 Requer Premium';
 }
@@ -2205,6 +2361,7 @@ function closeFabMenu(){
   $('fab-backdrop').classList.remove('open');
   $('fab-menu').classList.remove('open');
   $('fab-btn').classList.remove('open');
+  syncFabIcon(false);
 }
 
 // ── PREMIUM ──
@@ -2290,10 +2447,133 @@ async function doForgot(){
   if(error)aMsg(error.message,'error');
   else aMsg('✓ Email enviado! Verifique sua caixa de entrada.','success');
 }
-async function doLogout(){
-  try{await SB.auth.signOut()}catch(e){}
-  window.location.reload();
+// ── TOGGLE SENHA ──
+function toggleSenha(inputId, btnId){
+  const inp=$(inputId),btn=$(btnId);
+  if(!inp)return;
+  inp.type=inp.type==='password'?'text':'password';
+  if(btn)btn.textContent=inp.type==='password'?'👁':'🙈';
 }
+
+// ── RESET SENHA ──
+async function doReset(){
+  const pass=$('reset-pass').value,pass2=$('reset-pass2').value;
+  const msg=$('reset-msg');
+  if(!pass||pass.length<6){msg.textContent='Senha deve ter pelo menos 6 caracteres.';msg.className='auth-msg error';return}
+  if(pass!==pass2){msg.textContent='As senhas não coincidem.';msg.className='auth-msg error';return}
+  $('reset-btn').textContent='Salvando...';$('reset-btn').disabled=true;
+  const{error}=await SB.auth.updateUser({password:pass});
+  if(error){
+    const erros={'New password should be different from the old password.':'A nova senha deve ser diferente da senha atual.'};
+    msg.textContent=erros[error.message]||error.message;msg.className='auth-msg error';
+    $('reset-btn').textContent='Salvar nova senha';$('reset-btn').disabled=false;
+  } else {
+    msg.textContent='✓ Senha alterada! Redirecionando...';msg.className='auth-msg success';
+    setTimeout(()=>window.location.href=window.location.pathname,1500);
+  }
+}
+
+// ── ANIMAÇÕES DE PÁGINA ──
+const PAGE_ORDER=['resumo','calendario','eventos','disciplinas','grupos'];
+let prevPg='';
+
+// ── FAB TOPBAR SYNC ──
+function syncFabIcon(open){
+  const ti=$('topbar-fab-icon');
+  if(ti)ti.style.transform=open?'rotate(45deg)':'rotate(0deg)';
+}
+
+// ── WIDGET HOJE ──
+function rWidgetHoje(){
+  const hoje=new Date();hoje.setHours(0,0,0,0);
+  const amanha=new Date(hoje);amanha.setDate(amanha.getDate()+1);
+  const toStr=d=>d.toISOString().split('T')[0];
+  const hojeStr=toStr(hoje),amanhaStr=toStr(amanha);
+  const evHoje=evts.filter(e=>e.data===hojeStr&&!e.concluido).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99'));
+  const evAmanha=evts.filter(e=>e.data===amanhaStr&&!e.concluido);
+  const semana=evts.filter(e=>{const d=new Date(e.data+'T00:00:00');return!e.concluido&&d>=hoje&&d<=new Date(hoje.getTime()+7*86400000)}).length;
+  const dias=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const meses=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const dataLabel=`${dias[hoje.getDay()]}, ${hoje.getDate()} de ${meses[hoje.getMonth()]}`;
+  const titulo=evHoje.length===0&&evAmanha.length===0?'Dia livre! 🎉':evHoje.length===0?`${evAmanha.length} evento${evAmanha.length>1?'s':''} amanhã`:`${evHoje.length} evento${evHoje.length>1?'s':''} hoje`;
+  const icones={prova:'📝',trabalho:'📂',apresentacao:'🎤',outro:'📌'};
+  const itemsHtml=evHoje.length>0?evHoje.slice(0,3).map(ev=>{const disc=gDisc(ev.disciplina_id);return`<div class="widget-hoje-item" onclick="openEvento('${ev.id}')"><span style="font-size:15px">${icones[ev.tipo]||'📌'}</span><span class="widget-hoje-item-hora">${ev.hora||'—'}</span><span class="widget-hoje-item-nome">${ev.nome}</span>${disc?`<span class="widget-hoje-item-disc">${disc.nome}</span>`:''}</div>`}).join(''):evAmanha.length>0?evAmanha.slice(0,2).map(ev=>{const disc=gDisc(ev.disciplina_id);return`<div class="widget-hoje-item" onclick="openEvento('${ev.id}')"><span style="font-size:15px">${icones[ev.tipo]||'📌'}</span><span class="widget-hoje-item-hora" style="opacity:.6">amanhã</span><span class="widget-hoje-item-nome">${ev.nome}</span>${disc?`<span class="widget-hoje-item-disc">${disc.nome}</span>`:''}</div>`}).join(''):'<div class="widget-hoje-vazio">✨ Nenhum evento nos próximos dias</div>';
+  const conc=evts.filter(e=>e.concluido).length,total=evts.length;
+  const pct=total>0?Math.round((conc/total)*100):0;
+  return`<div class="widget-hoje"><div class="widget-hoje-data">${dataLabel}</div><div class="widget-hoje-titulo">${titulo}</div><div class="widget-hoje-items">${itemsHtml}</div><div class="widget-hoje-footer"><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${evHoje.length}</div><div class="widget-hoje-stat-label">Hoje</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${evAmanha.length}</div><div class="widget-hoje-stat-label">Amanhã</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${semana}</div><div class="widget-hoje-stat-label">Semana</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${pct}%</div><div class="widget-hoje-stat-label">Feitos</div></div></div></div>`;
+}
+
+// ── PROGRESSO ──
+function rProgressChart(){
+  if(!discs.length)return'';
+  const hoje=new Date();hoje.setHours(0,0,0,0);
+  const discData=discs.map(d=>{const es=evts.filter(e=>e.disciplina_id===d.id);const total=es.length;const conc=es.filter(e=>e.concluido).length;const pct=total>0?Math.round((conc/total)*100):0;return{...d,total,conc,pct}}).filter(d=>d.total>0).sort((a,b)=>b.pct-a.pct);
+  if(!discData.length)return'';
+  const totalEvts=evts.length,totalConc=evts.filter(e=>e.concluido).length;
+  const globalPct=totalEvts>0?Math.round((totalConc/totalEvts)*100):0;
+  const C=2*Math.PI*22;
+  const pendFuturos=evts.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=hoje).length;
+  const urgentes=evts.filter(e=>!e.concluido&&dLeft(e.data)<=3&&dLeft(e.data)>=0).length;
+  function miniRing(pct,color,label,num){const off=C*(1-pct/100);return`<div class="prog-ring-card"><svg width="52" height="52" viewBox="0 0 52 52" style="transform:rotate(-90deg)"><circle cx="26" cy="26" r="22" fill="none" stroke="var(--border)" stroke-width="6"/><circle cx="26" cy="26" r="22" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"/></svg><div class="prog-ring-num">${num}</div><div class="prog-ring-label">${label}</div></div>`}
+  const rings=`<div class="prog-ring-wrap">${miniRing(globalPct,'var(--brand)',`${globalPct}% feito`,totalConc+'/'+totalEvts)}${miniRing(pendFuturos>0?50:0,'var(--amber)','Pendentes',pendFuturos)}${miniRing(urgentes>0?100:0,urgentes>0?'var(--red)':'var(--green)','Urgentes',urgentes)}</div>`;
+  const bars=discData.map(d=>`<div class="disc-prog-item"><div class="disc-prog-header"><span class="disc-prog-name">${d.nome}</span><span class="disc-prog-count">${d.conc}/${d.total} · ${d.pct}%</span></div><div class="disc-prog-bar"><div class="disc-prog-fill" style="width:${d.pct}%;background:${d.cor}"></div></div></div>`).join('');
+  return`<div class="section-head" style="margin-bottom:12px"><span class="section-title">📊 Progresso por disciplina</span><button class="btn btn-ghost btn-sm" onclick="openPomo()" style="font-size:11px">🍅 Pomodoro</button></div>${rings}<div class="disc-progress">${bars}</div>`;
+}
+
+// ── POMODORO ──
+const POMO_DUR={foco:25*60,curto:5*60,longo:15*60};
+const CIRCUM=2*Math.PI*65;
+let pomoState={mode:'foco',running:false,timer:null,remaining:25*60,total:25*60,sessionsDone:0,sessions:0,evNome:'',evDisc:''};
+function openPomo(evNome,evDisc){
+  pomoState.evNome=evNome||'Sessão de estudo';pomoState.evDisc=evDisc||'';
+  $('pomo-ev-title').textContent=pomoState.evNome;$('pomo-ev-disc').textContent=pomoState.evDisc;
+  pomoState.sessions=parseInt(localStorage.getItem('pomo_sessions_today')||'0');
+  renderPomoDots();updatePomoDisplay();$('pomo-overlay').classList.add('open');
+}
+function closePomo(){if(pomoState.running)pausePomo();$('pomo-overlay').classList.remove('open')}
+function setPomoMode(m){
+  if(pomoState.running)pausePomo();
+  pomoState.mode=m;pomoState.remaining=POMO_DUR[m];pomoState.total=POMO_DUR[m];
+  document.querySelectorAll('.pomo-mode').forEach(b=>b.classList.remove('on'));
+  $('pomo-m-'+m).classList.add('on');
+  const labels={foco:'Foco',curto:'Pausa curta',longo:'Pausa longa'};
+  $('pomo-phase-label').textContent=labels[m];updatePomoDisplay();
+}
+function togglePomo(){pomoState.running?pausePomo():startPomo()}
+function startPomo(){
+  pomoState.running=true;$('pomo-btn').textContent='⏸ Pausar';
+  pomoState.timer=setInterval(()=>{
+    pomoState.remaining--;updatePomoDisplay();
+    if(pomoState.remaining<=0){
+      clearInterval(pomoState.timer);pomoState.running=false;
+      if(pomoState.mode==='foco'){pomoState.sessionsDone++;pomoState.sessions++;localStorage.setItem('pomo_sessions_today',pomoState.sessions);renderPomoDots()}
+      $('pomo-btn').textContent='▶ Iniciar';
+      const next=pomoState.sessionsDone%4===0?'longo':'curto';
+      if(pomoState.mode==='foco')setTimeout(()=>setPomoMode(next),800);else setTimeout(()=>setPomoMode('foco'),800);
+    }
+  },1000);
+}
+function pausePomo(){clearInterval(pomoState.timer);pomoState.running=false;$('pomo-btn').textContent='▶ Iniciar'}
+function resetPomo(){pausePomo();pomoState.remaining=POMO_DUR[pomoState.mode];updatePomoDisplay()}
+function skipPomo(){pausePomo();pomoState.remaining=0;updatePomoDisplay()}
+function updatePomoDisplay(){
+  const m=Math.floor(pomoState.remaining/60).toString().padStart(2,'0');
+  const s=(pomoState.remaining%60).toString().padStart(2,'0');
+  $('pomo-display').textContent=m+':'+s;
+  const fill=$('pomo-ring-fill');
+  fill.style.strokeDashoffset=CIRCUM*(1-pomoState.remaining/pomoState.total);
+  const colors={foco:'#EF4444',curto:'#10B981',longo:'#8B5CF6'};
+  fill.style.stroke=colors[pomoState.mode];
+  $('pomo-count').textContent=pomoState.sessions;
+}
+function renderPomoDots(){
+  const n=Math.min(pomoState.sessionsDone%4,4);
+  $('pomo-dots').innerHTML=Array.from({length:4},(_,i)=>`<div class="pomo-dot ${i<n?'done':i===n?'active':''}"></div>`).join('');
+}
+
+// ── CALENDÁRIO COM PREVIEW ──
+let calSelectedDay=null;
+function selectCalDay(ds){calSelectedDay=calSelectedDay===ds?null:ds;render()}
 
 // ── SERVICE WORKER ──
 if('serviceWorker' in navigator){
