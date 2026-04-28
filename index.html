@@ -584,6 +584,28 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .premium-status.inactive{background:var(--amber-light);color:#92400E;border:1px solid rgba(245,158,11,.2)}
 
 /* ══ MOBILE ══ */
+/* ══ ONBOARDING ══ */
+.onboarding{position:fixed;inset:0;z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px}
+.onboarding-bg{position:absolute;inset:0;background:linear-gradient(145deg,#082F49,#0284C7 60%,#0EA5E9);transition:opacity .4s}
+.onboarding-card{background:rgba(255,255,255,0.96);border-radius:28px;padding:40px 32px 32px;width:100%;max-width:400px;position:relative;z-index:1;box-shadow:0 32px 80px rgba(0,0,0,.25);text-align:center}
+.onboarding-icon{font-size:64px;margin-bottom:16px;line-height:1;display:block}
+.onboarding-title{font-size:24px;font-weight:700;font-family:'Playfair Display',serif;color:#082F49;letter-spacing:-.5px;margin-bottom:10px}
+.onboarding-desc{font-size:14px;color:#475569;line-height:1.65;margin-bottom:28px}
+.onboarding-dots{display:flex;gap:7px;justify-content:center;margin-bottom:24px}
+.onboarding-dot{width:8px;height:8px;border-radius:50%;background:#BAE6FD;transition:all .25s}
+.onboarding-dot.on{width:24px;border-radius:4px;background:#0EA5E9}
+.onboarding-actions{display:flex;gap:10px}
+.onboarding-skip{flex:1;padding:13px;background:transparent;border:1.5px solid #E2E8F0;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;color:#94A3B8;font-family:inherit;transition:all .15s}
+.onboarding-skip:hover{border-color:#0EA5E9;color:#0EA5E9}
+.onboarding-next{flex:2;padding:13px;background:linear-gradient(135deg,#0284C7,#0EA5E9);border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;font-family:inherit;box-shadow:0 4px 16px rgba(14,165,233,.35);transition:all .15s}
+.onboarding-next:hover{box-shadow:0 6px 22px rgba(14,165,233,.45);transform:translateY(-1px)}
+@media(max-width:480px){
+  .onboarding-card{padding:32px 24px 28px;border-radius:24px}
+  .onboarding-icon{font-size:52px}
+  .onboarding-title{font-size:20px}
+  .onboarding-desc{font-size:13px}
+}
+
 /* ══ IPAD / TABLET (768px - 1200px) ══ */
 @media(min-width:768px) and (max-width:1200px){
   .sidebar{width:220px}
@@ -676,6 +698,21 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
   <div class="loading-logo">Simplo</div>
   <div class="loading-sub">sua agenda acadêmica</div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding" style="display:none">
+  <div class="onboarding-bg"></div>
+  <div class="onboarding-card">
+    <span class="onboarding-icon" id="ob-icon">🎓</span>
+    <div class="onboarding-title" id="ob-title">Bem-vindo ao Simplo!</div>
+    <div class="onboarding-desc" id="ob-desc">Sua agenda acadêmica inteligente. Organize provas, trabalhos e apresentações em um só lugar.</div>
+    <div class="onboarding-dots" id="ob-dots"></div>
+    <div class="onboarding-actions">
+      <button class="onboarding-skip" onclick="finishOnboarding()">Pular</button>
+      <button class="onboarding-next" id="ob-next" onclick="nextOnboarding()">Próximo →</button>
+    </div>
+  </div>
 </div>
 
 <!-- AUTH -->
@@ -1472,6 +1509,7 @@ async function boot(u){
   await loadPerfil();
   prevPg = '';
   badges(); render();
+  checkOnboarding();
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
 
@@ -2699,6 +2737,82 @@ if ('serviceWorker' in navigator) {
     }, 1000);
   }
 
+
+// ── ONBOARDING ──
+const OB_STEPS = [
+  {
+    icon: '🎓',
+    title: 'Bem-vindo ao Simplo!',
+    desc: 'Sua agenda acadêmica inteligente. Organize provas, trabalhos e apresentações em um só lugar.'
+  },
+  {
+    icon: '📅',
+    title: 'Gerencie seus eventos',
+    desc: 'Adicione provas, trabalhos e apresentações com data, horário e disciplina. Receba alertas antes dos prazos.'
+  },
+  {
+    icon: '🤖',
+    title: 'IA que te ajuda',
+    desc: 'Com o plano Premium, importe cronogramas enviados pelo professor — a IA extrai todos os eventos automaticamente.'
+  },
+  {
+    icon: '👥',
+    title: 'Estude em grupo',
+    desc: 'Crie grupos com seus colegas, compartilhe eventos, avisos e tarefas em tempo real.'
+  },
+  {
+    icon: '🚀',
+    title: 'Tudo pronto!',
+    desc: 'Comece adicionando suas disciplinas e o primeiro evento. Bons estudos! 📚'
+  }
+];
+let obStep = 0;
+
+function showOnboarding(){
+  obStep = 0;
+  renderObStep();
+  $('onboarding').style.display = 'flex';
+}
+
+function renderObStep(){
+  const s = OB_STEPS[obStep];
+  const total = OB_STEPS.length;
+
+  // Animação suave
+  const card = document.querySelector('.onboarding-card');
+  card.style.opacity = '0';card.style.transform = 'translateY(8px)';
+  setTimeout(()=>{
+    $('ob-icon').textContent = s.icon;
+    $('ob-title').textContent = s.title;
+    $('ob-desc').textContent = s.desc;
+    $('ob-next').textContent = obStep === total-1 ? '✓ Começar' : 'Próximo →';
+    $('ob-dots').innerHTML = Array.from({length:total},(_,i)=>
+      `<div class="onboarding-dot${i===obStep?' on':''}"></div>`
+    ).join('');
+    card.style.opacity = '1';card.style.transform = 'translateY(0)';
+    card.style.transition = 'opacity .22s ease, transform .22s ease';
+  }, 80);
+}
+
+function nextOnboarding(){
+  if(obStep < OB_STEPS.length - 1){
+    obStep++;
+    renderObStep();
+  } else {
+    finishOnboarding();
+  }
+}
+
+function finishOnboarding(){
+  $('onboarding').style.display = 'none';
+  localStorage.setItem('ob_done_'+U.id, '1');
+}
+
+function checkOnboarding(){
+  if(!localStorage.getItem('ob_done_'+U.id)){
+    setTimeout(showOnboarding, 600);
+  }
+}
 
 // ── FAB MENU ──
 let fabOpen = false;
