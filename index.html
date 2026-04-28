@@ -740,19 +740,19 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 <div class="fab-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
 <div class="fab-menu" id="fab-menu">
   <div class="fab-item" onclick="closeFabMenu();openModal('evento')">
-    <div class="fab-item-icon" style="background:#EFF6FF">📝</div>
+    <div class="fab-item-icon" style="background:#EFF6FF"><i data-lucide="calendar-plus" style="width:18px;height:18px;color:#0284C7"></i></div>
     <div><div class="fab-item-label">Novo evento</div><div class="fab-item-sub">Prova, trabalho, apresentação</div></div>
   </div>
   <div class="fab-item" onclick="closeFabMenu();openModal('disc')">
-    <div class="fab-item-icon" style="background:#F0FDF4">📚</div>
+    <div class="fab-item-icon" style="background:#F0FDF4"><i data-lucide="graduation-cap" style="width:18px;height:18px;color:#16A34A"></i></div>
     <div><div class="fab-item-label">Nova disciplina</div><div class="fab-item-sub">Adicionar matéria</div></div>
   </div>
   <div class="fab-item" onclick="closeFabMenu();abrirImportComGate()">
-    <div class="fab-item-icon" style="background:#FFF7ED">🤖</div>
+    <div class="fab-item-icon" style="background:#FFF7ED"><i data-lucide="bot" style="width:18px;height:18px;color:#EA580C"></i></div>
     <div><div class="fab-item-label">Importar com IA</div><div class="fab-item-sub" id="fab-import-sub">Requer Premium</div></div>
   </div>
   <div class="fab-item" onclick="closeFabMenu();openGrupoEntry('criar')">
-    <div class="fab-item-icon" style="background:#F5F3FF">👥</div>
+    <div class="fab-item-icon" style="background:#F5F3FF"><i data-lucide="users" style="width:18px;height:18px;color:#7C3AED"></i></div>
     <div><div class="fab-item-label">Criar grupo</div><div class="fab-item-sub">Novo grupo de estudo</div></div>
   </div>
 </div>
@@ -796,16 +796,16 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   </div>
   <nav style="flex:1;overflow-y:auto;padding:8px 0">
     <div style="font-size:10px;font-weight:700;color:var(--text-3);padding:8px 18px 2px;text-transform:uppercase">Principal</div>
-    <div class="drawer-item" onclick="go('resumo');closeDrawer()"><span class="icon">📋</span>Resumo</div>
-    <div class="drawer-item" onclick="go('calendario');closeDrawer()"><span class="icon">📅</span>Calendário</div>
+    <div class="drawer-item" onclick="go('resumo');closeDrawer()"><i data-lucide="layout-dashboard" style="width:16px;height:16px"></i>Resumo</div>
+    <div class="drawer-item" onclick="go('calendario');closeDrawer()"><i data-lucide="calendar" style="width:16px;height:16px"></i>Calendário</div>
     <div style="font-size:10px;font-weight:700;color:var(--text-3);padding:8px 18px 2px;text-transform:uppercase">Eventos</div>
-    <div class="drawer-item" onclick="go('eventos','todos');closeDrawer()"><span class="icon">📚</span>Eventos</div>
+    <div class="drawer-item" onclick="go('eventos','todos');closeDrawer()"><i data-lucide="book-open" style="width:16px;height:16px"></i>Eventos</div>
     <div style="font-size:10px;font-weight:700;color:var(--text-3);padding:8px 18px 2px;text-transform:uppercase">Config</div>
-    <div class="drawer-item" onclick="go('disciplinas');closeDrawer()"><span class="icon">🏫</span>Disciplinas</div>
-    <div class="drawer-item" onclick="go('grupos');closeDrawer()"><span class="icon">👥</span>Grupos</div>
-    <div class="drawer-item" onclick="openModal('perfil');closeDrawer()"><span class="icon">👤</span>Meu Perfil</div>
-    <div class="drawer-item" onclick="openModal('cfg');closeDrawer()"><span class="icon">⚙️</span>Configurações</div>
-    <div class="drawer-item" onclick="openModal('import');closeDrawer()"><span class="icon">📎</span>Importar cronograma</div>
+    <div class="drawer-item" onclick="go('disciplinas');closeDrawer()"><i data-lucide="graduation-cap" style="width:16px;height:16px"></i>Disciplinas</div>
+    <div class="drawer-item" onclick="go('grupos');closeDrawer()"><i data-lucide="users" style="width:16px;height:16px"></i>Grupos</div>
+    <div class="drawer-item" onclick="openModal('perfil');closeDrawer()"><i data-lucide="user" style="width:16px;height:16px"></i>Meu Perfil</div>
+    <div class="drawer-item" onclick="openModal('cfg');closeDrawer()"><i data-lucide="settings" style="width:16px;height:16px"></i>Configurações</div>
+    <div class="drawer-item" onclick="abrirImportComGate();closeDrawer()"><i data-lucide="bot" style="width:16px;height:16px"></i>Importar com IA</div>
   </nav>
   <div style="padding:14px 18px;border-top:1px solid var(--border)">
     <button class="btn btn-secondary btn-block" onclick="doLogout()">Sair da conta</button>
@@ -989,11 +989,11 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     </div>
   </div>
   <div class="tabs" style="flex-wrap:wrap;gap:3px">
-    <button class="tab on" onclick="setAbaGrupo('mural')">📢 Mural</button>
-    <button class="tab" onclick="setAbaGrupo('tarefas')">✅ Tarefas</button>
-    <button class="tab" onclick="setAbaGrupo('eventos')">📅 Eventos</button>
-    <button class="tab" onclick="setAbaGrupo('arquivos')">📎 Arquivos</button>
-    <button class="tab" onclick="setAbaGrupo('membros')">👥 Membros</button>
+    <button class="tab on" onclick="setAbaGrupo('mural')"><i data-lucide="megaphone" style="width:14px;height:14px"></i> Mural</button>
+    <button class="tab" onclick="setAbaGrupo('tarefas')"><i data-lucide="check-square" style="width:14px;height:14px"></i> Tarefas</button>
+    <button class="tab" onclick="setAbaGrupo('eventos')"><i data-lucide="calendar" style="width:14px;height:14px"></i> Eventos</button>
+    <button class="tab" onclick="setAbaGrupo('arquivos')"><i data-lucide="paperclip" style="width:14px;height:14px"></i> Arquivos</button>
+    <button class="tab" onclick="setAbaGrupo('membros')"><i data-lucide="users" style="width:14px;height:14px"></i> Membros</button>
   </div>
   <div id="grupo-content"></div>
 </div>
@@ -1313,7 +1313,7 @@ function render(){
   const pagesWithFab=['resumo','eventos'];
   const fabActions=$('topbar-actions');
   if(fabActions)fabActions.style.display=pagesWithFab.includes(pg)?'flex':'none';
-  if(!prevPg||prevPg===pg){el.innerHTML=html;return}
+  if(!prevPg||prevPg===pg){el.innerHTML=html;initIcons();return}
   const pi=PAGE_ORDER.indexOf(prevPg),ni=PAGE_ORDER.indexOf(pg);
   const fwd=ni>=pi;
   el.classList.remove('page-enter','page-enter-back','page-exit','page-exit-back');
@@ -1378,9 +1378,17 @@ function rEventos(){
   let evs=[...evts].sort((a,b)=>new Date(a.data)-new Date(b.data));
   if(flt!=='todos')evs=evs.filter(e=>e.tipo===flt);
   const tipos=['todos','prova','trabalho','apresentacao','outro'];
-  const labs=['Todos','📝 Provas','📂 Trabalhos','🎤 Apresentações','📌 Outros'];
-  return'<div class="filters">'+tipos.map((t,i)=>'<button class="filter'+(flt===t?' on':'')+'" onclick="setFlt(\''+t+'\')">'+labs[i]+'</button>').join('')+'</div>'
+  const labs=[
+    '<i data-lucide="list" style="width:13px;height:13px"></i> Todos',
+    '<i data-lucide="file-text" style="width:13px;height:13px"></i> Provas',
+    '<i data-lucide="briefcase" style="width:13px;height:13px"></i> Trabalhos',
+    '<i data-lucide="presentation" style="width:13px;height:13px"></i> Apresentações',
+    '<i data-lucide="tag" style="width:13px;height:13px"></i> Outros'
+  ];
+  const html='<div class="filters">'+tipos.map((t,i)=>'<button class="filter'+(flt===t?' on':'')+'" onclick="setFlt(\''+t+'\')" style="display:flex;align-items:center;gap:5px">'+labs[i]+'</button>').join('')+'</div>'
     +'<div class="event-list">'+(evs.length?evs.map(cardHTML).join(''):'<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Nenhum evento aqui</div></div>')+'</div>';
+  setTimeout(initIcons,50);
+  return html;
 }
 function setFlt(f){flt=f;const t={todos:'Todos os eventos',prova:'Provas',trabalho:'Trabalhos',apresentacao:'Apresentações',outro:'Outros'};$('page-title').textContent=t[f];render()}
 
@@ -1611,7 +1619,7 @@ function openDrawer(){
   const d=$('drawer'),o=$('dbg');
   d.style.display='flex';o.style.display='block';o.style.pointerEvents='auto';
   $('d-email').textContent=U?.email||'';
-  setTimeout(()=>{d.style.transform='translateX(0)'},10);
+  setTimeout(()=>{d.style.transform='translateX(0)';initIcons();},10);
 }
 function closeDrawer(){
   const d=$('drawer'),o=$('dbg');
@@ -1907,6 +1915,7 @@ async function abrirGrupo(id) {
   abaGrupo = 'mural';
   document.querySelectorAll('#m-grupo .tab').forEach((t,i) => t.classList.toggle('on', i===0));
   $('m-grupo').classList.add('open');
+  setTimeout(initIcons, 50);
   await carregarDadosGrupo();
 }
 
@@ -2641,22 +2650,6 @@ function rWidgetHoje(){
 }
 
 // ── PROGRESSO ──
-function rProgressChart(){
-  if(!discs.length)return'';
-  const hoje=new Date();hoje.setHours(0,0,0,0);
-  const discData=discs.map(d=>{const es=evts.filter(e=>e.disciplina_id===d.id);const total=es.length;const conc=es.filter(e=>e.concluido).length;const pct=total>0?Math.round((conc/total)*100):0;return{...d,total,conc,pct}}).filter(d=>d.total>0).sort((a,b)=>b.pct-a.pct);
-  if(!discData.length)return'';
-  const totalEvts=evts.length,totalConc=evts.filter(e=>e.concluido).length;
-  const globalPct=totalEvts>0?Math.round((totalConc/totalEvts)*100):0;
-  const C=2*Math.PI*22;
-  const pendFuturos=evts.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=hoje).length;
-  const urgentes=evts.filter(e=>!e.concluido&&dLeft(e.data)<=3&&dLeft(e.data)>=0).length;
-  function miniRing(pct,color,label,num){const off=C*(1-pct/100);return`<div class="prog-ring-card"><svg width="52" height="52" viewBox="0 0 52 52" style="transform:rotate(-90deg)"><circle cx="26" cy="26" r="22" fill="none" stroke="var(--border)" stroke-width="6"/><circle cx="26" cy="26" r="22" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"/></svg><div class="prog-ring-num">${num}</div><div class="prog-ring-label">${label}</div></div>`}
-  const rings=`<div class="prog-ring-wrap">${miniRing(globalPct,'var(--brand)',`${globalPct}% feito`,totalConc+'/'+totalEvts)}${miniRing(pendFuturos>0?50:0,'var(--amber)','Pendentes',pendFuturos)}${miniRing(urgentes>0?100:0,urgentes>0?'var(--red)':'var(--green)','Urgentes',urgentes)}</div>`;
-  const bars=discData.map(d=>`<div class="disc-prog-item"><div class="disc-prog-header"><span class="disc-prog-name">${d.nome}</span><span class="disc-prog-count">${d.conc}/${d.total} · ${d.pct}%</span></div><div class="disc-prog-bar"><div class="disc-prog-fill" style="width:${d.pct}%;background:${d.cor}"></div></div></div>`).join('');
-  return`<div class="section-head" style="margin-bottom:12px"><span class="section-title">📊 Progresso por disciplina</span><button class="btn btn-ghost btn-sm" onclick="openPomo()" style="font-size:11px">🍅 Pomodoro</button></div>${rings}<div class="disc-progress">${bars}</div>`;
-}
-
 // ── POMODORO ──
 const POMO_DUR={foco:25*60,curto:5*60,longo:15*60};
 const CIRCUM=2*Math.PI*65;
