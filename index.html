@@ -15,6 +15,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Simplo">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -543,6 +549,21 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 
 /* ── RESET SENHA ── */
 #auth-reset{display:none}
+/* ── FLATPICKR TEMA ── */
+.flatpickr-calendar{border:1px solid var(--border)!important;border-radius:var(--radius-lg)!important;box-shadow:var(--shadow-lg)!important;font-family:'Sora',sans-serif!important}
+.flatpickr-day.selected,.flatpickr-day.selected:hover{background:var(--brand)!important;border-color:var(--brand)!important}
+.flatpickr-day:hover{background:var(--brand-light)!important}
+.flatpickr-months .flatpickr-month{background:var(--brand)!important;color:#fff!important;border-radius:var(--radius-lg) var(--radius-lg) 0 0!important}
+.flatpickr-current-month,.flatpickr-monthDropdown-months{color:#fff!important}
+.flatpickr-weekday{color:var(--text-3)!important;font-weight:700!important}
+.numInputWrapper:hover{background:transparent!important}
+[data-theme="dark"] .flatpickr-calendar{background:var(--surface)!important;color:var(--text)!important}
+[data-theme="dark"] .flatpickr-day{color:var(--text)!important}
+[data-theme="dark"] .flatpickr-day.flatpickr-disabled{color:var(--text-3)!important}
+
+/* ── LUCIDE ICONS ── */
+.nav-btn i,.bnav-item i{display:flex;align-items:center;flex-shrink:0}
+.nav-btn{gap:9px}
 </style>
 </head>
 <body>
@@ -670,14 +691,14 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
       </div>
       <nav class="sidebar-nav">
         <div class="nav-group">Principal</div>
-        <button class="nav-btn active" onclick="go('resumo')"><span class="icon">📋</span>Resumo</button>
-        <button class="nav-btn" onclick="go('calendario')"><span class="icon">📅</span>Calendário</button>
-        <button class="nav-btn" onclick="go('eventos','todos')"><span class="icon">📚</span>Eventos<span class="nav-badge" id="b-all">0</span></button>
+        <button class="nav-btn active" onclick="go('resumo')"><i data-lucide="layout-dashboard" style="width:16px;height:16px"></i>Resumo</button>
+        <button class="nav-btn" onclick="go('calendario')"><i data-lucide="calendar" style="width:16px;height:16px"></i>Calendário</button>
+        <button class="nav-btn" onclick="go('eventos','todos')"><i data-lucide="book-open" style="width:16px;height:16px"></i>Eventos<span class="nav-badge" id="b-all">0</span></button>
         <div class="nav-group">Config</div>
-        <button class="nav-btn" onclick="go('disciplinas')"><span class="icon">🏫</span>Disciplinas</button>
-        <button class="nav-btn" onclick="go('grupos')"><span class="icon">👥</span>Grupos</button>
-        <button class="nav-btn" onclick="openModal('perfil')"><span class="icon">👤</span>Meu Perfil</button>
-        <button class="nav-btn" onclick="openModal('cfg')"><span class="icon">⚙️</span>Configurações</button>
+        <button class="nav-btn" onclick="go('disciplinas')"><i data-lucide="graduation-cap" style="width:16px;height:16px"></i>Disciplinas</button>
+        <button class="nav-btn" onclick="go('grupos')"><i data-lucide="users" style="width:16px;height:16px"></i>Grupos</button>
+        <button class="nav-btn" onclick="openModal('perfil')"><i data-lucide="user" style="width:16px;height:16px"></i>Meu Perfil</button>
+        <button class="nav-btn" onclick="openModal('cfg')"><i data-lucide="settings" style="width:16px;height:16px"></i>Configurações</button>
       </nav>
       <div class="sidebar-bottom">
         <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;min-width:0">
@@ -708,11 +729,11 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav" id="bottom-nav">
-  <div class="bnav-item on" id="bn-resumo" onclick="go('resumo');bnav('resumo')"><span class="bnav-icon">📋</span>Resumo</div>
-  <div class="bnav-item" id="bn-calendario" onclick="go('calendario');bnav('calendario')"><span class="bnav-icon">📅</span>Agenda</div>
+  <div class="bnav-item on" id="bn-resumo" onclick="go('resumo');bnav('resumo')"><i data-lucide="layout-dashboard" style="width:20px;height:20px"></i>Resumo</div>
+  <div class="bnav-item" id="bn-calendario" onclick="go('calendario');bnav('calendario')"><i data-lucide="calendar" style="width:20px;height:20px"></i>Agenda</div>
   <div class="bnav-fab" onclick="toggleFabMenu()"><div class="bnav-fab-btn" id="fab-btn">+</div></div>
-  <div class="bnav-item" id="bn-eventos" onclick="go('eventos','todos');bnav('eventos')"><span class="bnav-icon">📚</span>Eventos</div>
-  <div class="bnav-item" id="bn-mais" onclick="openDrawer()"><span class="bnav-icon">☰</span>Mais</div>
+  <div class="bnav-item" id="bn-eventos" onclick="go('eventos','todos');bnav('eventos')"><i data-lucide="book-open" style="width:20px;height:20px"></i>Eventos</div>
+  <div class="bnav-item" id="bn-mais" onclick="openDrawer()"><i data-lucide="menu" style="width:20px;height:20px"></i>Mais</div>
 </nav>
 
 <!-- FAB MENU -->
@@ -807,7 +828,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         <option value="outro">📌 Outro</option>
       </select>
     </div>
-    <div class="field"><label>Data</label><input type="date" id="e-data" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none"></div>
+    <div class="field"><label>Data</label><input type="text" id="e-data" placeholder="Selecione a data" readonly style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;cursor:pointer;background:var(--surface);color:var(--text)"></div>
   </div>
   <div class="field"><label>Nome / Descrição</label><input type="text" id="e-nome" placeholder="Ex: Prova AV1, Entrega do projeto..."></div>
   <div class="field-row">
@@ -1054,13 +1075,17 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <div class="modal-title">👤 Meu Perfil</div>
     <button class="modal-close" onclick="closeModal('perfil')">✕</button>
   </div>
-  <div style="display:flex;align-items:center;gap:14px;background:var(--brand-light);border-radius:12px;padding:14px;margin-bottom:18px">
+  <div style="display:flex;align-items:center;gap:14px;background:var(--brand-light);border-radius:12px;padding:14px;margin-bottom:12px">
     <div id="perfil-avatar" style="width:52px;height:52px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0">?</div>
-    <div>
-      <div id="perfil-nome-display" style="font-size:15px;font-weight:700;color:var(--text)">Sem nome</div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:7px">
+        <div id="perfil-nome-display" style="font-size:15px;font-weight:700;color:var(--text)">Sem nome</div>
+        <span id="perfil-premium-badge"></span>
+      </div>
       <div id="perfil-curso-display" style="font-size:12px;color:var(--text-3);margin-top:1px"></div>
     </div>
   </div>
+  <div id="perfil-premium-card" style="margin-bottom:14px"></div>
   <div class="field"><label>Nome completo</label><input type="text" id="p-nome" placeholder="Ex: Emanuel Silva"></div>
   <div class="field-row">
     <div class="field"><label>Curso</label><input type="text" id="p-curso" placeholder="Ex: Psicologia"></div>
@@ -1221,6 +1246,7 @@ async function boot(u){
   await loadPerfil();
   atualizarUIPremium();
   badges();render();
+  initIcons();
   checkOnboarding();
   setTimeout(pedirPermissaoNotificacao, 2000);
 }
@@ -1283,6 +1309,10 @@ function render(){
   else if(pg==='calendario')html=rCal();
   else if(pg==='disciplinas')html=rDiscsPage();
   else if(pg==='grupos')html=rGruposPage();
+  // Mostrar/esconder botão + Criar conforme a aba
+  const pagesWithFab=['resumo','eventos'];
+  const fabActions=$('topbar-actions');
+  if(fabActions)fabActions.style.display=pagesWithFab.includes(pg)?'flex':'none';
   if(!prevPg||prevPg===pg){el.innerHTML=html;return}
   const pi=PAGE_ORDER.indexOf(prevPg),ni=PAGE_ORDER.indexOf(pg);
   const fwd=ni>=pi;
@@ -1293,7 +1323,7 @@ function render(){
     el.classList.remove('page-exit','page-exit-back');
     el.classList.add(fwd?'page-enter':'page-enter-back');
     el.scrollTo({top:0,behavior:'smooth'});
-    setTimeout(()=>el.classList.remove('page-enter','page-enter-back'),250);
+    setTimeout(()=>{ el.classList.remove('page-enter','page-enter-back'); initIcons(); },250);
   },140);
 }
 
@@ -1446,6 +1476,7 @@ function openEvento(id,preDate){
     $('btn-del-ev').style.display='none';
   }
   $('m-evento').classList.add('open');
+  setTimeout(initFlatpickr, 50);
 }
 async function salvarEvento(){
   const nome=$('e-nome').value.trim(),data=$('e-data').value;
@@ -2382,12 +2413,26 @@ function copyPix(){
 }
 function atualizarUIPremium(){
   const premium=isPremium();
+  // Sidebar badge
   const badge=$('s-premium-badge');
   if(badge)badge.style.display=premium?'inline':'none';
+  // Config status
   const statusBar=$('premium-status-bar');
   if(statusBar)statusBar.innerHTML=premium
     ?'<div class="premium-status active">✅ Conta Premium ativa — IA disponível</div>'
     :'<div class="premium-status inactive">🔒 Você ainda não tem acesso Premium</div>';
+  // Perfil badge
+  const perfilBadge=$('perfil-premium-badge');
+  if(perfilBadge)perfilBadge.innerHTML=premium?'<span class="premium-badge">⭐ Premium</span>':'<span style="font-size:10px;font-weight:700;background:var(--border);color:var(--text-3);padding:2px 8px;border-radius:20px">FREE</span>';
+  // Perfil card
+  const perfilCard=$('perfil-premium-card');
+  if(perfilCard){
+    if(premium){
+      perfilCard.innerHTML='<div style="background:var(--green-light);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px"><span>⭐</span><div style="font-size:12px;font-weight:600;color:#065F46">Conta Premium ativa — IA disponível</div></div>';
+    } else {
+      perfilCard.innerHTML='<div style="background:var(--amber-light);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div style="font-size:12px;color:#92400E;font-weight:600">Conta gratuita</div><button class="btn btn-sm" onclick="closeModal(\'perfil\');openModal(\'premium\')" style="background:var(--brand);color:#fff;border:none;font-size:11px">Ver Premium</button></div>';
+    }
+  }
 }
 function openCfg(){
   applyDark(document.documentElement.getAttribute('data-theme')==='dark');
@@ -2447,6 +2492,98 @@ async function doForgot(){
   if(error)aMsg(error.message,'error');
   else aMsg('✓ Email enviado! Verifique sua caixa de entrada.','success');
 }
+// ── LUCIDE ICONS ──
+function initIcons(){
+  if(window.lucide)lucide.createIcons();
+}
+
+// ── FLATPICKR ──
+let fpData = null;
+function initFlatpickr(){
+  if(!window.flatpickr)return;
+  const el = $('e-data');
+  if(!el)return;
+  if(fpData)fpData.destroy();
+  fpData = flatpickr(el, {
+    locale: 'pt',
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'D, d \\de F \\de Y',
+    minDate: 'today',
+    disableMobile: false,
+    theme: 'airbnb',
+    onChange: function(selectedDates, dateStr){
+      el.value = dateStr;
+    }
+  });
+}
+
+// ── CHART.JS PROGRESSO ──
+let progressChart = null;
+function rProgressChart(){
+  if(!discs.length)return'';
+  const hoje=new Date();hoje.setHours(0,0,0,0);
+  const discData=discs.map(d=>{
+    const es=evts.filter(e=>e.disciplina_id===d.id);
+    const total=es.length;
+    const conc=es.filter(e=>e.concluido).length;
+    const pct=total>0?Math.round((conc/total)*100):0;
+    return{...d,total,conc,pct};
+  }).filter(d=>d.total>0).sort((a,b)=>b.pct-a.pct);
+  if(!discData.length)return'';
+
+  const totalEvts=evts.length;
+  const totalConc=evts.filter(e=>e.concluido).length;
+  const globalPct=totalEvts>0?Math.round((totalConc/totalEvts)*100):0;
+  const pendFuturos=evts.filter(e=>!e.concluido&&new Date(e.data+'T00:00:00')>=hoje).length;
+  const urgentes=evts.filter(e=>!e.concluido&&dLeft(e.data)<=3&&dLeft(e.data)>=0).length;
+
+  // Mini stats cards
+  const stats=`<div class="prog-ring-wrap">
+    <div class="prog-ring-card"><div class="prog-ring-num" style="color:var(--brand)">${totalConc}/${totalEvts}</div><div class="prog-ring-label">Concluídos</div></div>
+    <div class="prog-ring-card"><div class="prog-ring-num" style="color:var(--amber)">${pendFuturos}</div><div class="prog-ring-label">Pendentes</div></div>
+    <div class="prog-ring-card"><div class="prog-ring-num" style="color:${urgentes>0?'var(--red)':'var(--green)'}">${urgentes}</div><div class="prog-ring-label">Urgentes</div></div>
+    <div class="prog-ring-card"><div class="prog-ring-num" style="color:var(--brand)">${globalPct}%</div><div class="prog-ring-label">Progresso</div></div>
+  </div>`;
+
+  // Chart.js bar chart
+  const chartHtml=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px">
+    <canvas id="progress-chart" height="140"></canvas>
+  </div>`;
+
+  // Render chart after DOM update
+  setTimeout(()=>{
+    const canvas=document.getElementById('progress-chart');
+    if(!canvas||!window.Chart)return;
+    if(progressChart)progressChart.destroy();
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    const textColor=isDark?'#7DD3FC':'#7DB9D4';
+    progressChart=new Chart(canvas,{
+      type:'bar',
+      data:{
+        labels:discData.map(d=>d.nome.length>15?d.nome.substring(0,15)+'…':d.nome),
+        datasets:[
+          {label:'Concluídos',data:discData.map(d=>d.conc),backgroundColor:discData.map(d=>d.cor+'CC'),borderRadius:6,borderSkipped:false},
+          {label:'Pendentes',data:discData.map(d=>d.total-d.conc),backgroundColor:discData.map(d=>d.cor+'33'),borderRadius:6,borderSkipped:false}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y}}},
+        scales:{
+          x:{stacked:true,grid:{display:false},ticks:{color:textColor,font:{size:11,family:'Sora'}}},
+          y:{stacked:true,display:false,grid:{display:false}}
+        }
+      }
+    });
+  },100);
+
+  return`<div class="section-head" style="margin-bottom:12px">
+    <span class="section-title">📊 Progresso por disciplina</span>
+    <button class="btn btn-ghost btn-sm" onclick="openPomo()" style="font-size:11px">🍅 Pomodoro</button>
+  </div>${stats}${chartHtml}`;
+}
+
 // ── TOGGLE SENHA ──
 function toggleSenha(inputId, btnId){
   const inp=$(inputId),btn=$(btnId);
