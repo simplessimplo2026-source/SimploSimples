@@ -554,6 +554,9 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .fab-backdrop.open{opacity:1;pointer-events:auto}
 .fab-menu{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:199;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;opacity:0;transition:opacity .2s}
 .fab-menu.open{opacity:1;pointer-events:auto}
+@media(min-width:769px){
+  .fab-menu{bottom:auto;top:70px;right:24px;left:auto;transform:none;align-items:flex-end}
+}
 .fab-item{display:flex;align-items:center;gap:10px;background:var(--surface-solid);border:1px solid var(--glass-border);border-radius:16px;padding:11px 18px;box-shadow:var(--shadow-md);cursor:pointer;min-width:190px;transition:transform .15s,box-shadow .15s;transform:translateY(10px);opacity:0;-webkit-tap-highlight-color:transparent}
 .fab-menu.open .fab-item{transform:translateY(0);opacity:1}
 .fab-item:nth-child(1){transition-delay:.05s}
@@ -701,7 +704,7 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 </div>
 
 <!-- ONBOARDING -->
-<div id="onboarding" style="display:none">
+<div id="onboarding" class="onboarding" style="display:none">
   <div class="onboarding-bg"></div>
   <div class="onboarding-card">
     <span class="onboarding-icon" id="ob-icon">🎓</span>
@@ -812,8 +815,9 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
           <span class="topbar-title" id="page-title">Resumo</span>
         </div>
         <div class="topbar-actions">
-          <button class="btn btn-secondary" onclick="abrirImportComGate()">📎 Importar</button>
-          <button class="btn btn-primary" onclick="openModal('evento')">+ Novo evento</button>
+          <button class="btn btn-primary" onclick="toggleFabMenu()" style="gap:6px" id="topbar-fab-btn">
+            <span id="topbar-fab-icon" style="font-size:18px;line-height:1;transition:transform .2s">+</span> Criar
+          </button>
         </div>
       </header>
       <main class="content" id="content"></main>
@@ -2826,7 +2830,9 @@ function openFabMenu() {
   $('fab-backdrop').classList.add('open');
   $('fab-menu').classList.add('open');
   $('fab-btn').classList.add('open');
-  // Atualizar sub do import conforme premium
+  // Animar botão da topbar no desktop
+  const ti = $('topbar-fab-icon');
+  if(ti) ti.style.transform = 'rotate(45deg)';
   const sub = $('fab-import-sub');
   if (sub) sub.textContent = isPremium() ? 'Importar cronograma' : '🔒 Requer Premium';
 }
@@ -2836,6 +2842,8 @@ function closeFabMenu() {
   $('fab-backdrop').classList.remove('open');
   $('fab-menu').classList.remove('open');
   $('fab-btn').classList.remove('open');
+  const ti = $('topbar-fab-icon');
+  if(ti) ti.style.transform = 'rotate(0deg)';
 }
 
 // ── EDGE FUNCTION (IA via Supabase) ──
