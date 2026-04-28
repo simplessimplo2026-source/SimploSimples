@@ -449,7 +449,9 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .empty-sub{font-size:13px}
 
 /* ══ OVERLAY / MODAL ══ */
-.overlay{display:none;position:fixed;inset:0;background:rgba(10,5,30,.5);z-index:9000;align-items:center;justify-content:center;-webkit-border:1px solid var(--border);border-radius:var(--radius-xl);padding:24px 26px;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalIn .22s cubic-bezier(.4,0,.2,1)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(10,5,30,.5);z-index:9000;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--surface-solid);border:1px solid var(--border);border-radius:var(--radius-xl);padding:24px 26px;width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalIn .22s cubic-bezier(.4,0,.2,1)}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
 .modal-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.4px}
 .modal-close{background:var(--border);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text-3);transition:all .15s}
@@ -484,7 +486,9 @@ body{background:var(--bg-grad);background-attachment:fixed;padding-top:env(safe-
 .drawer-item .icon{font-size:16px;width:20px;text-align:center}
 
 /* ══ POMODORO ══ */
-.pomo-overlay{display:none;position:fixed;inset:0;background:rgba(10,5,30,.6);z-index:9100;align-items:center;justify-content:center;-webkit-border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px 28px 24px;width:340px;max-width:92vw;box-shadow:var(--shadow-lg);animation:modalIn .22s cubic-bezier(.4,0,.2,1);text-align:center}
+.pomo-overlay{display:none;position:fixed;inset:0;background:rgba(10,5,30,.6);z-index:9100;align-items:center;justify-content:center}
+.pomo-overlay.open{display:flex}
+.pomo-modal{background:var(--surface-solid);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px 28px 24px;width:340px;max-width:92vw;box-shadow:var(--shadow-lg);animation:modalIn .22s cubic-bezier(.4,0,.2,1);text-align:center}
 .pomo-ring{position:relative;width:160px;height:160px;margin:0 auto 20px}
 .pomo-ring svg{transform:rotate(-90deg)}
 .pomo-ring-bg{fill:none;stroke:var(--border);stroke-width:10}
