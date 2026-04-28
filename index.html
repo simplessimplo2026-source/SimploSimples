@@ -19,18 +19,6 @@
 <meta name="theme-color" content="#0EA5E9">
 <meta name="msapplication-TileColor" content="#0C4A6E">
 <meta name="description" content="Sua agenda acadêmica inteligente — organize provas, trabalhos e apresentações">
-<!-- OneSignal Push -->
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "e876d809-1432-4411-8f4e-197b314f06b4",
-      notifyButton: { enable: false },
-      allowLocalhostAsSecureOrigin: true,
-    });
-  });
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -2691,20 +2679,17 @@ function toggleQR() {
   btn.textContent = '📱 Ocultar QR Code';
 }
 
-// ── NOTIFICAÇÕES (OneSignal) ──
+// ── NOTIFICAÇÕES NATIVAS ──
 async function pedirPermissaoNotificacao() {
-  // OneSignal cuida da permissão automaticamente
-  // Só agendamos as notificações locais como backup
-  agendarNotificacoes();
-
-  // Vincular o usuário ao OneSignal pelo email
-  try {
-    if (window.OneSignal && U?.email) {
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.login(U.id); // usa o ID do Supabase como external_id
-      });
-    }
-  } catch(e) { console.log('OneSignal login:', e.message); }
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    agendarNotificacoes();
+    return;
+  }
+  if (Notification.permission !== 'denied') {
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') agendarNotificacoes();
+  }
 }
 
 function agendarNotificacoes() {
@@ -2721,18 +2706,15 @@ function agendarNotificacoes() {
 }
 
 function verificarEventosUrgentes() {
-  if (!evts.length) return;
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  if (!evts.length || Notification.permission !== 'granted') return;
 
-  // Verificar se já notificou hoje
-  const hoje_str = hoje.toISOString().split('T')[0];
-  const jaNotificou = localStorage.getItem('notif_' + hoje_str);
-  if (jaNotificou) return;
+  const hoje_str = new Date().toISOString().split('T')[0];
+  if (localStorage.getItem('notif_' + hoje_str)) return;
 
   const urgentes = evts.filter(e => {
     if (e.concluido) return false;
     const dl = dLeft(e.data);
-    return dl >= 0 && dl <= 1; // hoje e amanhã
+    return dl >= 0 && dl <= 1;
   });
 
   if (!urgentes.length) return;
@@ -2743,8 +2725,7 @@ function verificarEventosUrgentes() {
     const disc = gDisc(ev.disciplina_id);
     const icone = ev.tipo === 'prova' ? '📝' : ev.tipo === 'trabalho' ? '📂' : '🎤';
 
-    // Notificação local via Service Worker
-    if (Notification.permission === 'granted' && navigator.serviceWorker.controller) {
+    if (navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({
         type: 'NOTIFY',
         title: `${icone} ${ev.nome}`,
