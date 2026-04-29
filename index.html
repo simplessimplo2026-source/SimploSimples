@@ -675,6 +675,15 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 .rel-insight{background:var(--green-light);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px 14px;font-size:12px;color:#065F46;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .rel-insight.warning{background:var(--amber-light);border-color:rgba(245,158,11,.2);color:#92400E}
 .rel-insight.danger{background:var(--red-light);border-color:rgba(239,68,68,.2);color:#B91C1C}
+/* ── VOTAÇÃO ── */
+.votacao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px}
+.votacao-pergunta{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+.votacao-opcao{margin-bottom:8px;cursor:pointer}
+.votacao-opcao-btn{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);transition:all .15s;position:relative;overflow:hidden}
+.votacao-opcao-btn:hover{border-color:var(--brand-mid);background:var(--brand-light)}
+.votacao-opcao-btn.votado{border-color:var(--brand);background:var(--brand-light);color:var(--brand)}
+.votacao-barra{position:absolute;left:0;top:0;bottom:0;background:rgba(14,165,233,0.12);border-radius:8px;transition:width .4s ease;pointer-events:none}
+.votacao-meta{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--text-3);font-weight:600}
 </style>
 </head>
 <body>
@@ -871,6 +880,32 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <div class="fab-item-icon" style="background:#F5F3FF"><i data-lucide="users" style="width:18px;height:18px;color:#7C3AED"></i></div>
     <div><div class="fab-item-label">Criar grupo</div><div class="fab-item-sub">Novo grupo de estudo</div></div>
   </div>
+</div>
+
+<!-- MODAL: VOTAÇÃO -->
+<div class="overlay" id="m-votacao">
+<div class="modal" style="max-width:420px">
+  <div class="modal-head">
+    <div class="modal-title">🗳️ Nova votação</div>
+    <button class="modal-close" onclick="closeModal('votacao')">✕</button>
+  </div>
+  <div class="field">
+    <label>Pergunta</label>
+    <input type="text" id="vot-pergunta" placeholder="Ex: Qual dia vocês podem estudar?">
+  </div>
+  <div class="field">
+    <label>Opções <span style="font-size:11px;color:var(--text-3)">(mín. 2)</span></label>
+    <div id="vot-opcoes">
+      <input type="text" class="vot-op" placeholder="Opção 1" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px">
+      <input type="text" class="vot-op" placeholder="Opção 2" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px">
+    </div>
+    <button onclick="addOpcaoVotacao()" class="btn btn-secondary btn-sm" style="width:100%">+ Adicionar opção</button>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-secondary" onclick="closeModal('votacao')">Cancelar</button>
+    <button class="btn btn-primary" onclick="criarVotacao()">🗳️ Criar votação</button>
+  </div>
+</div>
 </div>
 
 <!-- MODAL: RELATÓRIO -->
@@ -2213,6 +2248,7 @@ async function carregarDadosGrupo() {
   grupoTarefas = r3.data || [];
   grupoEventos = r4.data || [];
   grupoArquivos = r5.data || [];
+  await carregarVotacoes();
   renderAbaGrupo();
 }
 
@@ -2240,9 +2276,18 @@ function renderMural() {
     + '<span style="font-size:12px;color:var(--text-3)">Código: <b style="color:var(--brand);letter-spacing:2px;font-family:monospace">'+codigo+'</b></span>'
     + '<button onclick="irParaMembros()" style="background:var(--brand-light);border:none;color:var(--brand);font-size:11px;font-weight:600;cursor:pointer;padding:4px 10px;border-radius:6px;font-family:inherit">&#128101; Convidar &rarr;</button>'
   + '</div>';
-  html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-primary btn-sm" onclick="abrirAviso()">📢 Novo aviso</button></div>';
-  if (!grupoAvisos.length) {
-    html += '<div class="empty"><div class="empty-icon">📢</div><div class="empty-title">Nenhum aviso ainda</div><div class="empty-sub">Poste um aviso para o grupo!</div></div>';
+  html += '<div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px">'
+    + '<button class="btn btn-secondary btn-sm" onclick="abrirVotacao()">🗳️ Votação</button>'
+    + '<button class="btn btn-primary btn-sm" onclick="abrirAviso()">📢 Novo aviso</button>'
+  + '</div>';
+
+  // Votações
+  if(grupoVotacoes&&grupoVotacoes.length){
+    html += grupoVotacoes.map(v=>votacaoHTML(v)).join('');
+  }
+
+  if (!grupoAvisos.length && (!grupoVotacoes||!grupoVotacoes.length)) {
+    html += '<div class="empty"><div class="empty-icon">📢</div><div class="empty-title">Nenhum aviso ainda</div><div class="empty-sub">Poste um aviso ou crie uma votação!</div></div>';
   } else {
     html += grupoAvisos.map(a => {
       const membro = grupoMembros.find(m => m.user_id === a.criado_por);
@@ -2853,6 +2898,95 @@ function rProgressChart(){
     <span class="section-title">📊 Progresso por disciplina</span>
     <button class="btn btn-ghost btn-sm" onclick="openPomo()" style="font-size:11px">🍅 Pomodoro</button>
   </div>${stats}<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px">${bars}</div>`;
+}
+
+// ── VOTAÇÃO ──
+let grupoVotacoes=[];
+let grupoVotos=[];
+
+async function carregarVotacoes(){
+  if(!grupoAtual)return;
+  const{data:vs}=await SB.from('votacoes').select('*').eq('grupo_id',grupoAtual.id).order('criado_em',{ascending:false});
+  grupoVotacoes=vs||[];
+  if(grupoVotacoes.length){
+    const ids=grupoVotacoes.map(v=>v.id);
+    const{data:votos}=await SB.from('votos').select('*').in('votacao_id',ids);
+    grupoVotos=votos||[];
+  }
+}
+
+function votacaoHTML(v){
+  const opcoes=v.opcoes||[];
+  const totalVotos=grupoVotos.filter(vt=>vt.votacao_id===v.id).length;
+  const meuVoto=grupoVotos.find(vt=>vt.votacao_id===v.id&&vt.user_id===U.id);
+  const opcoesHtml=opcoes.map((op,i)=>{
+    const qtd=grupoVotos.filter(vt=>vt.votacao_id===v.id&&vt.opcao_index===i).length;
+    const pct=totalVotos>0?Math.round((qtd/totalVotos)*100):0;
+    const votei=meuVoto?.opcao_index===i;
+    return`<div class="votacao-opcao">
+      <button class="votacao-opcao-btn${votei?' votado':''}" onclick="votar('${v.id}',${i})">
+        <div class="votacao-barra" style="width:${meuVoto?pct:0}%"></div>
+        <span style="position:relative">${op}${meuVoto?` — ${pct}% (${qtd})`:''}</span>
+      </button>
+    </div>`;
+  }).join('');
+  const criador=grupoMembros.find(m=>m.user_id===v.criado_por);
+  return`<div class="votacao-card">
+    <div class="votacao-pergunta">🗳️ ${v.pergunta}</div>
+    ${opcoesHtml}
+    <div class="votacao-meta">
+      <span>${criador?.nome||'Membro'}</span>
+      <span>${totalVotos} voto${totalVotos!==1?'s':''}</span>
+    </div>
+  </div>`;
+}
+
+function abrirVotacao(){
+  $('vot-pergunta').value='';
+  document.querySelectorAll('.vot-op').forEach((el,i)=>{el.value='';if(i>1)el.parentNode.removeChild(el)});
+  $('m-votacao').classList.add('open');
+}
+
+function addOpcaoVotacao(){
+  const n=document.querySelectorAll('.vot-op').length+1;
+  const inp=document.createElement('input');
+  inp.type='text';inp.className='vot-op';
+  inp.placeholder=`Opção ${n}`;
+  inp.style.cssText='width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px';
+  $('vot-opcoes').appendChild(inp);
+}
+
+async function criarVotacao(){
+  const pergunta=$('vot-pergunta').value.trim();
+  const opcoes=[...document.querySelectorAll('.vot-op')].map(el=>el.value.trim()).filter(Boolean);
+  if(!pergunta){alert('Digite a pergunta!');return}
+  if(opcoes.length<2){alert('Adicione pelo menos 2 opções!');return}
+  const{error}=await SB.from('votacoes').insert({
+    grupo_id:grupoAtual.id,
+    criado_por:U.id,
+    pergunta,
+    opcoes
+  });
+  if(error){alert('Erro: '+error.message);return}
+  closeModal('votacao');
+  await carregarVotacoes();
+  renderAbaGrupo();
+}
+
+async function votar(votacaoId,opcaoIndex){
+  const meuVoto=grupoVotos.find(vt=>vt.votacao_id===votacaoId&&vt.user_id===U.id);
+  if(meuVoto){
+    mostrarToast('Você já votou nessa enquete!');
+    return;
+  }
+  const{error}=await SB.from('votos').insert({
+    votacao_id:votacaoId,
+    user_id:U.id,
+    opcao_index:opcaoIndex
+  });
+  if(error){alert('Erro: '+error.message);return}
+  await carregarVotacoes();
+  renderAbaGrupo();
 }
 
 // ── RELATÓRIO MENSAL ──
