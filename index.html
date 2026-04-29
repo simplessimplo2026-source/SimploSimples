@@ -1613,6 +1613,9 @@ function openModal(id){
   else if(id==='disc')openDisc(null);
   else if(id==='import')openImport();
   else if(id==='cfg')openCfg();
+  else if(id==='premium')$('m-premium').classList.add('open');
+  else if(id==='relatorio')$('m-relatorio').classList.add('open');
+  else {const m=$('m-'+id);if(m)m.classList.add('open');}
 }
 function closeModal(id){$('m-'+id).classList.remove('open')}
 // Modais só fecham pelo X ou Cancelar
