@@ -963,6 +963,7 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   <div class="field"><label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;font-size:13px;font-weight:500;letter-spacing:0"><input type="checkbox" id="e-done" style="width:15px;height:15px;accent-color:var(--brand);cursor:pointer"> Marcar como concluído</label></div>
   <div class="modal-actions">
     <button class="btn btn-danger btn-sm" id="btn-del-ev" style="margin-right:auto;display:none" onclick="delEvento()">🗑 Excluir</button>
+    <button class="btn btn-secondary btn-sm" id="btn-export-cal" style="display:none" onclick="exportarCalendario()" title="Exportar para Google/Apple Calendar">📅 Agenda</button>
     <button class="btn btn-secondary" onclick="closeModal('evento')">Cancelar</button>
     <button class="btn btn-primary" id="btn-salvar-ev">Salvar evento</button>
   </div>
@@ -1539,7 +1540,8 @@ function rEventos(){
     '<i data-lucide="presentation" style="width:13px;height:13px"></i> Apresentações',
     '<i data-lucide="tag" style="width:13px;height:13px"></i> Outros'
   ];
-  const html='<div class="filters">'+tipos.map((t,i)=>'<button class="filter'+(flt===t?' on':'')+'" onclick="setFlt(\''+t+'\')" style="display:flex;align-items:center;gap:5px">'+labs[i]+'</button>').join('')+'</div>'
+  const exportBtn=evts.length?`<button onclick="exportarTodosCalendario()" class="btn btn-secondary btn-sm" style="display:flex;align-items:center;gap:5px;white-space:nowrap"><i data-lucide="calendar-down" style="width:13px;height:13px"></i> Exportar</button>`:'';
+  const html='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div class="filters" style="margin-bottom:0;flex:1">'+tipos.map((t,i)=>'<button class="filter'+(flt===t?' on':'')+'" onclick="setFlt(\''+t+'\')" style="display:flex;align-items:center;gap:5px">'+labs[i]+'</button>').join('')+'</div>'+exportBtn+'</div>'
     +'<div class="event-list">'+(evs.length?evs.map(cardHTML).join(''):'<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Nenhum evento aqui</div></div>')+'</div>';
   setTimeout(initIcons,50);
   return html;
@@ -1631,11 +1633,13 @@ function openEvento(id,preDate){
     $('e-disc').value=ev.disciplina_id||'';$('e-hora').value=ev.hora||'';
     $('e-notas').value=ev.notas||'';$('e-done').checked=ev.concluido||false;
     $('btn-del-ev').style.display='inline-flex';
+    $('btn-export-cal').style.display='inline-flex';
   }else{
     $('m-evento-title').textContent='Novo evento';
     $('e-tipo').value='prova';$('e-data').value=preDate||'';$('e-nome').value='';
     $('e-disc').value='';$('e-hora').value='';$('e-notas').value='';$('e-done').checked=false;
     $('btn-del-ev').style.display='none';
+    $('btn-export-cal').style.display='none';
   }
   $('m-evento').classList.add('open');
   setTimeout(initFlatpickr, 50);
@@ -2902,6 +2906,78 @@ function openRelatorio(){
     </div>
   `;
   openModal('relatorio');
+}
+
+// ── EXPORTAR CALENDÁRIO (.ics) ──
+function gerarICS(eventos){
+  const pad=n=>String(n).padStart(2,'0');
+  const uid=()=>Math.random().toString(36).substr(2,9).toUpperCase();
+  const now=new Date();
+  const stamp=now.getFullYear()+pad(now.getMonth()+1)+pad(now.getDate())+'T'+pad(now.getHours())+pad(now.getMinutes())+pad(now.getSeconds())+'Z';
+
+  const tipos={prova:'PROVA',trabalho:'TRABALHO',apresentacao:'APRESENTAÇÃO',outro:'EVENTO'};
+
+  const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Simplo Estudante//PT','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+
+  eventos.forEach(ev=>{
+    const disc=gDisc(ev.disciplina_id);
+    const [y,m,d]=ev.data.split('-');
+    let dtstart,dtend;
+    if(ev.hora){
+      const [h,min]=ev.hora.split(':');
+      dtstart=`${y}${m}${d}T${h}${min||'00'}00`;
+      const endH=String(parseInt(h)+2).padStart(2,'0');
+      dtend=`${y}${m}${d}T${endH}${min||'00'}00`;
+    } else {
+      dtstart=`${y}${m}${d}`;
+      dtend=`${y}${m}${d}`;
+    }
+    const title=`[${tipos[ev.tipo]||'EVENTO'}] ${ev.nome}${disc?' — '+disc.nome:''}`;
+    const desc=ev.notas?ev.notas.replace(/\n/g,'\\n'):'';
+    lines.push('BEGIN:VEVENT');
+    lines.push(`UID:${uid()}@simplo`);
+    lines.push(`DTSTAMP:${stamp}`);
+    if(ev.hora){
+      lines.push(`DTSTART:${dtstart}`);
+      lines.push(`DTEND:${dtend}`);
+    } else {
+      lines.push(`DTSTART;VALUE=DATE:${dtstart}`);
+      lines.push(`DTEND;VALUE=DATE:${dtend}`);
+    }
+    lines.push(`SUMMARY:${title}`);
+    if(desc)lines.push(`DESCRIPTION:${desc}`);
+    lines.push('BEGIN:VALARM');
+    lines.push('TRIGGER:-P1D');
+    lines.push('ACTION:DISPLAY');
+    lines.push(`DESCRIPTION:Lembrete: ${ev.nome}`);
+    lines.push('END:VALARM');
+    lines.push('END:VEVENT');
+  });
+
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
+}
+
+function exportarCalendario(){
+  const ev=evts.find(e=>e.id===evId);
+  if(!ev){alert('Salve o evento primeiro!');return}
+  const ics=gerarICS([ev]);
+  const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=ev.nome.replace(/[^a-z0-9]/gi,'_')+'.ics';
+  a.click();URL.revokeObjectURL(url);
+}
+
+function exportarTodosCalendario(){
+  const pend=evts.filter(e=>!e.concluido);
+  if(!pend.length){alert('Nenhum evento pendente para exportar!');return}
+  const ics=gerarICS(pend);
+  const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='simplo_eventos.ics';
+  a.click();URL.revokeObjectURL(url);
 }
 
 // ── TOGGLE SENHA ──
