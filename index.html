@@ -653,6 +653,29 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   .bottom-nav{padding-bottom:max(8px, env(safe-area-inset-bottom))}
   .modal{padding-bottom:max(28px, env(safe-area-inset-bottom))}
 }
+/* ── RELATÓRIO MENSAL ── */
+.rel-header{background:linear-gradient(135deg,var(--brand),var(--brand-mid));border-radius:var(--radius-lg);padding:20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.rel-header::before{content:'📊';position:absolute;right:-10px;top:-10px;font-size:80px;opacity:.1}
+.rel-mes{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-bottom:4px}
+.rel-titulo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:12px}
+.rel-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rel-stat{background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center}
+.rel-stat-num{font-size:24px;font-weight:700;font-family:'Playfair Display',serif;line-height:1}
+.rel-stat-label{font-size:9px;opacity:.8;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.rel-section{margin-bottom:18px}
+.rel-section-title{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.rel-disc-item{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.rel-disc-name{font-size:12px;font-weight:600;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rel-disc-bar-wrap{flex:2;height:6px;background:var(--border);border-radius:4px;overflow:hidden}
+.rel-disc-bar{height:100%;border-radius:4px;transition:width .6s ease}
+.rel-disc-pct{font-size:11px;font-weight:700;color:var(--text-3);min-width:32px;text-align:right}
+.rel-week{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:4px}
+.rel-week-item{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center}
+.rel-week-num{font-size:18px;font-weight:700;font-family:'Playfair Display',serif;color:var(--brand);line-height:1}
+.rel-week-label{font-size:9px;color:var(--text-3);font-weight:600;margin-top:3px}
+.rel-insight{background:var(--green-light);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px 14px;font-size:12px;color:#065F46;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.rel-insight.warning{background:var(--amber-light);border-color:rgba(245,158,11,.2);color:#92400E}
+.rel-insight.danger{background:var(--red-light);border-color:rgba(239,68,68,.2);color:#B91C1C}
 </style>
 </head>
 <body>
@@ -844,6 +867,17 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     <div class="fab-item-icon" style="background:#F5F3FF"><i data-lucide="users" style="width:18px;height:18px;color:#7C3AED"></i></div>
     <div><div class="fab-item-label">Criar grupo</div><div class="fab-item-sub">Novo grupo de estudo</div></div>
   </div>
+</div>
+
+<!-- MODAL: RELATÓRIO -->
+<div class="overlay" id="m-relatorio">
+<div class="modal" style="max-width:480px">
+  <div class="modal-head">
+    <div class="modal-title">📊 Relatório mensal</div>
+    <button class="modal-close" onclick="closeModal('relatorio')">✕</button>
+  </div>
+  <div id="rel-content"></div>
+</div>
 </div>
 
 <!-- MODAL: PREMIUM -->
@@ -2773,6 +2807,126 @@ function rProgressChart(){
   </div>${stats}${chartHtml}`;
 }
 
+// ── RELATÓRIO MENSAL ──
+function openRelatorio(){
+  const now=new Date();
+  const mes=now.getMonth();
+  const ano=now.getFullYear();
+  const mesNome=now.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+
+  // Filtrar eventos do mês
+  const evMes=evts.filter(e=>{
+    const d=new Date(e.data+'T00:00:00');
+    return d.getMonth()===mes&&d.getFullYear()===ano;
+  });
+  const evAnt=evts.filter(e=>{
+    const d=new Date(e.data+'T00:00:00');
+    const antMes=mes===0?11:mes-1;
+    const antAno=mes===0?ano-1:ano;
+    return d.getMonth()===antMes&&d.getFullYear()===antAno;
+  });
+
+  const total=evMes.length;
+  const conc=evMes.filter(e=>e.concluido).length;
+  const pend=total-conc;
+  const pct=total>0?Math.round((conc/total)*100):0;
+  const pctAnt=evAnt.length>0?Math.round((evAnt.filter(e=>e.concluido).length/evAnt.length)*100):0;
+  const diff=pct-pctAnt;
+
+  // Por tipo
+  const provas=evMes.filter(e=>e.tipo==='prova').length;
+  const trabalhos=evMes.filter(e=>e.tipo==='trabalho').length;
+  const apres=evMes.filter(e=>e.tipo==='apresentacao').length;
+
+  // Por disciplina
+  const discData=discs.map(d=>{
+    const es=evMes.filter(e=>e.disciplina_id===d.id);
+    const c=es.filter(e=>e.concluido).length;
+    return{...d,total:es.length,conc:c,pct:es.length>0?Math.round((c/es.length)*100):0};
+  }).filter(d=>d.total>0).sort((a,b)=>b.total-a.total);
+
+  // Por semana
+  const semanas=[0,0,0,0];
+  evMes.forEach(e=>{
+    const d=new Date(e.data+'T00:00:00').getDate();
+    const sem=Math.min(Math.floor((d-1)/7),3);
+    semanas[sem]++;
+  });
+
+  // Pomodoro sessões
+  const pomoSessoes=parseInt(localStorage.getItem('pomo_sessions_today')||'0');
+
+  // Insights
+  const insights=[];
+  if(pct>=80)insights.push({tipo:'',msg:`🏆 Excelente! ${pct}% de conclusão este mês. Continue assim!`});
+  else if(pct>=50)insights.push({tipo:'warning',msg:`📈 Você concluiu ${pct}% dos eventos. Falta pouco para chegar nos 80%!`});
+  else if(total>0)insights.push({tipo:'danger',msg:`⚠️ Apenas ${pct}% de conclusão. Hora de organizar melhor a semana!`});
+  if(diff>0)insights.push({tipo:'',msg:`📊 Você melhorou ${diff}% em relação ao mês anterior. Ótimo progresso!`});
+  else if(diff<0)insights.push({tipo:'warning',msg:`📉 Queda de ${Math.abs(diff)}% em relação ao mês passado. Vamos recuperar!`});
+  if(provas>2)insights.push({tipo:'warning',msg:`📝 Mês pesado! ${provas} provas no total. Use o Pomodoro para estudar.`});
+
+  const discBars=discData.map(d=>`
+    <div class="rel-disc-item">
+      <div class="rel-disc-name">${d.nome}</div>
+      <div class="rel-disc-bar-wrap"><div class="rel-disc-bar" style="width:${d.pct}%;background:${d.cor}"></div></div>
+      <div class="rel-disc-pct">${d.pct}%</div>
+    </div>`).join('');
+
+  const insightsHtml=insights.map(i=>`<div class="rel-insight ${i.tipo}">${i.msg}</div>`).join('');
+
+  $('rel-content').innerHTML=`
+    <div class="rel-header">
+      <div class="rel-mes">${mesNome}</div>
+      <div class="rel-titulo">${total===0?'Nenhum evento este mês':pct>=70?'Mês produtivo! 🎉':pct>=40?'Indo bem 📚':'Vamos nessa 💪'}</div>
+      <div class="rel-stats">
+        <div class="rel-stat"><div class="rel-stat-num">${total}</div><div class="rel-stat-label">Eventos</div></div>
+        <div class="rel-stat"><div class="rel-stat-num">${conc}</div><div class="rel-stat-label">Feitos</div></div>
+        <div class="rel-stat"><div class="rel-stat-num">${pct}%</div><div class="rel-stat-label">Taxa</div></div>
+      </div>
+    </div>
+
+    ${insights.length?`<div class="rel-section">${insightsHtml}</div>`:''}
+
+    <div class="rel-section">
+      <div class="rel-section-title">Por tipo</div>
+      <div class="rel-week" style="grid-template-columns:repeat(3,1fr)">
+        <div class="rel-week-item"><div class="rel-week-num" style="color:var(--red)">${provas}</div><div class="rel-week-label">📝 Provas</div></div>
+        <div class="rel-week-item"><div class="rel-week-num" style="color:var(--brand)">${trabalhos}</div><div class="rel-week-label">📂 Trabalhos</div></div>
+        <div class="rel-week-item"><div class="rel-week-num" style="color:var(--purple)">${apres}</div><div class="rel-week-label">🎤 Apres.</div></div>
+      </div>
+    </div>
+
+    ${discData.length?`
+    <div class="rel-section">
+      <div class="rel-section-title">Por disciplina</div>
+      ${discBars}
+    </div>`:''}
+
+    <div class="rel-section">
+      <div class="rel-section-title">Por semana</div>
+      <div class="rel-week">
+        ${semanas.map((n,i)=>`<div class="rel-week-item"><div class="rel-week-num">${n}</div><div class="rel-week-label">Sem ${i+1}</div></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="rel-section">
+      <div class="rel-section-title">Comparativo</div>
+      <div style="display:flex;gap:12px">
+        <div class="rel-week-item" style="flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:var(--text-3);font-weight:700;margin-bottom:4px">Mês anterior</div>
+          <div style="font-size:24px;font-weight:700;font-family:'Playfair Display',serif;color:var(--text-3)">${pctAnt}%</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:20px">${diff>0?'📈':diff<0?'📉':'➡️'}</div>
+        <div class="rel-week-item" style="flex:1;background:var(--brand-light);border:1px solid var(--brand-mid);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:var(--brand);font-weight:700;margin-bottom:4px">Este mês</div>
+          <div style="font-size:24px;font-weight:700;font-family:'Playfair Display',serif;color:var(--brand)">${pct}%</div>
+        </div>
+      </div>
+    </div>
+  `;
+  openModal('relatorio');
+}
+
 // ── TOGGLE SENHA ──
 function toggleSenha(inputId, btnId){
   const inp=$(inputId),btn=$(btnId);
@@ -2826,7 +2980,7 @@ function rWidgetHoje(){
   const itemsHtml=evHoje.length>0?evHoje.slice(0,3).map(ev=>{const disc=gDisc(ev.disciplina_id);return`<div class="widget-hoje-item" onclick="openEvento('${ev.id}')"><span style="font-size:15px">${icones[ev.tipo]||'📌'}</span><span class="widget-hoje-item-hora">${ev.hora||'—'}</span><span class="widget-hoje-item-nome">${ev.nome}</span>${disc?`<span class="widget-hoje-item-disc">${disc.nome}</span>`:''}</div>`}).join(''):evAmanha.length>0?evAmanha.slice(0,2).map(ev=>{const disc=gDisc(ev.disciplina_id);return`<div class="widget-hoje-item" onclick="openEvento('${ev.id}')"><span style="font-size:15px">${icones[ev.tipo]||'📌'}</span><span class="widget-hoje-item-hora" style="opacity:.6">amanhã</span><span class="widget-hoje-item-nome">${ev.nome}</span>${disc?`<span class="widget-hoje-item-disc">${disc.nome}</span>`:''}</div>`}).join(''):'<div class="widget-hoje-vazio">✨ Nenhum evento nos próximos dias</div>';
   const conc=evts.filter(e=>e.concluido).length,total=evts.length;
   const pct=total>0?Math.round((conc/total)*100):0;
-  return`<div class="widget-hoje"><div class="widget-hoje-data">${dataLabel}</div><div class="widget-hoje-titulo">${titulo}</div><div class="widget-hoje-items">${itemsHtml}</div><div class="widget-hoje-footer"><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${evHoje.length}</div><div class="widget-hoje-stat-label">Hoje</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${evAmanha.length}</div><div class="widget-hoje-stat-label">Amanhã</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${semana}</div><div class="widget-hoje-stat-label">Semana</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${pct}%</div><div class="widget-hoje-stat-label">Feitos</div></div></div></div>`;
+  return`<div class="widget-hoje"><div class="widget-hoje-data">${dataLabel}</div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="widget-hoje-titulo" style="margin-bottom:0">${titulo}</div><button onclick="openRelatorio()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;flex-shrink:0">📊 Relatório</button></div><div class="widget-hoje-items">${itemsHtml}</div><div class="widget-hoje-footer"><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${evHoje.length}</div><div class="widget-hoje-stat-label">Hoje</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${evAmanha.length}</div><div class="widget-hoje-stat-label">Amanhã</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${semana}</div><div class="widget-hoje-stat-label">Semana</div></div><div class="widget-hoje-divider"></div><div class="widget-hoje-stat"><div class="widget-hoje-stat-num">${pct}%</div><div class="widget-hoje-stat-label">Feitos</div></div></div></div>`;
 }
 
 // ── PROGRESSO ──
