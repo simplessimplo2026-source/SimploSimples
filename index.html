@@ -745,6 +745,11 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
   </div>
 </div>
 
+<!-- OFFLINE BANNER -->
+<div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9500;background:#F59E0B;color:#fff;padding:8px 16px;font-size:12px;font-weight:700;align-items:center;justify-content:center;gap:8px;text-align:center">
+  📵 Você está offline — suas alterações serão salvas e sincronizadas quando a conexão voltar
+</div>
+
 <!-- ONBOARDING -->
 <div id="onboarding" class="onboarding" style="display:none">
   <div class="onboarding-card">
@@ -1408,6 +1413,10 @@ async function boot(u){
   $('s-email').textContent=u.email;
   $('app').style.display='block';
   $('bottom-nav').classList.add('visible');
+  // Inicializar DB offline
+  try{ await abrirDB(); }catch(e){ console.log('IndexedDB não disponível:', e.message); }
+  // Verificar status online
+  atualizarStatusOnline();
   await loadAll();
   await loadGrupos();
   await loadPerfil();
@@ -1420,11 +1429,23 @@ async function boot(u){
 
 // ── DATA ──
 async function loadAll(){
+  if(!isOnline){
+    // Carregar do cache local
+    discs=await dbLer('disciplinas');
+    evts=await dbLer('eventos');
+    mostrarToast('📵 Carregando dados offline...');
+    return;
+  }
   const[r1,r2]=await Promise.all([
     SB.from('disciplinas').select('*').order('nome'),
     SB.from('eventos').select('*').order('data')
   ]);
   discs=r1.data||[];evts=r2.data||[];
+  // Salvar no cache local
+  if(db){
+    await dbSalvar('disciplinas',discs);
+    await dbSalvar('eventos',evts);
+  }
 }
 async function rDiscs(){const{data}=await SB.from('disciplinas').select('*').order('nome');discs=data||[]}
 async function rEvts(){const{data}=await SB.from('eventos').select('*').order('data');evts=data||[]}
@@ -1652,18 +1673,61 @@ async function salvarEvento(){
   if(!nome||!data){alert('Preencha nome e data!');return}
   if(!U){alert('Sessão expirada!');return}
   const ev={tipo:$('e-tipo').value,data,nome,disciplina_id:$('e-disc').value||null,hora:$('e-hora').value||'',notas:$('e-notas').value.trim(),concluido:$('e-done').checked,user_id:U.id};
+
+  if(!isOnline){
+    // Offline — salvar localmente e adicionar à fila
+    const id=evId||'offline_'+Date.now();
+    const evLocal={...ev,id};
+    if(evId){
+      evts=evts.map(e=>e.id===evId?evLocal:e);
+      await dbSalvar('eventos',evLocal);
+      await dbAdicionarFila({tipo:'update_evento',dados:evLocal});
+    } else {
+      evts.push(evLocal);
+      await dbSalvar('eventos',evLocal);
+      await dbAdicionarFila({tipo:'insert_evento',dados:evLocal});
+    }
+    mostrarToast('💾 Salvo offline — será sincronizado em breve');
+    closeModal('evento');badges();render();
+    return;
+  }
+
   const r=evId?await SB.from('eventos').update(ev).eq('id',evId):await SB.from('eventos').insert(ev);
   if(r.error){alert('Erro: '+r.error.message);return}
-  await rEvts();closeModal('evento');badges();render();
+  await rEvts();
+  if(db)await dbSalvar('eventos',evts);
+  closeModal('evento');badges();render();
 }
+
 async function delEvento(){
   if(!confirm('Excluir evento?'))return;
+  if(!isOnline){
+    evts=evts.filter(e=>e.id!==evId);
+    await dbDeletar('eventos',evId);
+    await dbAdicionarFila({tipo:'delete_evento',dados:{id:evId}});
+    mostrarToast('🗑 Removido offline');
+    closeModal('evento');badges();render();
+    return;
+  }
   await SB.from('eventos').delete().eq('id',evId);
-  await rEvts();closeModal('evento');badges();render();
+  await rEvts();
+  if(db)await dbSalvar('eventos',evts);
+  closeModal('evento');badges();render();
 }
+
 async function toggleDone(id,atual){
-  await SB.from('eventos').update({concluido:!atual}).eq('id',id);
-  await rEvts();badges();render();
+  const novo=!atual;
+  evts=evts.map(e=>e.id===id?{...e,concluido:novo}:e);
+  if(!isOnline){
+    const ev=evts.find(e=>e.id===id);
+    if(ev)await dbSalvar('eventos',ev);
+    await dbAdicionarFila({tipo:'update_evento',dados:{id,concluido:novo}});
+    badges();render();
+    return;
+  }
+  await SB.from('eventos').update({concluido:novo}).eq('id',id);
+  if(db){const ev=evts.find(e=>e.id===id);if(ev)await dbSalvar('eventos',ev);}
+  badges();render();
 }
 
 // ── DISCIPLINA ──
@@ -3094,6 +3158,131 @@ function renderPomoDots(){
 // ── CALENDÁRIO COM PREVIEW ──
 let calSelectedDay=null;
 function selectCalDay(ds){calSelectedDay=calSelectedDay===ds?null:ds;render()}
+
+// ── OFFLINE / INDEXEDDB ──
+const DB_NAME='simplo_db', DB_VER=1;
+let db=null;
+
+function abrirDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('disciplinas'))d.createObjectStore('disciplinas',{keyPath:'id'});
+      if(!d.objectStoreNames.contains('eventos'))d.createObjectStore('eventos',{keyPath:'id'});
+      if(!d.objectStoreNames.contains('fila'))d.createObjectStore('fila',{keyPath:'id',autoIncrement:true});
+    };
+    req.onsuccess=e=>{db=e.target.result;res(db)};
+    req.onerror=()=>rej(req.error);
+  });
+}
+
+function dbSalvar(store,dados){
+  return new Promise((res,rej)=>{
+    if(!db)return res();
+    const tx=db.transaction(store,'readwrite');
+    const s=tx.objectStore(store);
+    if(Array.isArray(dados))dados.forEach(d=>s.put(d));
+    else s.put(dados);
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+
+function dbLer(store){
+  return new Promise((res,rej)=>{
+    if(!db)return res([]);
+    const tx=db.transaction(store,'readonly');
+    const req=tx.objectStore(store).getAll();
+    req.onsuccess=()=>res(req.result||[]);
+    req.onerror=()=>rej(req.error);
+  });
+}
+
+function dbDeletar(store,id){
+  return new Promise((res,rej)=>{
+    if(!db)return res();
+    const tx=db.transaction(store,'readwrite');
+    tx.objectStore(store).delete(id);
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+
+function dbAdicionarFila(acao){
+  return new Promise((res,rej)=>{
+    if(!db)return res();
+    const tx=db.transaction('fila','readwrite');
+    tx.objectStore('fila').add({...acao,ts:Date.now()});
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+
+function dbLimparFila(){
+  return new Promise((res,rej)=>{
+    if(!db)return res();
+    const tx=db.transaction('fila','readwrite');
+    tx.objectStore('fila').clear();
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+
+// Status de conexão
+let isOnline=navigator.onLine;
+function atualizarStatusOnline(){
+  const wasOffline=!isOnline;
+  isOnline=navigator.onLine;
+  const banner=$('offline-banner');
+  if(banner)banner.style.display=isOnline?'none':'flex';
+  if(isOnline&&wasOffline){
+    sincronizarFila();
+    // Recarregar dados do servidor
+    if(U)loadAll().then(()=>{badges();render()});
+  }
+}
+window.addEventListener('online',atualizarStatusOnline);
+window.addEventListener('offline',atualizarStatusOnline);
+
+async function sincronizarFila(){
+  if(!db||!isOnline)return;
+  const fila=await dbLer('fila');
+  if(!fila.length)return;
+  console.log(`Sincronizando ${fila.length} ações offline...`);
+  for(const acao of fila){
+    try{
+      if(acao.tipo==='insert_evento'){
+        const{id,...ev}=acao.dados;
+        await SB.from('eventos').insert({...ev,user_id:U.id});
+      } else if(acao.tipo==='update_evento'){
+        await SB.from('eventos').update(acao.dados).eq('id',acao.dados.id);
+      } else if(acao.tipo==='delete_evento'){
+        await SB.from('eventos').delete().eq('id',acao.dados.id);
+      } else if(acao.tipo==='insert_disc'){
+        const{id,...d}=acao.dados;
+        await SB.from('disciplinas').insert({...d,user_id:U.id});
+      }
+    }catch(e){console.log('Sync erro:',e.message)}
+  }
+  await dbLimparFila();
+  // Recarregar dados limpos do servidor
+  await loadAll();
+  badges();render();
+  mostrarToast('✅ Dados sincronizados!');
+}
+
+function mostrarToast(msg){
+  let t=$('simplo-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='simplo-toast';
+    t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#082F49;color:#fff;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:700;z-index:9999;transition:opacity .3s;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',3000);
+}
 
 // ── SERVICE WORKER ──
 if('serviceWorker' in navigator){
