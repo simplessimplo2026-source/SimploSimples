@@ -1963,7 +1963,7 @@ function salvarCfg(){
   if(!v.startsWith('sk-')){alert('Key deve começar com sk-');return}
   localStorage.setItem('oai_key',v);closeModal('cfg');alert('✓ Key salva!');
 }
-function removeKey(){if(!await confirmar('A chave será removida do navegador.','Remover API Key?','🔑','danger','Remover'))return;localStorage.removeItem('oai_key');closeModal('cfg')}
+async function removeKey(){if(!await confirmar('A chave será removida do navegador.','Remover API Key?','🔑','danger','Remover'))return;localStorage.removeItem('oai_key');closeModal('cfg')}
 
 // ── IMPORT ──
 function openImport(){
