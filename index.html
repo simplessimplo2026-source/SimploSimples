@@ -689,6 +689,24 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 #progress-bar.loading{opacity:1;animation:progressPulse 1.5s ease infinite}
 @keyframes progressPulse{0%{width:15%}50%{width:75%}100%{width:85%}}
 #progress-bar.done{width:100%!important;opacity:0;transition:width .1s,opacity .5s .1s}
+/* ── MODAL DE CONFIRMAÇÃO ── */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99990;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--surface);border-radius:20px;padding:28px 24px 20px;width:100%;max-width:320px;box-shadow:0 24px 60px rgba(0,0,0,.2);text-align:center;animation:modalIn .2s ease}
+.confirm-icon{font-size:40px;margin-bottom:10px}
+.confirm-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.confirm-msg{font-size:13px;color:var(--text-3);line-height:1.5;margin-bottom:20px}
+.confirm-btns{display:flex;gap:10px}
+.confirm-btn-cancel{flex:1;padding:12px;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-2);font-family:inherit}
+.confirm-btn-ok{flex:1;padding:12px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff}
+.confirm-btn-ok.danger{background:var(--red)}
+.confirm-btn-ok.primary{background:linear-gradient(135deg,var(--brand),var(--brand-mid))}
+
+/* ── PROGRESS BAR ── */
+#progress-bar{position:fixed;top:0;left:0;z-index:99999;height:3px;background:linear-gradient(90deg,var(--brand),var(--brand-mid));border-radius:0 2px 2px 0;width:0%;opacity:0;pointer-events:none;transition:opacity .3s}
+#progress-bar.loading{opacity:1;animation:progressAnim 1.5s ease infinite}
+#progress-bar.done{width:100%!important;opacity:0;transition:width .1s,opacity .5s .2s}
+@keyframes progressAnim{0%{width:10%}50%{width:70%}100%{width:85%}}
 </style>
 </head>
 <body>
@@ -765,6 +783,22 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 <!-- OFFLINE BANNER -->
 <div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9500;background:#F59E0B;color:#fff;padding:8px 16px;font-size:12px;font-weight:700;align-items:center;justify-content:center;gap:8px;text-align:center">
   📵 Você está offline — suas alterações serão salvas e sincronizadas quando a conexão voltar
+</div>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar"></div>
+
+<!-- MODAL: CONFIRMAÇÃO -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="confirm-title" id="confirm-title">Tem certeza?</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="confirm-btn-cancel" onclick="confirmarNao()">Cancelar</button>
+      <button class="confirm-btn-ok danger" id="confirm-ok" onclick="confirmarSim()">Confirmar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ONBOARDING -->
@@ -1401,17 +1435,7 @@ async function doAuth(){
   }
 }
 
-async function doForgot(){
-  const email=$('a-email').value.trim();
-  if(!email){aMsg('Digite seu email primeiro!','error');return}
-  $('auth-btn').textContent='Enviando...';$('auth-btn').disabled=true;
-  const{error}=await SB.auth.resetPasswordForEmail(email,{
-    redirectTo:window.location.origin+window.location.pathname
-  });
-  $('auth-btn').textContent='Entrar';$('auth-btn').disabled=false;
-  if(error)aMsg(error.message,'error');
-  else aMsg('✓ Email enviado! Verifique sua caixa de entrada.','success');
-}
+
 async function doLogout(){
   try{await SB.auth.signOut()}catch(e){}
   window.location.reload();
@@ -1736,6 +1760,7 @@ function btnLoading(btnId, loading, textoOriginal, textoLoading='Salvando...'){
 }
 
 async function salvarEvento(){
+  startLoading();
   const nome=$('e-nome').value.trim(),data=$('e-data').value;
   if(!nome||!data){mostrarToast('⚠️ Preencha nome e data!');return}
   if(!U){mostrarToast('⚠️ Sessão expirada!');return}
@@ -1782,7 +1807,7 @@ async function salvarEvento(){
 }
 
 async function delEvento(){
-  if(!confirm('Excluir evento?'))return;
+  if(!await confirmar('Esta ação não pode ser desfeita.','Excluir evento?','🗑️','danger','Excluir'))return;
   btnLoading('btn-del-ev',true,'🗑 Excluir','Excluindo...');
   startLoading();
 
@@ -1834,6 +1859,7 @@ function openDisc(id){
 }
 
 async function salvarDisc(){
+  startLoading();
   const nome=$('d-nome').value.trim();
   if(!nome){mostrarToast('⚠️ Informe o nome!');return}
   if(!U){mostrarToast('⚠️ Sessão expirada!');return}
@@ -1878,7 +1904,7 @@ async function salvarDisc(){
 }
 
 async function delDisc(){
-  if(!confirm('Excluir disciplina?'))return;
+  if(!await confirmar('Os eventos perderão o vínculo.','Excluir disciplina?','🗑️','danger','Excluir'))return;
   btnLoading('btn-del-disc',true,'🗑','Excluindo...');
   startLoading();
 
@@ -1901,13 +1927,7 @@ async function delDisc(){
 }
 
 // ── CONFIG ──
-function openCfg(){
-  const k=oai();
-  $('cfg-key').value=k?'••••••••••••••••':'';
-  $('cfg-status').textContent=k?'✓ Key configurada':'✗ Nenhuma key';
-  $('cfg-status').style.color=k?'var(--green)':'var(--red)';
-  $('m-cfg').classList.add('open');
-}
+
 function salvarCfg(){
   const v=$('cfg-key').value.trim();
   if(!v||v.startsWith('•')){alert('Digite uma key válida!');return}
@@ -2129,7 +2149,7 @@ async function salvarEdicaoTarefa() {
 }
 
 async function deletarTarefa() {
-  if (!confirm('Excluir tarefa?')) return;
+  if (!await confirmar('A tarefa será removida.','Excluir tarefa?','🗑️','danger','Excluir')) return;
   await SB.from('grupo_tarefas').delete().eq('id', tarefaEditId);
   closeModal('editar-tarefa');
   await carregarDadosGrupo();
@@ -2160,19 +2180,7 @@ function compartilharWpp(id) {
 }
 
 // ── DARK MODE ──
-function applyDark(on) {
-  document.documentElement.setAttribute('data-theme', on ? 'dark' : '');
-  const toggle = document.getElementById('dark-toggle');
-  const knob = document.getElementById('dark-knob');
-  if (toggle) toggle.style.background = on ? '#3B82F6' : '';
-  if (knob) knob.style.left = on ? '22px' : '2px';
-}
 
-function toggleDark() {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  applyDark(!isDark);
-  localStorage.setItem('dark_mode', isDark ? '0' : '1');
-}
 
 // ── PERFIL ──
 let perfil = null;
@@ -2679,7 +2687,7 @@ async function uploadArquivo(e) {
 }
 
 async function deletarArquivo(btn) {
-  if (!confirm('Excluir este arquivo?')) return;
+  if (!await confirmar('O arquivo será removido.','Excluir arquivo?','🗑️','danger','Excluir')) return;
   const path = btn.getAttribute('data-path');
   const id = btn.getAttribute('data-id');
   await SB.storage.from('grupo-arquivos').remove([path]);
@@ -2690,7 +2698,7 @@ async function deletarArquivo(btn) {
 
 
 async function excluirGrupo() {
-  if (!confirm('Excluir o grupo "'+grupoAtual.nome+'"? Todos os dados serão perdidos.')) return;
+  if (!await confirmar('Todos os dados serão perdidos.',`Excluir "${grupoAtual.nome}"?`,'🗑️','danger','Excluir')) return;
   if (!confirm('Tem certeza? Esta ação não pode ser desfeita!')) return;
   // Deletar arquivos do storage
   const { data: arqs } = await SB.from('grupo_arquivos').select('storage_path').eq('grupo_id', grupoAtual.id);
@@ -3567,6 +3575,26 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/SimploSimples/sw.js')
     .then(()=>console.log('SW ok')).catch(e=>console.log('SW erro:',e));
 }
+
+// ── MODAL CONFIRMAÇÃO ──
+let _confirmResolve=null;
+function confirmar(msg,titulo='Tem certeza?',icone='🗑️',tipo='danger',okTexto='Confirmar'){
+  return new Promise(res=>{
+    _confirmResolve=res;
+    $('confirm-icon').textContent=icone;
+    $('confirm-title').textContent=titulo;
+    $('confirm-msg').textContent=msg;
+    $('confirm-ok').textContent=okTexto;
+    $('confirm-ok').className='confirm-btn-ok '+tipo;
+    $('confirm-overlay').classList.add('open');
+  });
+}
+function confirmarSim(){$('confirm-overlay').classList.remove('open');if(_confirmResolve){_confirmResolve(true);_confirmResolve=null;}}
+function confirmarNao(){$('confirm-overlay').classList.remove('open');if(_confirmResolve){_confirmResolve(false);_confirmResolve=null;}}
+
+// ── PROGRESS BAR ──
+function startLoading(){const b=$('progress-bar');if(b){b.className='loading';}}
+function stopLoading(){const b=$('progress-bar');if(b){b.className='done';setTimeout(()=>{b.className='';},600);}}
 
 init();
 </script>
