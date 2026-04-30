@@ -1,4 +1,4 @@
-const CACHE = 'simplo-v3';
+const CACHE = 'simplo-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -74,4 +74,19 @@ self.addEventListener('push', e => {
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(clients.openWindow(e.notification.data || './'));
+});
+
+// Receber mensagens do app para mostrar notificações
+self.addEventListener('message', e => {
+  if (e.data?.type === 'NOTIFY') {
+    self.registration.showNotification(e.data.title, {
+      body: e.data.body,
+      icon: './logo.svg',
+      badge: './logo.svg',
+      tag: e.data.tag,
+      renotify: false,
+      vibrate: [200, 100, 200],
+      data: { url: './' }
+    });
+  }
 });
