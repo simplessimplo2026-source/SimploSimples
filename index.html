@@ -1498,7 +1498,6 @@ async function boot(u){
 
 // ── DATA ──
 async function loadAll(){
-  startLoading();
   if(!isOnline){
     // Carregar do cache local
     discs=await dbLer('disciplinas');
