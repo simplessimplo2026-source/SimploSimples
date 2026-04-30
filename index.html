@@ -1703,14 +1703,25 @@ function openEvento(id,preDate){
   $('m-evento').classList.add('open');
   setTimeout(initFlatpickr, 50);
 }
+// ── LOADING DE BOTÃO ──
+function btnLoading(btnId, loading, textoOriginal, textoLoading='Salvando...'){
+  const btn=$(btnId);
+  if(!btn)return;
+  btn.disabled=loading;
+  btn.textContent=loading?textoLoading:textoOriginal;
+  btn.style.opacity=loading?'0.7':'1';
+}
+
 async function salvarEvento(){
   const nome=$('e-nome').value.trim(),data=$('e-data').value;
-  if(!nome||!data){alert('Preencha nome e data!');return}
-  if(!U){alert('Sessão expirada!');return}
+  if(!nome||!data){mostrarToast('⚠️ Preencha nome e data!');return}
+  if(!U){mostrarToast('⚠️ Sessão expirada!');return}
+  
+  btnLoading('btn-salvar-ev',true,'Salvar evento','Salvando...');
+  
   const ev={tipo:$('e-tipo').value,data,nome,disciplina_id:$('e-disc').value||null,hora:$('e-hora').value||'',notas:$('e-notas').value.trim(),concluido:$('e-done').checked,user_id:U.id};
 
   if(!isOnline){
-    // Offline — salvar localmente e adicionar à fila
     const id=evId||'offline_'+Date.now();
     const evLocal={...ev,id};
     if(evId){
@@ -1722,47 +1733,84 @@ async function salvarEvento(){
       await dbSalvar('eventos',evLocal);
       await dbAdicionarFila({tipo:'insert_evento',dados:evLocal});
     }
-    mostrarToast('💾 Salvo offline — será sincronizado em breve');
     closeModal('evento');badges();render();
+    mostrarToast('💾 Salvo offline!');
     return;
   }
 
-  const r=evId?await SB.from('eventos').update(ev).eq('id',evId):await SB.from('eventos').insert(ev);
-  if(r.error){alert('Erro: '+r.error.message);return}
-  await rEvts();
+  // Atualização otimista — fechar modal e atualizar tela imediatamente
+  const tempId='temp_'+Date.now();
+  if(!evId){
+    evts.push({...ev,id:tempId});
+    closeModal('evento');badges();render();
+  }
+
+  const r=evId
+    ?await SB.from('eventos').update(ev).eq('id',evId).select().single()
+    :await SB.from('eventos').insert(ev).select().single();
+
+  if(r.error){
+    // Reverter se erro
+    if(!evId)evts=evts.filter(e=>e.id!==tempId);
+    btnLoading('btn-salvar-ev',false,'Salvar evento');
+    mostrarToast('❌ Erro ao salvar: '+r.error.message);
+    return;
+  }
+
+  // Substituir temp pelo real
+  if(!evId){
+    evts=evts.map(e=>e.id===tempId?r.data:e);
+  } else {
+    evts=evts.map(e=>e.id===evId?{...e,...ev}:e);
+    closeModal('evento');
+  }
   if(db)await dbSalvar('eventos',evts);
-  closeModal('evento');badges();render();
+  badges();render();
+  mostrarToast('✅ Evento salvo!');
 }
 
 async function delEvento(){
   if(!confirm('Excluir evento?'))return;
+  btnLoading('btn-del-ev',true,'🗑 Excluir','Excluindo...');
+  
   if(!isOnline){
     evts=evts.filter(e=>e.id!==evId);
     await dbDeletar('eventos',evId);
     await dbAdicionarFila({tipo:'delete_evento',dados:{id:evId}});
-    mostrarToast('🗑 Removido offline');
     closeModal('evento');badges();render();
+    mostrarToast('🗑 Removido offline');
     return;
   }
-  await SB.from('eventos').delete().eq('id',evId);
-  await rEvts();
-  if(db)await dbSalvar('eventos',evts);
+
+  // Otimista — remover da tela imediatamente
+  const backup=[...evts];
+  evts=evts.filter(e=>e.id!==evId);
   closeModal('evento');badges();render();
+
+  const{error}=await SB.from('eventos').delete().eq('id',evId);
+  if(error){
+    evts=backup;badges();render();
+    mostrarToast('❌ Erro ao excluir!');
+    return;
+  }
+  if(db)await dbDeletar('eventos',evId);
+  mostrarToast('🗑 Evento excluído!');
 }
 
 async function toggleDone(id,atual){
   const novo=!atual;
+  // Otimista — atualizar imediatamente
   evts=evts.map(e=>e.id===id?{...e,concluido:novo}:e);
+  badges();render();
+
   if(!isOnline){
     const ev=evts.find(e=>e.id===id);
     if(ev)await dbSalvar('eventos',ev);
     await dbAdicionarFila({tipo:'update_evento',dados:{id,concluido:novo}});
-    badges();render();
     return;
   }
   await SB.from('eventos').update({concluido:novo}).eq('id',id);
   if(db){const ev=evts.find(e=>e.id===id);if(ev)await dbSalvar('eventos',ev);}
-  badges();render();
 }
 
 // ── DISCIPLINA ──
@@ -1780,21 +1828,63 @@ function openDisc(id){
   }
   $('m-disc').classList.add('open');
 }
+
 async function salvarDisc(){
   const nome=$('d-nome').value.trim();
-  if(!nome){alert('Informe o nome!');return}
-  if(!U){alert('Sessão expirada!');return}
+  if(!nome){mostrarToast('⚠️ Informe o nome!');return}
+  if(!U){mostrarToast('⚠️ Sessão expirada!');return}
+
+  btnLoading('btn-salvar-disc',true,'Salvar','Salvando...');
+
   const d={nome,prof:$('d-prof').value.trim(),cor:$('d-cor').value,user_id:U.id};
-  const r=discId?await SB.from('disciplinas').update(d).eq('id',discId):await SB.from('disciplinas').insert(d);
-  if(r.error){alert('Erro: '+r.error.message);return}
-  await rDiscs();closeModal('disc');render();
+
+  // Otimista
+  const tempId='temp_'+Date.now();
+  if(!discId){
+    discs.push({...d,id:tempId});
+    closeModal('disc');render();
+  }
+
+  const r=discId
+    ?await SB.from('disciplinas').update(d).eq('id',discId).select().single()
+    :await SB.from('disciplinas').insert(d).select().single();
+
+  if(r.error){
+    if(!discId)discs=discs.filter(d=>d.id!==tempId);
+    btnLoading('btn-salvar-disc',false,'Salvar');
+    mostrarToast('❌ Erro: '+r.error.message);
+    return;
+  }
+
+  if(!discId){
+    discs=discs.map(d=>d.id===tempId?r.data:d);
+  } else {
+    discs=discs.map(d=>d.id===discId?{...d,...d,...r.data}:d);
+    closeModal('disc');
+  }
+  if(db)await dbSalvar('disciplinas',discs);
+  render();
+  mostrarToast('✅ Disciplina salva!');
 }
+
 async function delDisc(){
   if(!confirm('Excluir disciplina?'))return;
-  await SB.from('eventos').update({disciplina_id:null}).eq('disciplina_id',discId);
-  await SB.from('disciplinas').delete().eq('id',discId);
-  await Promise.all([rDiscs(),rEvts()]);
+  btnLoading('btn-del-disc',true,'🗑','Excluindo...');
+
+  const backup=[...discs];
+  discs=discs.filter(d=>d.id!==discId);
   closeModal('disc');render();
+
+  await SB.from('eventos').update({disciplina_id:null}).eq('disciplina_id',discId);
+  const{error}=await SB.from('disciplinas').delete().eq('id',discId);
+  if(error){
+    discs=backup;render();
+    mostrarToast('❌ Erro ao excluir!');
+    return;
+  }
+  evts=evts.map(e=>e.disciplina_id===discId?{...e,disciplina_id:null}:e);
+  if(db){await dbSalvar('disciplinas',discs);await dbSalvar('eventos',evts);}
+  mostrarToast('🗑 Disciplina excluída!');
 }
 
 // ── CONFIG ──
@@ -2919,25 +3009,48 @@ function votacaoHTML(v){
   const opcoes=v.opcoes||[];
   const totalVotos=grupoVotos.filter(vt=>vt.votacao_id===v.id).length;
   const meuVoto=grupoVotos.find(vt=>vt.votacao_id===v.id&&vt.user_id===U.id);
+  const souCriador=v.criado_por===U.id;
+  const encerrada=v.encerrada||false;
+
   const opcoesHtml=opcoes.map((op,i)=>{
     const qtd=grupoVotos.filter(vt=>vt.votacao_id===v.id&&vt.opcao_index===i).length;
     const pct=totalVotos>0?Math.round((qtd/totalVotos)*100):0;
     const votei=meuVoto?.opcao_index===i;
+    const podeVotar=!meuVoto&&!encerrada;
     return`<div class="votacao-opcao">
-      <button class="votacao-opcao-btn${votei?' votado':''}" onclick="votar('${v.id}',${i})">
-        <div class="votacao-barra" style="width:${meuVoto?pct:0}%"></div>
-        <span style="position:relative">${op}${meuVoto?` — ${pct}% (${qtd})`:''}</span>
+      <button class="votacao-opcao-btn${votei?' votado':''}" 
+        onclick="${podeVotar?`votar('${v.id}',${i})`:'mostrarToast(\"'+(encerrada?'Votação encerrada':'Você já votou!')+'\")'}">
+        <div class="votacao-barra" style="width:${pct}%"></div>
+        <span style="position:relative;display:flex;align-items:center;justify-content:space-between;width:100%">
+          <span>${op}${votei?' ✓':''}</span>
+          <span style="font-size:11px;opacity:.7">${pct}% (${qtd})</span>
+        </span>
       </button>
     </div>`;
   }).join('');
+
   const criador=grupoMembros.find(m=>m.user_id===v.criado_por);
+  const statusBadge=encerrada
+    ?'<span style="background:var(--red-light);color:var(--red);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Encerrada</span>'
+    :'<span style="background:var(--green-light);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Aberta</span>';
+
+  const adminBtns=souCriador?`
+    <div style="display:flex;gap:6px;margin-top:10px">
+      ${!encerrada?`<button onclick="encerrarVotacao('${v.id}')" class="btn btn-secondary btn-sm" style="font-size:11px">🔒 Encerrar</button>`:''}
+      <button onclick="excluirVotacao('${v.id}')" class="btn btn-danger btn-sm" style="font-size:11px">🗑 Excluir</button>
+    </div>`:'';
+
   return`<div class="votacao-card">
-    <div class="votacao-pergunta">🗳️ ${v.pergunta}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="votacao-pergunta" style="margin-bottom:0">🗳️ ${v.pergunta}</div>
+      ${statusBadge}
+    </div>
     ${opcoesHtml}
     <div class="votacao-meta">
       <span>${criador?.nome||'Membro'}</span>
-      <span>${totalVotos} voto${totalVotos!==1?'s':''}</span>
+      <span>${totalVotos} voto${totalVotos!==1?'s':''} · ${meuVoto?'Você votou':'Não votou'}</span>
     </div>
+    ${adminBtns}
   </div>`;
 }
 
@@ -2987,6 +3100,24 @@ async function votar(votacaoId,opcaoIndex){
   if(error){alert('Erro: '+error.message);return}
   await carregarVotacoes();
   renderAbaGrupo();
+}
+
+async function encerrarVotacao(id){
+  if(!confirm('Encerrar votação? Ninguém mais poderá votar.'))return;
+  const{error}=await SB.from('votacoes').update({encerrada:true}).eq('id',id);
+  if(error){alert('Erro: '+error.message);return}
+  await carregarVotacoes();
+  renderAbaGrupo();
+}
+
+async function excluirVotacao(id){
+  if(!confirm('Excluir votação? Esta ação não pode ser desfeita.'))return;
+  await SB.from('votos').delete().eq('votacao_id',id);
+  const{error}=await SB.from('votacoes').delete().eq('id',id);
+  if(error){alert('Erro: '+error.message);return}
+  await carregarVotacoes();
+  renderAbaGrupo();
+  mostrarToast('🗑 Votação excluída');
 }
 
 // ── RELATÓRIO MENSAL ──
