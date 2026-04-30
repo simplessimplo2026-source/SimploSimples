@@ -1427,17 +1427,7 @@ async function doAuth(){
   }
 }
 
-async function doForgot(){
-  const email=$('a-email').value.trim();
-  if(!email){aMsg('Digite seu email primeiro!','error');return}
-  $('auth-btn').textContent='Enviando...';$('auth-btn').disabled=true;
-  const{error}=await SB.auth.resetPasswordForEmail(email,{
-    redirectTo:window.location.origin+window.location.pathname
-  });
-  $('auth-btn').textContent='Entrar';$('auth-btn').disabled=false;
-  if(error)aMsg(error.message,'error');
-  else aMsg('✓ Email enviado! Verifique sua caixa de entrada.','success');
-}
+// doForgot moved below
 async function doLogout(){
   try{await SB.auth.signOut()}catch(e){}
   window.location.reload();
@@ -1949,13 +1939,7 @@ async function delDisc(){
 }
 
 // ── CONFIG ──
-function openCfg(){
-  const k=oai();
-  $('cfg-key').value=k?'••••••••••••••••':'';
-  $('cfg-status').textContent=k?'✓ Key configurada':'✗ Nenhuma key';
-  $('cfg-status').style.color=k?'var(--green)':'var(--red)';
-  $('m-cfg').classList.add('open');
-}
+// openCfg moved to premium section
 function salvarCfg(){
   const v=$('cfg-key').value.trim();
   if(!v||v.startsWith('•')){alert('Digite uma key válida!');return}
@@ -2099,13 +2083,13 @@ document.getElementById('btn-criar-grupo') && document.getElementById('btn-criar
 document.getElementById('btn-entrar-grupo') && document.getElementById('btn-entrar-grupo').addEventListener('click', function(e) {
   e.preventDefault(); e.stopPropagation(); entrarGrupo();
 });
-document.getElementById('btn-salvar-disc').addEventListener('click', function(e) {
+document.getElementById('btn-salvar-disc')?.addEventListener('click', function(e) {
   e.preventDefault(); e.stopPropagation(); salvarDisc();
 });
-document.getElementById('btn-salvar-ev').addEventListener('click', function(e) {
+document.getElementById('btn-salvar-ev')?.addEventListener('click', function(e) {
   e.preventDefault(); e.stopPropagation(); salvarEvento();
 });
-document.getElementById('btn-confirmar').addEventListener('click', function(e) {
+document.getElementById('btn-confirmar')?.addEventListener('click', function(e) {
   e.preventDefault(); e.stopPropagation(); confirmarImport();
 });
 
