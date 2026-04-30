@@ -684,6 +684,11 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 .votacao-opcao-btn.votado{border-color:var(--brand);background:var(--brand-light);color:var(--brand)}
 .votacao-barra{position:absolute;left:0;top:0;bottom:0;background:rgba(14,165,233,0.12);border-radius:8px;transition:width .4s ease;pointer-events:none}
 .votacao-meta{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--text-3);font-weight:600}
+/* ── PROGRESS BAR (topo) ── */
+#progress-bar{position:fixed;top:0;left:0;z-index:99999;height:3px;background:linear-gradient(90deg,var(--brand),var(--brand-mid),var(--accent,#38BDF8));border-radius:0 2px 2px 0;width:0%;transition:width .3s ease,opacity .4s ease;opacity:0;pointer-events:none}
+#progress-bar.loading{opacity:1;animation:progressPulse 1.5s ease infinite}
+@keyframes progressPulse{0%{width:15%}50%{width:75%}100%{width:85%}}
+#progress-bar.done{width:100%!important;opacity:0;transition:width .1s,opacity .5s .1s}
 </style>
 </head>
 <body>
@@ -753,6 +758,9 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
     </div>
   </div>
 </div>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar"></div>
 
 <!-- OFFLINE BANNER -->
 <div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9500;background:#F59E0B;color:#fff;padding:8px 16px;font-size:12px;font-weight:700;align-items:center;justify-content:center;gap:8px;text-align:center">
@@ -1464,6 +1472,7 @@ async function boot(u){
 
 // ── DATA ──
 async function loadAll(){
+  startLoading();
   if(!isOnline){
     // Carregar do cache local
     discs=await dbLer('disciplinas');
@@ -1481,6 +1490,7 @@ async function loadAll(){
     await dbSalvar('disciplinas',discs);
     await dbSalvar('eventos',evts);
   }
+  stopLoading();
 }
 async function rDiscs(){const{data}=await SB.from('disciplinas').select('*').order('nome');discs=data||[]}
 async function rEvts(){const{data}=await SB.from('eventos').select('*').order('data');evts=data||[]}
@@ -1703,6 +1713,19 @@ function openEvento(id,preDate){
   $('m-evento').classList.add('open');
   setTimeout(initFlatpickr, 50);
 }
+// ── PROGRESS BAR ──
+function startLoading(){
+  const bar=$('progress-bar');
+  if(!bar)return;
+  bar.className='loading';
+}
+function stopLoading(){
+  const bar=$('progress-bar');
+  if(!bar)return;
+  bar.className='done';
+  setTimeout(()=>{bar.className='';bar.style.width='0%'},600);
+}
+
 // ── LOADING DE BOTÃO ──
 function btnLoading(btnId, loading, textoOriginal, textoLoading='Salvando...'){
   const btn=$(btnId);
@@ -1716,101 +1739,82 @@ async function salvarEvento(){
   const nome=$('e-nome').value.trim(),data=$('e-data').value;
   if(!nome||!data){mostrarToast('⚠️ Preencha nome e data!');return}
   if(!U){mostrarToast('⚠️ Sessão expirada!');return}
-  
+
   btnLoading('btn-salvar-ev',true,'Salvar evento','Salvando...');
-  
+  startLoading();
+
   const ev={tipo:$('e-tipo').value,data,nome,disciplina_id:$('e-disc').value||null,hora:$('e-hora').value||'',notas:$('e-notas').value.trim(),concluido:$('e-done').checked,user_id:U.id};
 
-  if(!isOnline){
-    const id=evId||'offline_'+Date.now();
-    const evLocal={...ev,id};
-    if(evId){
-      evts=evts.map(e=>e.id===evId?evLocal:e);
-      await dbSalvar('eventos',evLocal);
-      await dbAdicionarFila({tipo:'update_evento',dados:evLocal});
-    } else {
-      evts.push(evLocal);
-      await dbSalvar('eventos',evLocal);
-      await dbAdicionarFila({tipo:'insert_evento',dados:evLocal});
-    }
-    closeModal('evento');badges();render();
-    mostrarToast('💾 Salvo offline!');
-    return;
-  }
-
-  // Atualização otimista — fechar modal e atualizar tela imediatamente
+  // Atualização otimista — fechar modal imediatamente
   const tempId='temp_'+Date.now();
-  if(!evId){
+  const isNovo=!evId;
+  if(isNovo){
     evts.push({...ev,id:tempId});
-    closeModal('evento');badges();render();
-  }
-
-  const r=evId
-    ?await SB.from('eventos').update(ev).eq('id',evId).select().single()
-    :await SB.from('eventos').insert(ev).select().single();
-
-  if(r.error){
-    // Reverter se erro
-    if(!evId)evts=evts.filter(e=>e.id!==tempId);
-    btnLoading('btn-salvar-ev',false,'Salvar evento');
-    mostrarToast('❌ Erro ao salvar: '+r.error.message);
-    return;
-  }
-
-  // Substituir temp pelo real
-  if(!evId){
-    evts=evts.map(e=>e.id===tempId?r.data:e);
   } else {
     evts=evts.map(e=>e.id===evId?{...e,...ev}:e);
-    closeModal('evento');
   }
-  if(db)await dbSalvar('eventos',evts);
-  badges();render();
-  mostrarToast('✅ Evento salvo!');
+  closeModal('evento');badges();render();
+
+  try{
+    const promise=isNovo
+      ?SB.from('eventos').insert(ev).select().single()
+      :SB.from('eventos').update(ev).eq('id',evId).select().single();
+
+    // Timeout de 8 segundos
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout')),8000));
+    const r=await Promise.race([promise,timeout]);
+
+    if(r.error)throw new Error(r.error.message);
+
+    if(isNovo){
+      evts=evts.map(e=>e.id===tempId?r.data:e);
+    }
+    if(db)await dbSalvar('eventos',evts);
+    mostrarToast('✅ Evento salvo!');
+    stopLoading();
+  }catch(e){
+    // Reverter
+    if(isNovo)evts=evts.filter(e=>e.id!==tempId);
+    else await rEvts();
+    badges();render();
+    mostrarToast('❌ Erro: '+e.message+'. Tente novamente.');
+  }
 }
 
 async function delEvento(){
   if(!confirm('Excluir evento?'))return;
   btnLoading('btn-del-ev',true,'🗑 Excluir','Excluindo...');
-  
-  if(!isOnline){
-    evts=evts.filter(e=>e.id!==evId);
-    await dbDeletar('eventos',evId);
-    await dbAdicionarFila({tipo:'delete_evento',dados:{id:evId}});
-    closeModal('evento');badges();render();
-    mostrarToast('🗑 Removido offline');
-    return;
-  }
+  startLoading();
 
-  // Otimista — remover da tela imediatamente
   const backup=[...evts];
   evts=evts.filter(e=>e.id!==evId);
   closeModal('evento');badges();render();
 
-  const{error}=await SB.from('eventos').delete().eq('id',evId);
-  if(error){
+  try{
+    const{error}=await SB.from('eventos').delete().eq('id',evId);
+    if(error)throw new Error(error.message);
+    if(db)await dbDeletar('eventos',evId);
+    mostrarToast('🗑 Evento excluído!');
+  stopLoading();
+  }catch(e){
     evts=backup;badges();render();
-    mostrarToast('❌ Erro ao excluir!');
-    return;
+    mostrarToast('❌ Erro ao excluir. Tente novamente.');
+    stopLoading();
   }
-  if(db)await dbDeletar('eventos',evId);
-  mostrarToast('🗑 Evento excluído!');
 }
 
 async function toggleDone(id,atual){
   const novo=!atual;
-  // Otimista — atualizar imediatamente
   evts=evts.map(e=>e.id===id?{...e,concluido:novo}:e);
   badges();render();
-
-  if(!isOnline){
-    const ev=evts.find(e=>e.id===id);
-    if(ev)await dbSalvar('eventos',ev);
-    await dbAdicionarFila({tipo:'update_evento',dados:{id,concluido:novo}});
-    return;
+  try{
+    await SB.from('eventos').update({concluido:novo}).eq('id',id);
+    if(db){const ev=evts.find(e=>e.id===id);if(ev)await dbSalvar('eventos',ev);}
+  }catch(e){
+    // Reverter se falhar
+    evts=evts.map(e=>e.id===id?{...e,concluido:atual}:e);
+    badges();render();
   }
-  await SB.from('eventos').update({concluido:novo}).eq('id',id);
-  if(db){const ev=evts.find(e=>e.id===id);if(ev)await dbSalvar('eventos',ev);}
 }
 
 // ── DISCIPLINA ──
@@ -1835,56 +1839,65 @@ async function salvarDisc(){
   if(!U){mostrarToast('⚠️ Sessão expirada!');return}
 
   btnLoading('btn-salvar-disc',true,'Salvar','Salvando...');
+  startLoading();
 
   const d={nome,prof:$('d-prof').value.trim(),cor:$('d-cor').value,user_id:U.id};
-
-  // Otimista
+  const isNovo=!discId;
   const tempId='temp_'+Date.now();
-  if(!discId){
+
+  if(isNovo){
     discs.push({...d,id:tempId});
-    closeModal('disc');render();
-  }
-
-  const r=discId
-    ?await SB.from('disciplinas').update(d).eq('id',discId).select().single()
-    :await SB.from('disciplinas').insert(d).select().single();
-
-  if(r.error){
-    if(!discId)discs=discs.filter(d=>d.id!==tempId);
-    btnLoading('btn-salvar-disc',false,'Salvar');
-    mostrarToast('❌ Erro: '+r.error.message);
-    return;
-  }
-
-  if(!discId){
-    discs=discs.map(d=>d.id===tempId?r.data:d);
   } else {
-    discs=discs.map(d=>d.id===discId?{...d,...d,...r.data}:d);
-    closeModal('disc');
+    discs=discs.map(dc=>dc.id===discId?{...dc,...d}:dc);
   }
-  if(db)await dbSalvar('disciplinas',discs);
-  render();
-  mostrarToast('✅ Disciplina salva!');
+  closeModal('disc');render();
+
+  try{
+    const promise=isNovo
+      ?SB.from('disciplinas').insert(d).select().single()
+      :SB.from('disciplinas').update(d).eq('id',discId).select().single();
+
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout')),8000));
+    const r=await Promise.race([promise,timeout]);
+
+    if(r.error)throw new Error(r.error.message);
+
+    if(isNovo){
+      discs=discs.map(dc=>dc.id===tempId?r.data:dc);
+    }
+    if(db)await dbSalvar('disciplinas',discs);
+    render();
+    mostrarToast('✅ Disciplina salva!');
+    stopLoading();
+  }catch(e){
+    if(isNovo)discs=discs.filter(dc=>dc.id!==tempId);
+    else await rDiscs();
+    render();
+    mostrarToast('❌ Erro: '+e.message+'. Tente novamente.');
+  }
 }
 
 async function delDisc(){
   if(!confirm('Excluir disciplina?'))return;
   btnLoading('btn-del-disc',true,'🗑','Excluindo...');
+  startLoading();
 
   const backup=[...discs];
   discs=discs.filter(d=>d.id!==discId);
   closeModal('disc');render();
 
-  await SB.from('eventos').update({disciplina_id:null}).eq('disciplina_id',discId);
-  const{error}=await SB.from('disciplinas').delete().eq('id',discId);
-  if(error){
+  try{
+    await SB.from('eventos').update({disciplina_id:null}).eq('disciplina_id',discId);
+    const{error}=await SB.from('disciplinas').delete().eq('id',discId);
+    if(error)throw new Error(error.message);
+    evts=evts.map(e=>e.disciplina_id===discId?{...e,disciplina_id:null}:e);
+    if(db){await dbSalvar('disciplinas',discs);await dbSalvar('eventos',evts);}
+    mostrarToast('🗑 Disciplina excluída!');
+  stopLoading();
+  }catch(e){
     discs=backup;render();
-    mostrarToast('❌ Erro ao excluir!');
-    return;
+    mostrarToast('❌ Erro ao excluir. Tente novamente.');
   }
-  evts=evts.map(e=>e.disciplina_id===discId?{...e,disciplina_id:null}:e);
-  if(db){await dbSalvar('disciplinas',discs);await dbSalvar('eventos',evts);}
-  mostrarToast('🗑 Disciplina excluída!');
 }
 
 // ── CONFIG ──
