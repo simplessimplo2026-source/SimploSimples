@@ -2063,8 +2063,7 @@ async function analisar(){
   }
   btn.textContent='✨ Analisar com IA';btn.disabled=false;
 }
-async function confirmar(){
-  if(!U){alert('Sessão expirada!');return}
+async function confirmarImport(){
   const def=$('imp-disc-def').value;const ins=[];
   impEvts.forEach((ev,i)=>{
     if(!document.getElementById('ic'+i)?.checked||!ev.data)return;
@@ -2108,7 +2107,7 @@ document.getElementById('btn-salvar-ev').addEventListener('click', function(e) {
   e.preventDefault(); e.stopPropagation(); salvarEvento();
 });
 document.getElementById('btn-confirmar').addEventListener('click', function(e) {
-  e.preventDefault(); e.stopPropagation(); confirmar();
+  e.preventDefault(); e.stopPropagation(); confirmarImport();
 });
 
 
