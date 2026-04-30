@@ -689,6 +689,19 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
 #progress-bar.loading{opacity:1;animation:progressPulse 1.5s ease infinite}
 @keyframes progressPulse{0%{width:15%}50%{width:75%}100%{width:85%}}
 #progress-bar.done{width:100%!important;opacity:0;transition:width .1s,opacity .5s .1s}
+/* ── MODAL DE CONFIRMAÇÃO ── */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .2s}
+.confirm-overlay.open{opacity:1}
+.confirm-box{background:var(--surface);border-radius:20px;padding:28px 24px 20px;width:100%;max-width:340px;box-shadow:0 24px 60px rgba(0,0,0,.2);transform:scale(.95);transition:transform .2s;text-align:center}
+.confirm-overlay.open .confirm-box{transform:scale(1)}
+.confirm-icon{font-size:40px;margin-bottom:12px}
+.confirm-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.confirm-msg{font-size:13px;color:var(--text-3);line-height:1.5;margin-bottom:22px}
+.confirm-btns{display:flex;gap:10px}
+.confirm-btn-cancel{flex:1;padding:12px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-2);font-family:inherit;transition:all .15s}
+.confirm-btn-ok{flex:1;padding:12px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.confirm-btn-ok.danger{background:var(--red);color:#fff}
+.confirm-btn-ok.primary{background:linear-gradient(135deg,var(--brand),var(--brand-mid));color:#fff}
 </style>
 </head>
 <body>
@@ -755,6 +768,19 @@ body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)
         </div>
       </div>
       <button class="btn-auth" id="reset-btn" onclick="doReset()">Salvar nova senha</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAÇÃO -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="confirm-title" id="confirm-title">Tem certeza?</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="confirm-btn-cancel" onclick="confirmarNao()">Cancelar</button>
+      <button class="confirm-btn-ok danger" id="confirm-ok" onclick="confirmarSim()">Confirmar</button>
     </div>
   </div>
 </div>
@@ -1713,6 +1739,29 @@ function openEvento(id,preDate){
   $('m-evento').classList.add('open');
   setTimeout(initFlatpickr, 50);
 }
+// ── MODAL DE CONFIRMAÇÃO ──
+let _confirmResolve=null;
+
+function confirmar(msg, titulo='Tem certeza?', icone='🗑️', tipo='danger', okTexto='Confirmar'){
+  return new Promise(res=>{
+    _confirmResolve=res;
+    $('confirm-icon').textContent=icone;
+    $('confirm-title').textContent=titulo;
+    $('confirm-msg').textContent=msg;
+    $('confirm-ok').textContent=okTexto;
+    $('confirm-ok').className='confirm-btn-ok '+tipo;
+    $('confirm-overlay').classList.add('open');
+  });
+}
+function confirmarSim(){
+  $('confirm-overlay').classList.remove('open');
+  if(_confirmResolve){_confirmResolve(true);_confirmResolve=null;}
+}
+function confirmarNao(){
+  $('confirm-overlay').classList.remove('open');
+  if(_confirmResolve){_confirmResolve(false);_confirmResolve=null;}
+}
+
 // ── PROGRESS BAR ──
 function startLoading(){
   const bar=$('progress-bar');
@@ -1782,7 +1831,7 @@ async function salvarEvento(){
 }
 
 async function delEvento(){
-  if(!confirm('Excluir evento?'))return;
+  if(!await confirmar('Esta ação não pode ser desfeita.','Excluir evento?','🗑️','danger','Excluir'))return;
   btnLoading('btn-del-ev',true,'🗑 Excluir','Excluindo...');
   startLoading();
 
@@ -1878,7 +1927,7 @@ async function salvarDisc(){
 }
 
 async function delDisc(){
-  if(!confirm('Excluir disciplina?'))return;
+  if(!await confirmar('Todos os eventos desta disciplina perderão o vínculo.','Excluir disciplina?','🗑️','danger','Excluir'))return;
   btnLoading('btn-del-disc',true,'🗑','Excluindo...');
   startLoading();
 
@@ -1914,7 +1963,7 @@ function salvarCfg(){
   if(!v.startsWith('sk-')){alert('Key deve começar com sk-');return}
   localStorage.setItem('oai_key',v);closeModal('cfg');alert('✓ Key salva!');
 }
-function removeKey(){if(!confirm('Remover?'))return;localStorage.removeItem('oai_key');closeModal('cfg')}
+function removeKey(){if(!await confirmar('A chave será removida do navegador.','Remover API Key?','🔑','danger','Remover'))return;localStorage.removeItem('oai_key');closeModal('cfg')}
 
 // ── IMPORT ──
 function openImport(){
@@ -2129,7 +2178,7 @@ async function salvarEdicaoTarefa() {
 }
 
 async function deletarTarefa() {
-  if (!confirm('Excluir tarefa?')) return;
+  if (!await confirmar('Esta tarefa será removida do grupo.','Excluir tarefa?','🗑️','danger','Excluir')) return;
   await SB.from('grupo_tarefas').delete().eq('id', tarefaEditId);
   closeModal('editar-tarefa');
   await carregarDadosGrupo();
@@ -2679,7 +2728,7 @@ async function uploadArquivo(e) {
 }
 
 async function deletarArquivo(btn) {
-  if (!confirm('Excluir este arquivo?')) return;
+  if (!await confirmar('O arquivo será removido permanentemente.','Excluir arquivo?','🗑️','danger','Excluir')) return;
   const path = btn.getAttribute('data-path');
   const id = btn.getAttribute('data-id');
   await SB.storage.from('grupo-arquivos').remove([path]);
@@ -2690,8 +2739,7 @@ async function deletarArquivo(btn) {
 
 
 async function excluirGrupo() {
-  if (!confirm('Excluir o grupo "'+grupoAtual.nome+'"? Todos os dados serão perdidos.')) return;
-  if (!confirm('Tem certeza? Esta ação não pode ser desfeita!')) return;
+  if (!await confirmar('Todos os dados serão perdidos permanentemente.',`Excluir "${grupoAtual.nome}"?`,'🗑️','danger','Excluir')) return;
   // Deletar arquivos do storage
   const { data: arqs } = await SB.from('grupo_arquivos').select('storage_path').eq('grupo_id', grupoAtual.id);
   if (arqs && arqs.length) {
@@ -3116,7 +3164,7 @@ async function votar(votacaoId,opcaoIndex){
 }
 
 async function encerrarVotacao(id){
-  if(!confirm('Encerrar votação? Ninguém mais poderá votar.'))return;
+  if(!await confirmar('Ninguém mais poderá votar após isso.','Encerrar votação?','🔒','primary','Encerrar'))return;
   const{error}=await SB.from('votacoes').update({encerrada:true}).eq('id',id);
   if(error){alert('Erro: '+error.message);return}
   await carregarVotacoes();
@@ -3124,7 +3172,7 @@ async function encerrarVotacao(id){
 }
 
 async function excluirVotacao(id){
-  if(!confirm('Excluir votação? Esta ação não pode ser desfeita.'))return;
+  if(!await confirmar('Esta ação não pode ser desfeita.','Excluir votação?','🗑️','danger','Excluir'))return;
   await SB.from('votos').delete().eq('votacao_id',id);
   const{error}=await SB.from('votacoes').delete().eq('id',id);
   if(error){alert('Erro: '+error.message);return}
